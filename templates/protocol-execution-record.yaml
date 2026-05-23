@@ -1,0 +1,26 @@
+schema_version: 1
+task_id: ""
+selected_protocol: ""
+selection_reason: ""
+fpf_spec:
+  commit: ""
+  status: ""
+  warning: ""
+protocol_repo:
+  commit: ""
+  status: ""
+  warning: ""
+checklist_items:
+  - id: ""
+    text: ""
+    status: "" # done | not_applicable | blocked
+    reason: ""
+evidence:
+  sources_used: []
+  sources_rejected: []
+  sources_not_checked: []
+final_audit:
+  consistency_check: ""
+  temporal_adequacy_check: ""
+  alternative_route_check: ""
+  residual_risk: ""

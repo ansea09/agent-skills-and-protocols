@@ -1,0 +1,62 @@
+schema_version: 1
+repository: ansea09/fpf-codex-protocols
+default_branch: main
+purpose: >
+  Codex procedure layer for current FPF-backed task classification,
+  protocol routing, mandatory checklist execution, SOP explanations,
+  examples, and engineering-basis disclosure.
+
+freshness_policy:
+  update_on_start: true
+  fallback: use_cached_with_explicit_warning
+  disclose_commit_in_substantive_answers: true
+
+canonical_files:
+  definitions: protocols/00-definitions.md
+  classification: protocols/01-classification.md
+  routing_table: protocols/02-routing-table.md
+  simple_medium_checklist: protocols/checklists/simple-medium.md
+  complex_master_checklist: protocols/checklists/complex/00-master.md
+  complex_checklists:
+    intake_scope: protocols/checklists/complex/10-intake-scope.md
+    actors_roles_work: protocols/checklists/complex/20-actors-roles-work.md
+    sources_evidence: protocols/checklists/complex/30-sources-evidence.md
+    reasoning_answer: protocols/checklists/complex/40-reasoning-answer.md
+    final_audit: protocols/checklists/complex/50-final-audit.md
+  simple_medium_sop: protocols/sop/simple-medium-sop.md
+  complex_sop: protocols/sop/complex-sop.md
+  examples:
+    simple_medium: examples/simple-medium-example.md
+    complex: examples/complex-example.md
+  execution_record_template: templates/protocol-execution-record.yaml
+
+protocols:
+  simple_medium:
+    checklist: protocols/checklists/simple-medium.md
+    sop: protocols/sop/simple-medium-sop.md
+    default_for:
+      - direct factual explanation with low risk
+      - small coding change with local verification
+      - straightforward summary or rewrite
+      - bounded advice without high-stakes consequences
+  complex:
+    checklist_bundle: protocols/checklists/complex/00-master.md
+    sop: protocols/sop/complex-sop.md
+    default_for:
+      - high-stakes legal medical financial security or safety work
+      - multi-source research or current information
+      - architecture or cross-system design
+      - ambiguous ontology or multiple viewpoints
+      - user-visible product or large code change
+      - automation agent delegation or external publication
+
+completion_status_values:
+  - done
+  - not_applicable
+  - blocked
+
+hard_rules:
+  no_silent_skips: true
+  no_invented_facts: true
+  hypothesis_must_be_labeled: true
+  never_ignore_higher_priority_instructions: true
