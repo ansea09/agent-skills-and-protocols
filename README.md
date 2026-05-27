@@ -8,7 +8,7 @@ Canonical registry: [registry.yaml](registry.yaml)
 
 Skills index: [skills-index.md](skills-index.md)
 
-Plugin marketplace: [.agents/plugins/marketplace.json](.agents/plugins/marketplace.json)
+Plugin marketplace metadata: [.agents/plugins/marketplace.json](.agents/plugins/marketplace.json)
 
 ## Core Rule
 
@@ -28,7 +28,7 @@ Before any substantive answer, code edit, review, research task, plan, or delega
 - [skills-index.md](skills-index.md) - inventory of staged skills and their intended use.
 - [skills/](skills/) - staged public copies of local Codex skills.
 - [plugins/](plugins/) - Codex plugin distribution artifacts for reusable installable skill packages.
-- [.agents/plugins/marketplace.json](.agents/plugins/marketplace.json) - repo-local marketplace for plugin installation.
+- [.agents/plugins/marketplace.json](.agents/plugins/marketplace.json) - machine-readable repo-local catalog that tells Codex which plugins this repository exposes.
 - [docs/skill-artifact-model.md](docs/skill-artifact-model.md) - layer model for public staged copies, installed operational copies, private overlays, runtime dependencies, cache/state, outputs, and personal automation.
 - [docs/adr/0001-fpf-latest-architecture.md](docs/adr/0001-fpf-latest-architecture.md) - accepted architecture decisions for `fpf-latest`.
 - [docs/install.md](docs/install.md) - installation instructions for selected skills.
@@ -41,9 +41,9 @@ Before any substantive answer, code edit, review, research task, plan, or delega
 - [protocols/checklists/complex/00-master.md](protocols/checklists/complex/00-master.md) - mandatory complex checklist bundle.
 - [protocols/sop/simple-medium-sop.md](protocols/sop/simple-medium-sop.md) - explanations for the short checklist.
 - [protocols/sop/complex-sop.md](protocols/sop/complex-sop.md) - explanations for the complex checklist bundle.
-- [process-models/](process-models/) - reference process models, including the assistant-user interaction model used to align OpenAI/API-facing terms with protocol-local terms.
-- [examples/](examples/) - worked examples.
-- [examples/use-cases.md](examples/use-cases.md) - collaboration usage scenario for the staged monorepo.
+- [protocols/templates/protocol-execution-record.yaml](protocols/templates/protocol-execution-record.yaml) - protocol execution record template.
+- [docs/process-models/](docs/process-models/) - reference process models, including the assistant-user interaction model used to align OpenAI/API-facing terms with protocol-local terms.
+- [docs/examples.md](docs/examples.md) - worked examples and collaboration usage scenario.
 
 ## Staged Skills
 

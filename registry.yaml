@@ -26,10 +26,10 @@ canonical_files:
   simple_medium_sop: protocols/sop/simple-medium-sop.md
   complex_sop: protocols/sop/complex-sop.md
   examples:
-    simple_medium: examples/simple-medium-example.md
-    complex: examples/complex-example.md
-    use_cases: examples/use-cases.md
-  execution_record_template: templates/protocol-execution-record.yaml
+    simple_medium: docs/examples.md
+    complex: docs/examples.md
+    use_cases: docs/examples.md
+  execution_record_template: protocols/templates/protocol-execution-record.yaml
   skills_index: skills-index.md
   skill_artifact_model: docs/skill-artifact-model.md
   skill_install_instructions: docs/install.md
@@ -42,14 +42,14 @@ skills:
 
 process_models:
   assistant_user_interaction:
-    problem_frame: process-models/assistant-user-interaction/00-problem-frame.md
-    boundary_and_scope: process-models/assistant-user-interaction/01-boundary-and-scope.md
-    current_openai_process: process-models/assistant-user-interaction/02-current-openai-process.md
-    viewpoint_bundle: process-models/assistant-user-interaction/03-viewpoint-bundle.md
-    api_to_protocol_mapping: process-models/assistant-user-interaction/04-api-to-protocol-term-mapping.md
-    target_process: process-models/assistant-user-interaction/05-target-fpf-mediated-process.md
-    open_questions: process-models/assistant-user-interaction/06-open-questions.md
-    evidence_register: process-models/assistant-user-interaction/evidence-register.yaml
+    problem_frame: docs/process-models/assistant-user-interaction/00-problem-frame.md
+    boundary_and_scope: docs/process-models/assistant-user-interaction/01-boundary-and-scope.md
+    current_openai_process: docs/process-models/assistant-user-interaction/02-current-openai-process.md
+    viewpoint_bundle: docs/process-models/assistant-user-interaction/03-viewpoint-bundle.md
+    api_to_protocol_mapping: docs/process-models/assistant-user-interaction/04-api-to-protocol-term-mapping.md
+    target_process: docs/process-models/assistant-user-interaction/05-target-fpf-mediated-process.md
+    open_questions: docs/process-models/assistant-user-interaction/06-open-questions.md
+    evidence_register: docs/process-models/assistant-user-interaction/evidence-register.yaml
 
 protocols:
   simple_medium:
