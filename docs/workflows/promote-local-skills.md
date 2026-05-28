@@ -34,6 +34,8 @@ The local skill is the operational copy used by Codex. The staged public skill i
 
 This matters for review: a diff may mention local automation in docs, but no public skill should depend on `bin/codex-fpf`, `jobs/fpf-update`, `.fpf-update/`, `~/.local/state/codex-fpf/`, or a user-specific LaunchAgent.
 
+`doc-to-md` has one public skill surface: `skills/doc-to-md`. Personal conversion defaults such as preferred OCR language strings or audit-first habits belong in private local policy files, not in a second public skill and not in the plugin artifact. The staged `doc-to-md` copy is curated because publication docs, optional runtime boundaries, and plugin packaging need manual review.
+
 ## Skill Modes
 
 The publication manifest is [`../../skills/promote-manifest.yaml`](../../skills/promote-manifest.yaml).
@@ -66,14 +68,24 @@ scripts/validate-skills.sh
 scripts/validate-plugins.sh
 ```
 
-5. Review the diff:
+5. For `doc-to-md`, run the release gate before publishing:
+
+```bash
+scripts/validate-doc-to-md-release.sh
+```
+
+This is stricter than structural validation. It requires installed, staged, and
+plugin copies to match, checks compatibility frontmatter against the support
+matrix, reads `mdown-doctor --json`, and runs the synthetic regression corpus.
+
+6. Review the diff:
 
 ```bash
 git diff -- skills skills-index.md docs examples scripts registry.yaml README.md
 ```
 
-6. Update `skills-index.md`, install docs, validation docs, and use cases when the public surface changed.
-7. Commit and push only after manual review.
+7. Update `skills-index.md`, install docs, validation docs, and use cases when the public surface changed.
+8. Commit and push only after manual review.
 
 ## Safety Rules
 
@@ -82,6 +94,7 @@ git diff -- skills skills-index.md docs examples scripts registry.yaml README.md
 - Do not commit generated artifacts such as `.DS_Store`, `__pycache__`, or `.pyc`.
 - Do not publish secrets, absolute private paths, local state files, cache files, logs, or machine-specific source references.
 - Do not treat private overlays, runtime dependencies, cache/state files, generated outputs, or personal automation as public staged skill content.
+- Do not treat private local policy files as public staged skill content.
 - Do not overwrite curated skills with local operational copies unless the public-safe edits have been reapplied and reviewed.
 
 ## Expected Failure Modes

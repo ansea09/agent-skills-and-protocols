@@ -53,6 +53,26 @@ bash "$CODEX_SKILLS_TARGET/fpf-work-guide/scripts/fpf-work-guide-doctor" --write
 bash "$CODEX_SKILLS_TARGET/fpf-work-guide/scripts/update_fpf_context.sh"
 ```
 
+For `doc-to-md`, install the skill source first, then build the local runtime:
+
+```bash
+cp -R skills/doc-to-md "$CODEX_SKILLS_TARGET/"
+bash "$CODEX_SKILLS_TARGET/doc-to-md/scripts/install.sh"
+```
+
+Optional `doc-to-md` workflows are installed explicitly:
+
+```bash
+bash "$CODEX_SKILLS_TARGET/doc-to-md/scripts/install.sh" --book
+bash "$CODEX_SKILLS_TARGET/doc-to-md/scripts/install.sh" --ocr
+bash "$CODEX_SKILLS_TARGET/doc-to-md/scripts/install.sh" --all
+```
+
+For `doc-to-md --hash-locked`, use only a published profile for the target OS,
+architecture, and Python minor version. Current public profiles are documented
+in `skills/doc-to-md/references/python-profiles.md`; unlisted Python minors are
+candidate/unverified.
+
 Install all staged skills:
 
 ```bash
@@ -148,9 +168,10 @@ The plugin artifacts live at:
 
 ```text
 plugins/fpf-work-guide
+plugins/doc-to-md
 ```
 
-Each plugin bundles its public skill only. Plugins do not include personal launchers, LaunchAgents, session-start hooks, workspace jobs, cache, logs, local state files, private overlays, or generated outputs.
+Each plugin bundles its public skill only. Plugins do not include personal launchers, LaunchAgents, session-start hooks, workspace jobs, cache, logs, local state files, private overlays, private local policy files, runtime venvs, OCR binaries, or generated outputs.
 
 ## Artifact Layers
 
@@ -210,4 +231,6 @@ export FPF_ENV_STATE_DIR="$FPF_UPDATE_STATE_DIR"
 
 `fpf-work-guide` expects Git and network access when a refresh is required. On Unix-like shells it uses Bash and standard Unix utilities. On native Windows it uses the bundled PowerShell scripts. If network access is unavailable but a valid cache already exists, it can use the current cached copy and disclose that status. Its scripts may run `git reset --hard` only when the cache directory contains a valid `.fpf-cache-repo` marker whose kind, repository URL, and branch match the configured cache, when the cache repository's `origin` remote matches the configured FPF/protocol repository URL, or when `FPF_ALLOW_NONSTANDARD_CACHE_RESET=1` is explicitly set.
 
-This public repository currently stages only `fpf-work-guide`. Other local or private skills should stay outside the public staged `skills/` tree unless they are deliberately promoted later.
+`doc-to-md` expects trusted local files by default. Its public skill source may include reusable workflow profiles such as `Textbook Audit + OCR Profile`, but personal defaults belong in a private local policy file and are not installed as a second public skill.
+
+This public repository currently stages `fpf-work-guide` and `doc-to-md`. Other local or private skills should stay outside the public staged `skills/` tree unless they are deliberately promoted later.

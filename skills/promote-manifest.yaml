@@ -7,6 +7,9 @@ skills:
   - name: fpf-work-guide
     mode: auto
     reason: "Public copy can be generated from the local working skill after generated artifacts and private markers are removed."
+  - name: doc-to-md
+    mode: curated
+    reason: "Public copy includes reviewed publication docs, optional workflow boundaries, plugin packaging, and local-policy separation; do not overwrite mechanically without manual diff review."
 
 exclude_artifacts:
   - ".DS_Store"
@@ -18,4 +21,8 @@ required_checks:
   - private_marker_scan
   - skills_index_coverage
   - plugin_copy_drift_check
+  - installed_staged_plugin_release_drift_check_for_doc_to_md
+  - doc_to_md_compatibility_semantic_check
+  - doc_to_md_machine_readable_doctor_check
+  - doc_to_md_regression_snapshot_check_before_markitdown_upgrade
   - manual_git_diff_review
