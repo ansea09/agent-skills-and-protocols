@@ -2,6 +2,9 @@
 
 This directory contains Codex plugin distribution artifacts.
 
+For non-technical installation, start with the Russian prompt-first guide:
+[`../docs/install-plugins-for-nontechnical-users.md`](../docs/install-plugins-for-nontechnical-users.md).
+
 Plugins are the packaging layer for sharing reusable skills beyond one local checkout or one repo-scoped `.agents/skills` folder. A plugin may bundle one or more skills and, later, optional app mappings, MCP server configuration, lifecycle hooks, and presentation assets.
 
 Current plugins:

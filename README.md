@@ -1,5 +1,7 @@
 # Codex Skills and Protocols
 
+Russian version: [`README.ru.md`](README.ru.md)
+
 Installable Codex skills, plugin packages, and FPF-backed protocol docs for reproducible Codex work.
 
 Use this repository when you want to:
@@ -21,6 +23,9 @@ For the full inventory, see [`skills-index.md`](skills-index.md).
 ## Install Via Plugin
 
 Use plugin installation when you want the cleanest reusable distribution unit.
+
+Non-technical users should start with the Russian prompt-first guide:
+[`docs/install-plugins-for-nontechnical-users.md`](docs/install-plugins-for-nontechnical-users.md).
 
 This repository exposes plugin metadata here:
 
@@ -97,6 +102,7 @@ More detail: [`docs/validation.md`](docs/validation.md).
 | [`skills/`](skills/) | Public staged skill source. This is reviewable source, not necessarily the active local runtime copy. | Users installing manually and contributors reviewing skill behavior. |
 | [`.gitignore`](.gitignore) | Rules that keep local state and generated files out of the public artifact. | Maintainers. |
 | [`README.md`](README.md) | This entrypoint. | Everyone. |
+| [`README.ru.md`](README.ru.md) | Russian entrypoint. | Russian-speaking users. |
 | [`registry.yaml`](registry.yaml) | Canonical file registry and protocol routing anchors. | Maintainers and protocol tooling. |
 | [`skills-index.md`](skills-index.md) | Human-readable inventory of staged skills and runtime notes. | Users and maintainers. |
 

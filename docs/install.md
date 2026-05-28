@@ -2,6 +2,9 @@
 
 These instructions install selected skills from this repository for local use in Codex or another agent runtime.
 
+If you are not comfortable running installation commands manually, use the Russian prompt-first plugin guide:
+[`install-plugins-for-nontechnical-users.md`](install-plugins-for-nontechnical-users.md).
+
 ## Codex Install Targets
 
 Codex supports several skill discovery scopes. Use the smallest scope that matches the job:
@@ -165,6 +168,9 @@ export FPF_ENV_STATE_DIR="/absolute/path/to/fpf-env-state"
 ## Distribution Boundary
 
 Direct skill folders are appropriate for local authoring, repo-scoped workflows, and personal setup. For reusable distribution to other developers or teams, package the skill as a Codex plugin or expose it through a plugin marketplace. Plugins are the installable distribution unit when the skill should be shared beyond one local checkout.
+
+For non-technical plugin installation, use the prompt-first guide:
+[`install-plugins-for-nontechnical-users.md`](install-plugins-for-nontechnical-users.md).
 
 This repository includes a repo-local plugin marketplace at:
 
