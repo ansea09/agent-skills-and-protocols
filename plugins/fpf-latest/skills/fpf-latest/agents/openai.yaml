@@ -1,4 +1,0 @@
-interface:
-  display_name: "FPF Latest"
-  short_description: "Use current FPF context with refresh gate"
-  default_prompt: "Use $fpf-latest to run the FPF context refresh gate, then answer with current FPF chunks, specification fallback, and Codex protocols."

@@ -4,7 +4,7 @@ source_root: "${CODEX_HOME:-$HOME/.codex}/skills"
 target_root: "skills"
 
 skills:
-  - name: fpf-latest
+  - name: fpf-work-guide
     mode: auto
     reason: "Public copy can be generated from the local working skill after generated artifacts and private markers are removed."
 
@@ -17,4 +17,5 @@ required_checks:
   - structural_validation
   - private_marker_scan
   - skills_index_coverage
+  - plugin_copy_drift_check
   - manual_git_diff_review

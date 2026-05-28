@@ -4,6 +4,7 @@ set -eu
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 plugins_dir="$repo_root/plugins"
 marketplace="$repo_root/.agents/plugins/marketplace.json"
+only_plugin="${PLUGINS_VALIDATE_ONLY:-}"
 failed=0
 
 . "$repo_root/scripts/lib/skills-publication.sh"
@@ -18,7 +19,17 @@ if [ ! -f "$marketplace" ]; then
   failed=1
 fi
 
-if ! scan_private_markers "$plugins_dir"; then
+if [ -n "$only_plugin" ]; then
+  assert_safe_skill_name "$only_plugin" || failed=1
+  if [ ! -d "$plugins_dir/$only_plugin" ]; then
+    echo "ERROR: requested plugin is missing: plugins/$only_plugin" >&2
+    failed=1
+  fi
+  if ! scan_private_markers "$plugins_dir/$only_plugin"; then
+    echo "ERROR: private markers found under plugins/$only_plugin" >&2
+    failed=1
+  fi
+elif ! scan_private_markers "$plugins_dir"; then
   echo "ERROR: private markers found under plugins/" >&2
   failed=1
 fi
@@ -26,6 +37,9 @@ fi
 for plugin_dir in "$plugins_dir"/*; do
   [ -d "$plugin_dir" ] || continue
   plugin_name=$(basename "$plugin_dir")
+  if [ -n "$only_plugin" ] && [ "$plugin_name" != "$only_plugin" ]; then
+    continue
+  fi
   manifest="$plugin_dir/.codex-plugin/plugin.json"
 
   if [ ! -f "$manifest" ]; then
@@ -62,7 +76,7 @@ if manifest.get("skills") != "./skills/":
     errors.append("plugin.json skills must be ./skills/")
 
 if "hooks" in manifest:
-    errors.append("plugin.json must not declare hooks for the base public fpf-latest plugin")
+    errors.append("plugin.json must not declare hooks for the base public fpf-work-guide plugin")
 
 skills_dir = plugin_dir / "skills"
 if not skills_dir.is_dir():

@@ -13,7 +13,7 @@ Use this repository when you want to:
 
 | Skill | What it does | Best use case | Start here |
 | --- | --- | --- | --- |
-| [`fpf-latest`](skills/fpf-latest/) | Maintains and uses current cached FPF context and Codex FPF protocols. | FPF-backed reasoning, planning, review, coding, and source-backed answers. | [`plugins/fpf-latest`](plugins/fpf-latest/) or [`skills/fpf-latest`](skills/fpf-latest/) |
+| [`fpf-work-guide`](skills/fpf-work-guide/) | Maintains and uses current cached FPF context and Codex FPF protocols. | FPF-backed reasoning, planning, review, coding, and source-backed answers. | [`plugins/fpf-work-guide`](plugins/fpf-work-guide/) or [`skills/fpf-work-guide`](skills/fpf-work-guide/) |
 
 For the full inventory, see [`skills-index.md`](skills-index.md).
 
@@ -29,7 +29,7 @@ This repository exposes plugin metadata here:
 
 Available plugin packages:
 
-- [`plugins/fpf-latest`](plugins/fpf-latest/) - plugin package for the public `fpf-latest` skill.
+- [`plugins/fpf-work-guide`](plugins/fpf-work-guide/) - plugin package for the public `fpf-work-guide` skill.
 
 If your Codex setup supports repo-local plugin marketplace discovery, point it at this repository's marketplace metadata. If not, use the manual skill-folder install below.
 
@@ -44,11 +44,11 @@ export CODEX_SKILLS_TARGET="${CODEX_SKILLS_TARGET:-$HOME/.agents/skills}"
 mkdir -p "$CODEX_SKILLS_TARGET"
 ```
 
-Install `fpf-latest`:
+Install `fpf-work-guide`:
 
 ```bash
-cp -R skills/fpf-latest "$CODEX_SKILLS_TARGET/"
-bash "$CODEX_SKILLS_TARGET/fpf-latest/scripts/fpf-latest-doctor" --write-state
+cp -R skills/fpf-work-guide "$CODEX_SKILLS_TARGET/"
+bash "$CODEX_SKILLS_TARGET/fpf-work-guide/scripts/fpf-work-guide-doctor" --write-state
 ```
 
 For legacy/current local Codex setups that still load from `${CODEX_HOME:-$HOME/.codex}/skills`, or for Claude Code, WSL, and non-default paths, use the detailed instructions in [`docs/install.md`](docs/install.md).
@@ -63,7 +63,7 @@ Issues and PRs are useful for:
 - docs corrections;
 - adapting a skill to a real workflow without adding private local state to the public artifact.
 
-Include the skill name, OS/runtime, installation path, command you ran, and the relevant diagnostic output. For `fpf-latest`, include whether the run used fresh data or the current cached copy when that status is shown.
+Include the skill name, OS/runtime, installation path, command you ran, and the relevant diagnostic output. For `fpf-work-guide`, include whether the run used fresh data or the current cached copy when that status is shown.
 
 ## Validate Before Sharing
 
