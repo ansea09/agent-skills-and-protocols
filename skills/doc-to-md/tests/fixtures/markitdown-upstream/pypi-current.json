@@ -1,0 +1,12 @@
+{
+  "info": {
+    "name": "markitdown",
+    "version": "0.1.6",
+    "requires_python": ">=3.10",
+    "requires_dist": [
+      "magika~=0.6.1",
+      "markdownify",
+      "pdfminer.six"
+    ]
+  }
+}

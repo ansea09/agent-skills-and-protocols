@@ -1,0 +1,7 @@
+# Hash-locked optional book audit runtime for macOS arm64 / Python 3.13.
+# Generated from the exact pinned requirements and downloaded wheel artifacts.
+# Scope: macOS arm64, Python 3.13. Do not use this file as a universal cross-platform lock.
+# Install with: python -m pip install --require-hashes -r <this-file>
+
+PyMuPDF==1.27.2.3 \
+    --hash=sha256:660d93cb6da5bbddf11d3982ae27745dd3a9902d9f24cdb69adab83962294b5a

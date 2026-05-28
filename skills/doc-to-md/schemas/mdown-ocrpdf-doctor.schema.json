@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/doc-to-md/schemas/mdown-ocrpdf-doctor.schema.json",
+  "title": "doc-to-md OCR doctor result",
+  "type": "object",
+  "required": ["schema_version", "tool", "paths", "checks", "status", "exit_code"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [1]
+    },
+    "tool": {
+      "type": "string",
+      "enum": ["mdown-ocrpdf"]
+    },
+    "paths": {
+      "type": "object",
+      "required": ["python", "lockfile"],
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {
+        "python": {"type": "string"},
+        "lockfile": {"type": "string"}
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["level", "message"],
+        "additionalProperties": true,
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": ["ok", "warn", "fail", "info"]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ok", "warn", "fail"]
+    },
+    "exit_code": {
+      "type": "integer"
+    }
+  }
+}

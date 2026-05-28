@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
+BOOK_VENV="${DOC_TO_MD_BOOK_VENV:-$CODEX_HOME_DIR/tools/doc-to-md-book-venv}"
+BOOK_PYTHON="${DOC_TO_MD_BOOK_PYTHON:-$BOOK_VENV/bin/python}"
+BOOK_SCRIPT="${DOC_TO_MD_BOOK_SCRIPT:-$CODEX_HOME_DIR/skills/doc-to-md/scripts/mdown_book.py}"
+runtime_requirements="$BOOK_VENV/.doc-to-md-requirements"
+if [[ -z "${DOC_TO_MD_BOOK_REQUIREMENTS:-}" && -f "$runtime_requirements" ]]; then
+  DOC_TO_MD_BOOK_REQUIREMENTS="$(<"$runtime_requirements")"
+fi
+BOOK_REQUIREMENTS="${DOC_TO_MD_BOOK_REQUIREMENTS:-$CODEX_HOME_DIR/skills/doc-to-md/requirements-book.txt}"
+export DOC_TO_MD_BOOK_REQUIREMENTS="$BOOK_REQUIREMENTS"
+
+if [[ ! -x "$BOOK_PYTHON" ]]; then
+  printf 'mdown-book: book workflow Python not found at %s\n' "$BOOK_PYTHON" >&2
+  printf 'Rebuild with: python3 -m venv %q && %q -m pip install -r %q\n' \
+    "$BOOK_VENV" "$BOOK_VENV/bin/python" "$BOOK_REQUIREMENTS" >&2
+  exit 127
+fi
+
+exec "$BOOK_PYTHON" "$BOOK_SCRIPT" "$@"

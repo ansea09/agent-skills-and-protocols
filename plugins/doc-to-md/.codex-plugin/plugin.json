@@ -1,0 +1,39 @@
+{
+  "name": "doc-to-md",
+  "version": "0.1.0",
+  "description": "Local document-to-Markdown conversion skill with MarkItDown, reusable workflow profiles, optional PDF audit bundles, and optional OCR preprocessing.",
+  "author": {
+    "name": "ansea09"
+  },
+  "homepage": "https://github.com/ansea09/codex-skills-and-protocols",
+  "repository": "https://github.com/ansea09/codex-skills-and-protocols",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "skills",
+    "markdown",
+    "documents",
+    "markitdown",
+    "pdf",
+    "ocr"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Doc To Md",
+    "shortDescription": "Convert trusted local documents to Markdown.",
+    "longDescription": "Distributes the public doc-to-md skill for Codex. It wraps a pinned local MarkItDown runtime, supports protected -o output writes, reusable standard and textbook/OCR workflow profiles, optional PDF audit bundles, optional OCR preprocessing, and explicit platform and reproducibility boundaries.",
+    "developerName": "ansea09",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Doc To Md to convert this local file to Markdown.",
+      "Run doc-to-md doctor and convert this PDF.",
+      "Create a PDF audit bundle for this textbook.",
+      "Use the Textbook Audit + OCR Profile for this scanned PDF."
+    ],
+    "brandColor": "#4A6FA5"
+  }
+}
