@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
+SCRIPT="${DOC_TO_MD_CORE_DOCTOR_SCRIPT:-$CODEX_HOME_DIR/skills/doc-to-md/scripts/mdown_doctor.py}"
+MARKITDOWN_VENV="${MARKITDOWN_VENV:-$CODEX_HOME_DIR/tools/markitdown-core-venv}"
+runtime_requirements="$MARKITDOWN_VENV/.doc-to-md-requirements"
+if [[ -z "${MARKITDOWN_REQUIREMENTS:-}" && -f "$runtime_requirements" ]]; then
+  MARKITDOWN_REQUIREMENTS="$(<"$runtime_requirements")"
+fi
+MARKITDOWN_REQUIREMENTS="${MARKITDOWN_REQUIREMENTS:-$CODEX_HOME_DIR/skills/doc-to-md/requirements-core.txt}"
+PYTHON_BIN="${PYTHON:-python3}"
+export MARKITDOWN_REQUIREMENTS
+
+if [[ ! -f "$SCRIPT" ]]; then
+  printf 'mdown-doctor: doctor script not found: %s\n' "$SCRIPT" >&2
+  printf 'Run from an installed doc-to-md skill or set DOC_TO_MD_CORE_DOCTOR_SCRIPT.\n' >&2
+  exit 127
+fi
+
+exec "$PYTHON_BIN" "$SCRIPT" "$@"

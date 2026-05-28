@@ -1,0 +1,7 @@
+# Hash-locked optional book audit runtime for macos-intel-py312.
+# Generated from exact pinned requirements and downloaded wheel artifacts.
+# Scope: platform-specific. Do not use this file as a universal cross-platform lock.
+# Install with: python -m pip install --require-hashes -r <this-file>
+
+PyMuPDF==1.27.2.3 \
+    --hash=sha256:fc1bc3cae6e9e150b0dbb0a9221bdfd411d65f0db2fe359eaa22467d7cc2a05f

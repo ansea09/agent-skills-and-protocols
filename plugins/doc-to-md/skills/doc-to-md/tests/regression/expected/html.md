@@ -1,0 +1,3 @@
+# HTML Smoke
+
+Snapshot body.

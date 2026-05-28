@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
+SCRIPT="${DOC_TO_MD_REFRESH_LOCKS_SCRIPT:-$CODEX_HOME_DIR/skills/doc-to-md/scripts/refresh-locks.py}"
+PYTHON_BIN="${PYTHON:-python3}"
+
+if [[ ! -f "$SCRIPT" ]]; then
+  printf 'mdown-refresh-locks: refresh script not found: %s\n' "$SCRIPT" >&2
+  printf 'Run from a checked-out skill source with: python3 scripts/refresh-locks.py\n' >&2
+  exit 127
+fi
+
+exec "$PYTHON_BIN" "$SCRIPT" "$@"

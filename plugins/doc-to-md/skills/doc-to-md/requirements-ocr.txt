@@ -1,0 +1,3 @@
+# Optional OCR preprocessing dependencies for doc-to-md.
+# Keep this separate from core/book runtimes.
+ocrmypdf==17.4.2

@@ -1,0 +1,49 @@
+# Pinned runtime for the local MarkItDown core profile on macOS Intel / Python 3.12.
+# Rebuild with:
+#   python3 -m venv "$HOME/.codex/tools/markitdown-core-venv"
+#   "$HOME/.codex/tools/markitdown-core-venv/bin/python" -m pip install -r "$HOME/.codex/skills/doc-to-md/requirements-core.macos-intel-py312.txt"
+#
+# Scope: local PDF/DOCX/PPTX/XLS/XLSX plus base text/HTML/CSV/JSON/XML/ZIP support.
+# Excluded by design: Azure, YouTube, audio transcription, plugins/OCR LLM clients.
+# Refreshed by scripts/refresh-locks.py; review conversion output before publishing.
+# Intel-specific note: onnxruntime 1.26.0 does not publish a compatible macOS
+# x86_64 wheel for this profile. Keep the last available Intel-compatible
+# onnxruntime pin unless the MarkItDown/Magika dependency graph changes.
+beautifulsoup4==4.14.3
+certifi==2026.5.20
+cffi==2.0.0
+charset-normalizer==3.4.7
+click==8.4.1
+cobble==0.1.4
+cryptography==48.0.0
+defusedxml==0.7.1
+et_xmlfile==2.0.0
+flatbuffers==25.12.19
+idna==3.16
+lxml==6.1.1
+magika==0.6.3
+mammoth==1.11.0
+markdownify==1.2.2
+markitdown==0.1.6
+numpy==2.4.6
+onnxruntime==1.19.2
+openpyxl==3.1.5
+packaging==26.2
+pandas==3.0.3
+pdfminer.six==20251230
+pdfplumber==0.11.9
+pillow==12.2.0
+protobuf==7.35.0
+pycparser==3.0
+pypdfium2==5.8.0
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.2
+python-pptx==1.0.2
+PyYAML==6.0.3
+requests==2.34.2
+six==1.17.0
+soupsieve==2.8.4
+typing_extensions==4.15.0
+urllib3==2.7.0
+xlrd==2.0.2
+xlsxwriter==3.2.9

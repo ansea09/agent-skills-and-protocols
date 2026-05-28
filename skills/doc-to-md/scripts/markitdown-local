@@ -1,0 +1,231 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
+MARKITDOWN_VENV="${MARKITDOWN_VENV:-$CODEX_HOME_DIR/tools/markitdown-core-venv}"
+MARKITDOWN_BIN="${MARKITDOWN_BIN:-$MARKITDOWN_VENV/bin/markitdown}"
+MARKITDOWN_REQUIREMENTS="${MARKITDOWN_REQUIREMENTS:-$CODEX_HOME_DIR/skills/doc-to-md/requirements-core.txt}"
+MARKITDOWN_TIMEOUT_SECONDS="${MARKITDOWN_TIMEOUT_SECONDS:-600}"
+MARKITDOWN_MAX_INPUT_MB="${MARKITDOWN_MAX_INPUT_MB:-512}"
+MARKITDOWN_WARN_STDOUT="${MARKITDOWN_WARN_STDOUT:-1}"
+MARKITDOWN_INPUT_ROOTS="${MARKITDOWN_INPUT_ROOTS:-}"
+MARKITDOWN_OUTPUT_ROOTS="${MARKITDOWN_OUTPUT_ROOTS:-}"
+
+allow_remote="${MARKITDOWN_ALLOW_REMOTE:-0}"
+allow_advanced="${MARKITDOWN_ALLOW_ADVANCED:-0}"
+inspect_mode=0
+args=()
+
+die() {
+  printf 'markitdown-local: %s\n' "$*" >&2
+  exit 64
+}
+
+require_nonnegative_int() {
+  local name="$1"
+  local value="$2"
+  case "$value" in
+    ''|*[!0-9]*)
+      printf 'markitdown-local: %s must be a non-negative integer, got %q\n' "$name" "$value" >&2
+      exit 64
+      ;;
+  esac
+}
+
+canonical_path() {
+  local path="$1"
+  python3 - "$path" <<'PY'
+from pathlib import Path
+import sys
+
+print(Path(sys.argv[1]).expanduser().resolve(strict=False))
+PY
+}
+
+path_under_roots() {
+  local path="$1"
+  local roots_spec="$2"
+  local label="$3"
+
+  if [[ -z "$roots_spec" ]]; then
+    return 0
+  fi
+
+  local target
+  target="$(canonical_path "$path")"
+  local old_ifs="$IFS"
+  IFS=':'
+  read -r -a roots <<<"$roots_spec"
+  IFS="$old_ifs"
+
+  local root
+  local resolved_root
+  for root in "${roots[@]}"; do
+    if [[ -z "$root" ]]; then
+      continue
+    fi
+    resolved_root="$(canonical_path "$root")"
+    if [[ "$target" == "$resolved_root" || "$target" == "$resolved_root"/* ]]; then
+      return 0
+    fi
+  done
+
+  printf 'markitdown-local: %s path is outside allowed roots: %s\n' "$label" "$path" >&2
+  printf 'Allowed roots: %s\n' "$roots_spec" >&2
+  exit 65
+}
+
+require_nonnegative_int MARKITDOWN_TIMEOUT_SECONDS "$MARKITDOWN_TIMEOUT_SECONDS"
+require_nonnegative_int MARKITDOWN_MAX_INPUT_MB "$MARKITDOWN_MAX_INPUT_MB"
+
+for arg in "$@"; do
+  case "$arg" in
+    --allow-remote)
+      allow_remote=1
+      ;;
+    --allow-advanced)
+      allow_advanced=1
+      ;;
+    -h|--help|--version|--list-plugins)
+      inspect_mode=1
+      args+=("$arg")
+      ;;
+    *)
+      args+=("$arg")
+      ;;
+  esac
+done
+
+if [[ ! -x "$MARKITDOWN_BIN" ]]; then
+  printf 'markitdown-local: MarkItDown binary not found at %s\n' "$MARKITDOWN_BIN" >&2
+  printf 'Rebuild with: python3 -m venv %q && %q -m pip install -r %q\n' \
+    "$MARKITDOWN_VENV" "$MARKITDOWN_VENV/bin/python" "$MARKITDOWN_REQUIREMENTS" >&2
+  exit 127
+fi
+
+if [[ "$allow_remote" != "1" ]]; then
+  for arg in "${args[@]}"; do
+    if [[ "$arg" =~ ^[A-Za-z][A-Za-z0-9+.-]*:// ]]; then
+      printf 'markitdown-local: blocked remote URI by default: %s\n' "$arg" >&2
+      printf 'Pass --allow-remote only for a trusted, intentional remote conversion.\n' >&2
+      exit 64
+    fi
+  done
+fi
+
+if [[ "$allow_advanced" != "1" ]]; then
+  for arg in "${args[@]}"; do
+    case "$arg" in
+      -d|--use-docintel|--use-docintel=*|-e|--endpoint|--endpoint=*|-p|--use-plugins|--use-plugins=*|--use-plugin|--use-plugin=*|--use-cu|--use-cu=*|--cu-endpoint|--cu-endpoint=*|--cu-analyzer-id|--cu-analyzer-id=*|--cu-file-types|--cu-file-types=*)
+        printf 'markitdown-local: blocked advanced/cloud/plugin option by default: %s\n' "$arg" >&2
+        printf 'Pass --allow-advanced only after intentionally enabling the needed dependencies and credentials.\n' >&2
+        exit 64
+        ;;
+    esac
+  done
+fi
+
+output_path=""
+output_value_index=-1
+output_arg_index=-1
+output_arg_style=""
+
+for i in "${!args[@]}"; do
+  arg="${args[$i]}"
+  case "$arg" in
+    -o|--output)
+      next=$((i + 1))
+      if [[ $next -ge ${#args[@]} ]]; then
+        printf 'markitdown-local: %s requires an output path\n' "$arg" >&2
+        exit 64
+      fi
+      output_path="${args[$next]}"
+      output_value_index=$next
+      output_arg_style="separate"
+      ;;
+    --output=*)
+      output_path="${arg#--output=}"
+      output_arg_index=$i
+      output_arg_style="long-equals"
+      ;;
+  esac
+done
+
+if [[ -z "$output_path" ]]; then
+  output_value_index=-1
+fi
+
+if [[ "$MARKITDOWN_MAX_INPUT_MB" != "0" ]]; then
+  max_bytes=$((MARKITDOWN_MAX_INPUT_MB * 1024 * 1024))
+  for i in "${!args[@]}"; do
+    if [[ $i -eq $output_value_index ]]; then
+      continue
+    fi
+    arg="${args[$i]}"
+    if [[ -f "$arg" ]]; then
+      path_under_roots "$arg" "$MARKITDOWN_INPUT_ROOTS" "input"
+      bytes="$(wc -c <"$arg" | tr -d ' ')"
+      if [[ "$bytes" -gt "$max_bytes" ]]; then
+        printf 'markitdown-local: input exceeds MARKITDOWN_MAX_INPUT_MB=%s: %s\n' "$MARKITDOWN_MAX_INPUT_MB" "$arg" >&2
+        printf 'Set MARKITDOWN_MAX_INPUT_MB=0 or a higher value for trusted large files.\n' >&2
+        exit 65
+      fi
+    fi
+  done
+else
+  for i in "${!args[@]}"; do
+    if [[ $i -eq $output_value_index ]]; then
+      continue
+    fi
+    arg="${args[$i]}"
+    if [[ -f "$arg" ]]; then
+      path_under_roots "$arg" "$MARKITDOWN_INPUT_ROOTS" "input"
+    fi
+  done
+fi
+
+if [[ -n "$output_path" && "$output_path" != "-" ]]; then
+  path_under_roots "$output_path" "$MARKITDOWN_OUTPUT_ROOTS" "output"
+elif [[ "$MARKITDOWN_WARN_STDOUT" != "0" && "$inspect_mode" != "1" ]]; then
+  printf 'markitdown-local: stdout mode is not atomic; use -o/--output for protected file writes.\n' >&2
+fi
+
+run_markitdown() {
+  if [[ "$MARKITDOWN_TIMEOUT_SECONDS" == "0" ]]; then
+    "$MARKITDOWN_BIN" "$@"
+  else
+    perl -e 'my $timeout = shift @ARGV; alarm($timeout) if $timeout > 0; exec @ARGV or die "exec failed: $!\n";' \
+      "$MARKITDOWN_TIMEOUT_SECONDS" "$MARKITDOWN_BIN" "$@"
+  fi
+}
+
+if [[ -n "$output_path" && "$output_path" != "-" ]]; then
+  output_dir="$(dirname "$output_path")"
+  output_base="$(basename "$output_path")"
+  mkdir -p "$output_dir"
+  tmp_output="$(mktemp "$output_dir/.${output_base}.tmp.XXXXXX")"
+  trap 'rm -f "$tmp_output"' EXIT
+
+  atomic_args=("${args[@]}")
+  case "$output_arg_style" in
+    separate)
+      atomic_args[$output_value_index]="$tmp_output"
+      ;;
+    long-equals)
+      atomic_args[$output_arg_index]="--output=$tmp_output"
+      ;;
+  esac
+
+  if run_markitdown "${atomic_args[@]}"; then
+    mv -f "$tmp_output" "$output_path"
+    trap - EXIT
+    exit 0
+  else
+    status=$?
+    rm -f "$tmp_output"
+    trap - EXIT
+    exit "$status"
+  fi
+fi
+
+run_markitdown "${args[@]}"
