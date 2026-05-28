@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+DEFAULT_SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd -P)"
+DOC_TO_MD_SKILL_DIR="${DOC_TO_MD_SKILL_DIR:-$DEFAULT_SKILL_DIR}"
+CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
+DOC_TO_MD_TOOLS_DIR="${DOC_TO_MD_TOOLS_DIR:-$CODEX_HOME_DIR/tools}"
 if [[ -n "${DOC_TO_MD_DEPENDENCY_MONITOR_SCRIPT:-}" ]]; then
   SCRIPT="$DOC_TO_MD_DEPENDENCY_MONITOR_SCRIPT"
 elif [[ -f "$SCRIPT_DIR/dependency_maintenance_monitor.py" ]]; then
   SCRIPT="$SCRIPT_DIR/dependency_maintenance_monitor.py"
 else
-  SCRIPT="$CODEX_HOME_DIR/skills/doc-to-md/scripts/dependency_maintenance_monitor.py"
+  SCRIPT="$DOC_TO_MD_SKILL_DIR/scripts/dependency_maintenance_monitor.py"
 fi
 
-CORE_PYTHON="$CODEX_HOME_DIR/tools/markitdown-core-venv/bin/python"
+CORE_PYTHON="$DOC_TO_MD_TOOLS_DIR/markitdown-core-venv/bin/python"
 if [[ -n "${PYTHON:-}" ]]; then
   PYTHON_BIN="$PYTHON"
 elif [[ -x "$CORE_PYTHON" ]]; then

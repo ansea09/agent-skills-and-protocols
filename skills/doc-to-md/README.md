@@ -10,7 +10,8 @@ files.
 
 Supported default paths: Codex on macOS arm64 for core, book, and OCR;
 Codex on Intel macOS for core and book on Python 3.12. WSL is a candidate.
-Claude Code on macOS is experimental unless runtime paths are configured.
+Claude Code on macOS is experimental unless the skill source and runtime paths
+are configured through the installer-generated shims.
 Native Windows PowerShell/CMD is unsupported.
 
 Python minor versions are profile-specific. `macos-arm64-py313` does not imply
@@ -64,15 +65,16 @@ or promising public support for a scenario.
 ## Claude Code
 
 Claude Code skill source may live under `~/.claude/skills` or `.claude/skills`.
-The runtime wrappers still default to `${CODEX_HOME:-$HOME/.codex}` and
-`~/.local/bin`, so configure these paths explicitly or use the `.codex`
-compatibility runtime:
+Run the installer from that installed source directory. It writes command shims
+into `DOC_TO_MD_BIN_DIR` and records the source path as `DOC_TO_MD_SKILL_DIR`.
+Use `DOC_TO_MD_TOOLS_DIR` to choose where local venvs are built; if unset, the
+installer keeps the `.codex/tools` compatibility default.
 
 ```bash
-export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+export DOC_TO_MD_SKILL_DIR="$HOME/.claude/skills/doc-to-md"
 export DOC_TO_MD_BIN_DIR="${DOC_TO_MD_BIN_DIR:-$HOME/.local/bin}"
-export DOC_TO_MD_TOOLS_DIR="${DOC_TO_MD_TOOLS_DIR:-$CODEX_HOME/tools}"
-bash "$HOME/.claude/skills/doc-to-md/scripts/install.sh"
+export DOC_TO_MD_TOOLS_DIR="${DOC_TO_MD_TOOLS_DIR:-$HOME/.codex/tools}"
+bash "$DOC_TO_MD_SKILL_DIR/scripts/install.sh"
 ```
 
 ## Usage

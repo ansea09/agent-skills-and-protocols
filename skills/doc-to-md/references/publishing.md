@@ -23,9 +23,9 @@ installation.
   writes because it is not atomic and can truncate an existing destination.
 - Publish and review the support matrix. Current contract: Codex/macOS arm64 is
   supported for core, book, and OCR; Codex/Intel macOS is supported for core
-  and book on Python 3.12; Claude Code/macOS is experimental unless runtime
-  paths are configured, WSL is a candidate, and native Windows PowerShell/CMD is
-  unsupported.
+  and book on Python 3.12; Claude Code/macOS is experimental unless installer
+  shims record `DOC_TO_MD_SKILL_DIR` and runtime paths are configured, WSL is a
+  candidate, and native Windows PowerShell/CMD is unsupported.
 - Publish and review `references/python-profiles.md`. Do not claim a Python
   minor version as supported because a different minor version passed. New
   Python minors start as candidate/unverified until their own profile evidence

@@ -317,8 +317,8 @@ Current support contract:
 - Codex on macOS arm64: supported for core, book, and OCR.
 - Codex on Intel macOS: supported for core and book on Python 3.12 with the
   `macos-intel-py312` profile.
-- Claude Code on macOS: experimental unless `CODEX_HOME`,
-  `DOC_TO_MD_BIN_DIR`, and `DOC_TO_MD_TOOLS_DIR` are configured.
+- Claude Code on macOS: experimental unless installer-generated shims record
+  `DOC_TO_MD_SKILL_DIR`, `DOC_TO_MD_BIN_DIR`, and `DOC_TO_MD_TOOLS_DIR`.
 - WSL on Windows: candidate.
 - Native Windows PowerShell/CMD: unsupported.
 
@@ -345,10 +345,12 @@ Python minor-version support and promotion procedure.
 Claude Code skill source may live under Claude skill locations such as
 `~/.claude/skills` or `.claude/skills`.
 
-The current runtime wrappers still default to `${CODEX_HOME:-$HOME/.codex}` and
-`~/.local/bin`. Therefore Claude Code use is experimental unless the runtime
-paths are configured explicitly or the runtime is installed in the `.codex`
-compatibility location.
+The installer writes command shims into `DOC_TO_MD_BIN_DIR`. These shims record
+the installed skill source path as `DOC_TO_MD_SKILL_DIR` and the runtime venv
+root as `DOC_TO_MD_TOOLS_DIR`, then delegate to the source wrappers. Source
+wrappers still use `${CODEX_HOME:-$HOME/.codex}/tools` as the compatibility
+default when `DOC_TO_MD_TOOLS_DIR` is absent, but they no longer require the
+skill source itself to live under `.codex`.
 
 The skill source location and the runtime dependency location are distinct.
 
@@ -620,7 +622,8 @@ installation does not prove local venvs or external OCR tools are available.
 - The implementation remains macOS/POSIX-first.
 - Native Windows requires a separate implementation before support can be
   claimed.
-- Claude Code use needs explicit runtime path configuration.
+- Claude Code use needs installer-recorded source and runtime paths until a
+  dedicated Claude Code release gate exists.
 - Hash-locked installs are only available for published platform profiles.
 - Intel macOS support currently requires Python 3.12 for the supported
   hash-locked core/book path.

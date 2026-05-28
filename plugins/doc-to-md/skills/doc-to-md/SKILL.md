@@ -8,7 +8,7 @@ compatibility:
   candidate_runtimes:
     - "WSL on Windows"
   experimental_runtimes:
-    - "Claude Code on macOS when CODEX_HOME, DOC_TO_MD_BIN_DIR, and DOC_TO_MD_TOOLS_DIR are configured"
+    - "Claude Code on macOS when DOC_TO_MD_SKILL_DIR, DOC_TO_MD_BIN_DIR, and DOC_TO_MD_TOOLS_DIR are configured by install.sh or environment"
   unsupported_runtimes:
     - "native Windows PowerShell/CMD"
   required_commands:
@@ -74,15 +74,15 @@ This skill is the portable public core. Keep only publishable commands, wrappers
 
 Personal local preferences belong outside this skill, for example in a private repository policy file. The public core must not depend on private-only files, paths, fixtures, or commands.
 
-Current support contract: Codex on macOS arm64 is supported for core, book, and OCR workflows with the `macos-arm64-py313` hash profile. Codex on Intel macOS is supported for core and book workflows with Python 3.12 and the `macos-intel-py312` hash profile; OCR hash-locked support is not published for Intel macOS. Python minor versions are not interchangeable for `--hash-locked`: unlisted profiles such as `macos-arm64-py312`, `macos-arm64-py314`, or `macos-intel-py313` are candidate/unverified until validated and listed in `references/python-profiles.md`. WSL is a candidate; Claude Code on macOS is experimental unless `CODEX_HOME`, `DOC_TO_MD_BIN_DIR`, and `DOC_TO_MD_TOOLS_DIR` are configured; native Windows PowerShell/CMD is unsupported. Read `references/support-matrix.md` before installing outside these maintained Codex/macOS paths.
+Current support contract: Codex on macOS arm64 is supported for core, book, and OCR workflows with the `macos-arm64-py313` hash profile. Codex on Intel macOS is supported for core and book workflows with Python 3.12 and the `macos-intel-py312` hash profile; OCR hash-locked support is not published for Intel macOS. Python minor versions are not interchangeable for `--hash-locked`: unlisted profiles such as `macos-arm64-py312`, `macos-arm64-py314`, or `macos-intel-py313` are candidate/unverified until validated and listed in `references/python-profiles.md`. WSL is a candidate; Claude Code on macOS is experimental unless the installed wrappers know the skill source path and runtime paths through `DOC_TO_MD_SKILL_DIR`, `DOC_TO_MD_BIN_DIR`, and `DOC_TO_MD_TOOLS_DIR`; native Windows PowerShell/CMD is unsupported. Read `references/support-matrix.md` before installing outside these maintained Codex/macOS paths.
 
-Use the local wrapper `markitdown-local`, which runs the pinned core MarkItDown venv at `${CODEX_HOME:-$HOME/.codex}/tools/markitdown-core-venv`. The short command `mdown` is a symlink to the same wrapper. Prefer local-file conversion with `-o/--output` so the wrapper can protect the previous output from normal process failures, then perform focused verification.
+Use the local wrapper `markitdown-local`, which runs the pinned core MarkItDown venv at `${DOC_TO_MD_TOOLS_DIR:-${CODEX_HOME:-$HOME/.codex}/tools}/markitdown-core-venv`. The short command `mdown` is a symlink to the same wrapper. Prefer local-file conversion with `-o/--output` so the wrapper can protect the previous output from normal process failures, then perform focused verification.
 
 Core scope is intentionally narrow: local PDF, DOCX, PPTX, XLS, XLSX, HTML, CSV, JSON, XML, text-like files, and ZIP extraction. Audio, YouTube, Azure, OCR plugins, and LLM-backed image description are advanced modes and are not part of the default runtime.
 
-For textbook-like local PDFs where page traceability, embedded raster images, link records, and quality warnings matter, use the separate PDF audit bundle wrapper `mdown-book`. It runs from `${CODEX_HOME:-$HOME/.codex}/tools/doc-to-md-book-venv`, calls the pinned core wrapper first, and keeps PyMuPDF out of the core runtime. This is not inline placement or high-fidelity PDF reconstruction.
+For textbook-like local PDFs where page traceability, embedded raster images, link records, and quality warnings matter, use the separate PDF audit bundle wrapper `mdown-book`. It runs from `${DOC_TO_MD_TOOLS_DIR:-${CODEX_HOME:-$HOME/.codex}/tools}/doc-to-md-book-venv`, calls the pinned core wrapper first, and keeps PyMuPDF out of the core runtime. This is not inline placement or high-fidelity PDF reconstruction.
 
-For scanned PDFs, use the optional OCR preprocessor `mdown-ocrpdf` first. It runs from `${CODEX_HOME:-$HOME/.codex}/tools/doc-to-md-ocr-venv`, keeps OCRmyPDF out of the core runtime, and writes a searchable OCR PDF before the audit bundle step.
+For scanned PDFs, use the optional OCR preprocessor `mdown-ocrpdf` first. It runs from `${DOC_TO_MD_TOOLS_DIR:-${CODEX_HOME:-$HOME/.codex}/tools}/doc-to-md-ocr-venv`, keeps OCRmyPDF out of the core runtime, and writes a searchable OCR PDF before the audit bundle step.
 
 ## Route Selection
 
@@ -252,13 +252,16 @@ bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --all
 ```
 
 For Claude Code, install the skill source into `~/.claude/skills/doc-to-md` or
-`.claude/skills/doc-to-md`, then configure runtime paths explicitly:
+`.claude/skills/doc-to-md`, then run the installer from that source directory.
+The installer writes command shims that pin `DOC_TO_MD_SKILL_DIR` to that
+source path. Configure `DOC_TO_MD_TOOLS_DIR` when the default `.codex/tools`
+compatibility location is not desired:
 
 ```bash
-export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+export DOC_TO_MD_SKILL_DIR="$HOME/.claude/skills/doc-to-md"
 export DOC_TO_MD_BIN_DIR="${DOC_TO_MD_BIN_DIR:-$HOME/.local/bin}"
-export DOC_TO_MD_TOOLS_DIR="${DOC_TO_MD_TOOLS_DIR:-$CODEX_HOME/tools}"
-bash "/path/to/claude/skills/doc-to-md/scripts/install.sh"
+export DOC_TO_MD_TOOLS_DIR="${DOC_TO_MD_TOOLS_DIR:-$HOME/.codex/tools}"
+bash "$DOC_TO_MD_SKILL_DIR/scripts/install.sh"
 ```
 
 For public release on maintained hash profiles, use hash-locked installs.

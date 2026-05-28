@@ -38,6 +38,17 @@ directory:
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh"
 ```
 
+For Claude Code or another non-`.codex` skill location, run the same installer
+from that installed source path. The installer writes command shims that record
+`DOC_TO_MD_SKILL_DIR` and delegate to the bundled source wrappers:
+
+```bash
+export DOC_TO_MD_SKILL_DIR="$HOME/.claude/skills/doc-to-md"
+export DOC_TO_MD_BIN_DIR="${DOC_TO_MD_BIN_DIR:-$HOME/.local/bin}"
+export DOC_TO_MD_TOOLS_DIR="${DOC_TO_MD_TOOLS_DIR:-$HOME/.codex/tools}"
+bash "$DOC_TO_MD_SKILL_DIR/scripts/install.sh"
+```
+
 Optional workflows are installed explicitly:
 
 ```bash
@@ -81,7 +92,8 @@ bundled `skills/doc-to-md/references/diagnostics.md` file.
 Codex on macOS arm64 is supported for core, book, and OCR. Codex on Intel macOS
 is supported for core and book on Python 3.12; Intel OCR hash-locked support is
 not published. WSL is a candidate. Claude Code on macOS is experimental unless
-`CODEX_HOME`, `DOC_TO_MD_BIN_DIR`, and `DOC_TO_MD_TOOLS_DIR` are configured.
+installer-generated shims record `DOC_TO_MD_SKILL_DIR`, `DOC_TO_MD_BIN_DIR`,
+and `DOC_TO_MD_TOOLS_DIR`.
 Native Windows PowerShell/CMD is unsupported.
 
 Read `skills/doc-to-md/references/support-matrix.md`,

@@ -20,6 +20,10 @@ audit bundles are local operational artifacts and are not release payloads.
   vulnerability metadata checks when `DOC_TO_MD_SCA_MODE=required` is used.
 - Added source and promotion release gates so public source/plugin validation is
   separate from installed-copy promotion validation.
+- Added installer-generated command shims for `doc-to-md` wrappers. The shims
+  record `DOC_TO_MD_SKILL_DIR`, `DOC_TO_MD_BIN_DIR`, and
+  `DOC_TO_MD_TOOLS_DIR`, so a Claude Code skill source no longer has to live
+  under `${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md`.
 - Added machine-readable doctor output contracts for core, book, and OCR
   doctors, with JSON Schema validation in the release gate.
 - Added synthetic regression coverage for ordinary conversion formats and PDF
@@ -31,8 +35,8 @@ audit bundles are local operational artifacts and are not release payloads.
   gaps.
 - Documented the support matrix: Codex/macOS arm64 is the primary supported
   path; Intel macOS is supported for core/book on Python 3.12; WSL is a
-  candidate; Claude Code on macOS is experimental with explicit runtime paths;
-  native Windows PowerShell/CMD is unsupported.
+  candidate; Claude Code on macOS is experimental with installer-recorded
+  source and runtime paths; native Windows PowerShell/CMD is unsupported.
 - Kept high-fidelity textbook parsing out of core. The textbook workflow remains
   an audit bundle plus optional OCR preprocessing, not inline reconstruction.
 
@@ -47,6 +51,11 @@ mdown-doctor --json
 mdown-book --doctor --json
 mdown-ocrpdf --doctor --json
 ```
+
+If wrappers were installed before the shim change, rerun `scripts/install.sh`
+from the installed skill source to replace copied wrappers with source-pinned
+command shims. Use `--wrappers-only` when existing runtimes should not be
+rebuilt.
 
 For public release review, run the source gate from the repository root:
 

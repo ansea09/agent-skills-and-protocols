@@ -1,16 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+DEFAULT_SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd -P)"
+DOC_TO_MD_SKILL_DIR="${DOC_TO_MD_SKILL_DIR:-$DEFAULT_SKILL_DIR}"
+DOC_TO_MD_BIN_DIR="${DOC_TO_MD_BIN_DIR:-$HOME/.local/bin}"
 CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
-BOOK_VENV="${DOC_TO_MD_BOOK_VENV:-$CODEX_HOME_DIR/tools/doc-to-md-book-venv}"
+DOC_TO_MD_TOOLS_DIR="${DOC_TO_MD_TOOLS_DIR:-$CODEX_HOME_DIR/tools}"
+BOOK_VENV="${DOC_TO_MD_BOOK_VENV:-$DOC_TO_MD_TOOLS_DIR/doc-to-md-book-venv}"
 BOOK_PYTHON="${DOC_TO_MD_BOOK_PYTHON:-$BOOK_VENV/bin/python}"
-BOOK_SCRIPT="${DOC_TO_MD_BOOK_SCRIPT:-$CODEX_HOME_DIR/skills/doc-to-md/scripts/mdown_book.py}"
+BOOK_SCRIPT="${DOC_TO_MD_BOOK_SCRIPT:-$DOC_TO_MD_SKILL_DIR/scripts/mdown_book.py}"
 runtime_requirements="$BOOK_VENV/.doc-to-md-requirements"
 if [[ -z "${DOC_TO_MD_BOOK_REQUIREMENTS:-}" && -f "$runtime_requirements" ]]; then
   DOC_TO_MD_BOOK_REQUIREMENTS="$(<"$runtime_requirements")"
 fi
-BOOK_REQUIREMENTS="${DOC_TO_MD_BOOK_REQUIREMENTS:-$CODEX_HOME_DIR/skills/doc-to-md/requirements-book.txt}"
+BOOK_REQUIREMENTS="${DOC_TO_MD_BOOK_REQUIREMENTS:-$DOC_TO_MD_SKILL_DIR/requirements-book.txt}"
+MDOWN_BIN="${MDOWN_BIN:-$DOC_TO_MD_BIN_DIR/mdown}"
 export DOC_TO_MD_BOOK_REQUIREMENTS="$BOOK_REQUIREMENTS"
+export MDOWN_BIN
 
 if [[ ! -x "$BOOK_PYTHON" ]]; then
   printf 'mdown-book: book workflow Python not found at %s\n' "$BOOK_PYTHON" >&2

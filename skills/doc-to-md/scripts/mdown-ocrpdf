@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+DEFAULT_SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd -P)"
+DOC_TO_MD_SKILL_DIR="${DOC_TO_MD_SKILL_DIR:-$DEFAULT_SKILL_DIR}"
 CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
-OCR_VENV="${DOC_TO_MD_OCR_VENV:-$CODEX_HOME_DIR/tools/doc-to-md-ocr-venv}"
+DOC_TO_MD_TOOLS_DIR="${DOC_TO_MD_TOOLS_DIR:-$CODEX_HOME_DIR/tools}"
+OCR_VENV="${DOC_TO_MD_OCR_VENV:-$DOC_TO_MD_TOOLS_DIR/doc-to-md-ocr-venv}"
 OCR_PYTHON="${DOC_TO_MD_OCR_PYTHON:-$OCR_VENV/bin/python}"
-OCR_SCRIPT="${DOC_TO_MD_OCR_SCRIPT:-$CODEX_HOME_DIR/skills/doc-to-md/scripts/mdown_ocrpdf.py}"
+OCR_SCRIPT="${DOC_TO_MD_OCR_SCRIPT:-$DOC_TO_MD_SKILL_DIR/scripts/mdown_ocrpdf.py}"
 runtime_requirements="$OCR_VENV/.doc-to-md-requirements"
 if [[ -z "${DOC_TO_MD_OCR_REQUIREMENTS:-}" && -f "$runtime_requirements" ]]; then
   DOC_TO_MD_OCR_REQUIREMENTS="$(<"$runtime_requirements")"
 fi
-OCR_REQUIREMENTS="${DOC_TO_MD_OCR_REQUIREMENTS:-$CODEX_HOME_DIR/skills/doc-to-md/requirements-ocr.lock.txt}"
+OCR_REQUIREMENTS="${DOC_TO_MD_OCR_REQUIREMENTS:-$DOC_TO_MD_SKILL_DIR/requirements-ocr.lock.txt}"
 export DOC_TO_MD_OCR_REQUIREMENTS="$OCR_REQUIREMENTS"
 
 if [[ ! -x "$OCR_PYTHON" ]]; then

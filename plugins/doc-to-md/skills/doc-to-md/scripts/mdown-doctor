@@ -1,16 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+DEFAULT_SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd -P)"
+DOC_TO_MD_SKILL_DIR="${DOC_TO_MD_SKILL_DIR:-$DEFAULT_SKILL_DIR}"
+DOC_TO_MD_BIN_DIR="${DOC_TO_MD_BIN_DIR:-$HOME/.local/bin}"
 CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
-SCRIPT="${DOC_TO_MD_CORE_DOCTOR_SCRIPT:-$CODEX_HOME_DIR/skills/doc-to-md/scripts/mdown_doctor.py}"
-MARKITDOWN_VENV="${MARKITDOWN_VENV:-$CODEX_HOME_DIR/tools/markitdown-core-venv}"
+DOC_TO_MD_TOOLS_DIR="${DOC_TO_MD_TOOLS_DIR:-$CODEX_HOME_DIR/tools}"
+SCRIPT="${DOC_TO_MD_CORE_DOCTOR_SCRIPT:-$DOC_TO_MD_SKILL_DIR/scripts/mdown_doctor.py}"
+MARKITDOWN_VENV="${MARKITDOWN_VENV:-$DOC_TO_MD_TOOLS_DIR/markitdown-core-venv}"
+MARKITDOWN_BIN="${MARKITDOWN_BIN:-$MARKITDOWN_VENV/bin/markitdown}"
+MARKITDOWN_PYTHON="${MARKITDOWN_PYTHON:-$MARKITDOWN_VENV/bin/python}"
+MARKITDOWN_WRAPPER="${MARKITDOWN_WRAPPER:-$DOC_TO_MD_BIN_DIR/markitdown-local}"
 runtime_requirements="$MARKITDOWN_VENV/.doc-to-md-requirements"
 if [[ -z "${MARKITDOWN_REQUIREMENTS:-}" && -f "$runtime_requirements" ]]; then
   MARKITDOWN_REQUIREMENTS="$(<"$runtime_requirements")"
 fi
-MARKITDOWN_REQUIREMENTS="${MARKITDOWN_REQUIREMENTS:-$CODEX_HOME_DIR/skills/doc-to-md/requirements-core.txt}"
+MARKITDOWN_REQUIREMENTS="${MARKITDOWN_REQUIREMENTS:-$DOC_TO_MD_SKILL_DIR/requirements-core.txt}"
 PYTHON_BIN="${PYTHON:-python3}"
-export MARKITDOWN_REQUIREMENTS
+export MARKITDOWN_VENV MARKITDOWN_BIN MARKITDOWN_PYTHON MARKITDOWN_REQUIREMENTS MARKITDOWN_WRAPPER
 
 if [[ ! -f "$SCRIPT" ]]; then
   printf 'mdown-doctor: doctor script not found: %s\n' "$SCRIPT" >&2

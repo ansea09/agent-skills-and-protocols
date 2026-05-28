@@ -2,7 +2,12 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd -P)"
+DEFAULT_SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd -P)"
+if [[ -n "${DOC_TO_MD_SKILL_DIR:-}" ]]; then
+  SKILL_DIR="$(cd "$DOC_TO_MD_SKILL_DIR" && pwd -P)"
+else
+  SKILL_DIR="$DEFAULT_SKILL_DIR"
+fi
 CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
 BIN_DIR="${DOC_TO_MD_BIN_DIR:-$HOME/.local/bin}"
 TOOLS_DIR="${DOC_TO_MD_TOOLS_DIR:-$CODEX_HOME_DIR/tools}"
@@ -33,6 +38,7 @@ Defaults:
 
 Environment:
   CODEX_HOME              defaults to $HOME/.codex
+  DOC_TO_MD_SKILL_DIR     defaults to the parent directory of this install script
   DOC_TO_MD_BIN_DIR       defaults to $HOME/.local/bin
   DOC_TO_MD_TOOLS_DIR     defaults to ${CODEX_HOME}/tools
   DOC_TO_MD_HASH_PROFILE  defaults to the detected platform/Python profile when --hash-locked is used
@@ -190,9 +196,37 @@ safe_rebuild_path() {
   fi
 }
 
+shell_quote() {
+  local value="$1"
+  printf "'"
+  printf "%s" "$value" | sed "s/'/'\\\\''/g"
+  printf "'"
+}
+
 install_wrapper() {
   local name="$1"
-  install -m 0755 "$SCRIPT_DIR/$name" "$BIN_DIR/$name"
+  local target="$BIN_DIR/$name"
+  {
+    printf '#!/usr/bin/env bash\n'
+    printf 'set -euo pipefail\n'
+    printf 'if [[ -z "${DOC_TO_MD_SKILL_DIR:-}" ]]; then\n'
+    printf '  DOC_TO_MD_SKILL_DIR=%s\n' "$(shell_quote "$SKILL_DIR")"
+    printf 'fi\n'
+    printf 'if [[ -z "${DOC_TO_MD_BIN_DIR:-}" ]]; then\n'
+    printf '  DOC_TO_MD_BIN_DIR=%s\n' "$(shell_quote "$BIN_DIR")"
+    printf 'fi\n'
+    printf 'if [[ -z "${DOC_TO_MD_TOOLS_DIR:-}" ]]; then\n'
+    printf '  DOC_TO_MD_TOOLS_DIR=%s\n' "$(shell_quote "$TOOLS_DIR")"
+    printf 'fi\n'
+    printf 'export DOC_TO_MD_SKILL_DIR DOC_TO_MD_BIN_DIR DOC_TO_MD_TOOLS_DIR\n'
+    printf 'wrapper="$DOC_TO_MD_SKILL_DIR/scripts/%s"\n' "$name"
+    printf 'if [[ ! -x "$wrapper" ]]; then\n'
+    printf '  printf "%s: wrapper not found or not executable: %%s\\n" "$wrapper" >&2\n' "$name"
+    printf '  exit 127\n'
+    printf 'fi\n'
+    printf 'exec "$wrapper" "$@"\n'
+  } > "$target"
+  chmod 0755 "$target"
 }
 
 install_wrapper markitdown-local

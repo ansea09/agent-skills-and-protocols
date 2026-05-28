@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
-SCRIPT="${DOC_TO_MD_REFRESH_LOCKS_SCRIPT:-$CODEX_HOME_DIR/skills/doc-to-md/scripts/refresh-locks.py}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+DEFAULT_SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd -P)"
+DOC_TO_MD_SKILL_DIR="${DOC_TO_MD_SKILL_DIR:-$DEFAULT_SKILL_DIR}"
+SCRIPT="${DOC_TO_MD_REFRESH_LOCKS_SCRIPT:-$DOC_TO_MD_SKILL_DIR/scripts/refresh-locks.py}"
 PYTHON_BIN="${PYTHON:-python3}"
 
 if [[ ! -f "$SCRIPT" ]]; then
