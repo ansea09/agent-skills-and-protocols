@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+if [[ -n "${DOC_TO_MD_DEPENDENCY_AUDIT_SCRIPT:-}" ]]; then
+  SCRIPT="$DOC_TO_MD_DEPENDENCY_AUDIT_SCRIPT"
+elif [[ -f "$SCRIPT_DIR/dependency_audit.py" ]]; then
+  SCRIPT="$SCRIPT_DIR/dependency_audit.py"
+else
+  SCRIPT="$CODEX_HOME_DIR/skills/doc-to-md/scripts/dependency_audit.py"
+fi
+
+CORE_PYTHON="$CODEX_HOME_DIR/tools/markitdown-core-venv/bin/python"
+if [[ -n "${PYTHON:-}" ]]; then
+  PYTHON_BIN="$PYTHON"
+elif [[ -x "$CORE_PYTHON" ]]; then
+  PYTHON_BIN="$CORE_PYTHON"
+else
+  PYTHON_BIN="python3"
+fi
+
+if [[ ! -f "$SCRIPT" ]]; then
+  printf 'mdown-dependency-audit: dependency audit script not found: %s\n' "$SCRIPT" >&2
+  printf 'Run from an installed doc-to-md skill or set DOC_TO_MD_DEPENDENCY_AUDIT_SCRIPT.\n' >&2
+  exit 127
+fi
+
+exec "$PYTHON_BIN" "$SCRIPT" "$@"

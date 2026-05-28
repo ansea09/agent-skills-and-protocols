@@ -1,0 +1,4 @@
+interface:
+  display_name: "Doc To Md"
+  short_description: "Convert local documents to Markdown with audit/OCR profiles"
+  default_prompt: "Use $doc-to-md to convert this trusted local file to Markdown."

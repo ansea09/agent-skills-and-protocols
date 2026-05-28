@@ -1,0 +1,8 @@
+{
+  "info": {
+    "name": "ocrmypdf",
+    "version": "17.5.0",
+    "requires_python": ">=3.11"
+  },
+  "vulnerabilities": []
+}

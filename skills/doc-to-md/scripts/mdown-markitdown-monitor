@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+if [[ -n "${DOC_TO_MD_MARKITDOWN_MONITOR_SCRIPT:-}" ]]; then
+  SCRIPT="$DOC_TO_MD_MARKITDOWN_MONITOR_SCRIPT"
+elif [[ -f "$SCRIPT_DIR/markitdown_upstream_monitor.py" ]]; then
+  SCRIPT="$SCRIPT_DIR/markitdown_upstream_monitor.py"
+else
+  SCRIPT="$CODEX_HOME_DIR/skills/doc-to-md/scripts/markitdown_upstream_monitor.py"
+fi
+CORE_PYTHON="$CODEX_HOME_DIR/tools/markitdown-core-venv/bin/python"
+if [[ -n "${PYTHON:-}" ]]; then
+  PYTHON_BIN="$PYTHON"
+elif [[ -x "$CORE_PYTHON" ]]; then
+  PYTHON_BIN="$CORE_PYTHON"
+else
+  PYTHON_BIN="python3"
+fi
+
+if [[ ! -f "$SCRIPT" ]]; then
+  printf 'mdown-markitdown-monitor: monitor script not found: %s\n' "$SCRIPT" >&2
+  printf 'Run from an installed doc-to-md skill or set DOC_TO_MD_MARKITDOWN_MONITOR_SCRIPT.\n' >&2
+  exit 127
+fi
+
+exec "$PYTHON_BIN" "$SCRIPT" "$@"

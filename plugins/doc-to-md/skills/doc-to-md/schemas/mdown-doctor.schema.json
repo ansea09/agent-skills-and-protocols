@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/doc-to-md/schemas/mdown-doctor.schema.json",
+  "title": "doc-to-md core doctor result",
+  "type": "object",
+  "required": ["schema_version", "tool", "paths", "checks", "status", "exit_code"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [1]
+    },
+    "tool": {
+      "type": "string",
+      "enum": ["mdown-doctor"]
+    },
+    "paths": {
+      "type": "object",
+      "required": ["venv", "binary", "python", "wrapper", "requirements"],
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {
+        "venv": {"type": "string"},
+        "binary": {"type": "string"},
+        "python": {"type": "string"},
+        "wrapper": {"type": "string"},
+        "requirements": {"type": "string"}
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["level", "message"],
+        "additionalProperties": true,
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": ["ok", "warn", "fail", "info"]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ok", "warn", "fail"]
+    },
+    "exit_code": {
+      "type": "integer"
+    }
+  }
+}
