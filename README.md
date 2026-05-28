@@ -15,7 +15,7 @@ Use this repository when you want to:
 
 | Skill | What it does | Best use case | Start here |
 | --- | --- | --- | --- |
-| [`fpf-work-guide`](skills/fpf-work-guide/) | Improves LLM answer quality by keeping current FPF context and Codex FPF protocols available and checked before substantive work. | FPF-backed reasoning, planning, review, coding, and source-backed answers. | [`skills/fpf-work-guide/README.md`](skills/fpf-work-guide/README.md) or [`plugins/fpf-work-guide`](plugins/fpf-work-guide/) |
+| [`fpf-work-guide`](skills/fpf-work-guide/) | Guides Codex toward more precise, traceable answers by validating current FPF context and applying FPF-backed protocols before substantive work. | FPF-backed reasoning, planning, review, coding, and source-backed answers. | [`skills/fpf-work-guide/README.md`](skills/fpf-work-guide/README.md) or [`plugins/fpf-work-guide`](plugins/fpf-work-guide/) |
 | [`doc-to-md`](skills/doc-to-md/) | Converts trusted local documents to Markdown with MarkItDown, optional PDF audit bundles, and optional OCR preprocessing. | Local document conversion, textbook-like PDF audit, scanned-PDF OCR preprocessing, and clean Markdown intermediates before analysis. | [`skills/doc-to-md/README.md`](skills/doc-to-md/README.md) or [`plugins/doc-to-md`](plugins/doc-to-md/) |
 
 For the full inventory, see [`skills-index.md`](skills-index.md).
