@@ -32,7 +32,25 @@ mkdir -p "$CODEX_SKILLS_TARGET"
 Install one skill:
 
 ```bash
-cp -R skills/fpf-latest "$CODEX_SKILLS_TARGET/"
+cp -R skills/fpf-work-guide "$CODEX_SKILLS_TARGET/"
+```
+
+### Migration From `fpf-latest`
+
+The former local skill name was `fpf-latest`. The public skill is now named `fpf-work-guide`.
+
+For a clean migration:
+
+1. Install `skills/fpf-work-guide` into the active skill target.
+2. Update launchers, docs, prompts, and shell variables that reference `fpf-latest` so they reference `fpf-work-guide`.
+3. Keep existing FPF and protocol caches unless you have a concrete reason to rebuild them; the cache repositories are independent of the skill directory name.
+4. Remove the old installed `fpf-latest` skill directory only after the new doctor and refresh gate succeed.
+
+Typical compatibility cleanup:
+
+```bash
+bash "$CODEX_SKILLS_TARGET/fpf-work-guide/scripts/fpf-work-guide-doctor" --write-state
+bash "$CODEX_SKILLS_TARGET/fpf-work-guide/scripts/update_fpf_context.sh"
 ```
 
 Install all staged skills:
@@ -43,10 +61,10 @@ find skills -mindepth 1 -maxdepth 1 -type d -exec cp -R {} "$CODEX_SKILLS_TARGET
 
 After installation, restart Codex or start a new Codex session so the skill list is reloaded.
 
-If you install `fpf-latest` in Codex, run its portable doctor once:
+If you install `fpf-work-guide` in Codex, run its portable doctor once:
 
 ```bash
-bash "$CODEX_SKILLS_TARGET/fpf-latest/scripts/fpf-latest-doctor" --write-state
+bash "$CODEX_SKILLS_TARGET/fpf-work-guide/scripts/fpf-work-guide-doctor" --write-state
 ```
 
 The doctor does not contact GitHub. It verifies local shell tooling, Git availability, cache state, install completeness, and records a local environment state so normal runtime use does not repeat the check unless the environment changes or the refresh gate is blocked.
@@ -59,24 +77,47 @@ export CODEX_SKILLS_TARGET="$CODEX_HOME/skills"
 mkdir -p "$CODEX_SKILLS_TARGET"
 ```
 
-For Claude Code or another non-Codex agent, install the same `fpf-latest` directory wherever that agent can read it, then run the doctor from that directory:
+For Claude Code or another non-Codex agent, install the same `fpf-work-guide` directory wherever that agent can read it, then run the doctor from that directory:
 
 ```bash
-export FPF_LATEST_SKILL_DIR="/absolute/path/to/fpf-latest"
-export FPF_CACHE_HOME="${FPF_CACHE_HOME:-$HOME/.cache/fpf-latest}"
-export FPF_UPDATE_STATE_DIR="${FPF_UPDATE_STATE_DIR:-$HOME/.local/state/fpf-latest}"
-bash "$FPF_LATEST_SKILL_DIR/scripts/fpf-latest-doctor" --write-state
+export FPF_WORK_GUIDE_SKILL_DIR="/absolute/path/to/fpf-work-guide"
+export FPF_CACHE_HOME="${FPF_CACHE_HOME:-$HOME/.cache/fpf-work-guide}"
+export FPF_UPDATE_STATE_DIR="${FPF_UPDATE_STATE_DIR:-$HOME/.local/state/fpf-work-guide}"
+bash "$FPF_WORK_GUIDE_SKILL_DIR/scripts/fpf-work-guide-doctor" --write-state
 ```
 
-For WSL, use the same Bash command inside WSL. For Git Bash on Windows, the command is best effort. Native PowerShell/CMD is not supported until this repository includes a separate PowerShell implementation.
+For WSL, use the same Bash command inside WSL. For Git Bash on Windows, the command is best effort. Native Windows PowerShell is implemented through the `.ps1` scripts; CMD can use the bundled `.cmd` wrappers, which delegate to PowerShell. Treat Windows as release-verified only after the PowerShell/CMD validation lane has passed on the target host or CI runner.
+
+For native Windows PowerShell, install the same `fpf-work-guide` directory and run the PowerShell doctor:
+
+```powershell
+$env:FPF_WORK_GUIDE_SKILL_DIR = "C:\absolute\path\to\fpf-work-guide"
+$env:FPF_CACHE_HOME = "C:\absolute\path\to\fpf-cache"
+$env:FPF_UPDATE_STATE_DIR = "C:\absolute\path\to\fpf-state"
+powershell -ExecutionPolicy Bypass -File "$env:FPF_WORK_GUIDE_SKILL_DIR\scripts\fpf-work-guide-doctor.ps1" --write-state
+```
+
+Then run the refresh gate through the PowerShell script:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:FPF_WORK_GUIDE_SKILL_DIR\scripts\update_fpf_context.ps1"
+```
+
+From CMD, use the wrappers:
+
+```bat
+set "FPF_WORK_GUIDE_SKILL_DIR=C:\absolute\path\to\fpf-work-guide"
+"%FPF_WORK_GUIDE_SKILL_DIR%\scripts\fpf-work-guide-doctor.cmd" --write-state
+"%FPF_WORK_GUIDE_SKILL_DIR%\scripts\update_fpf_context.cmd"
+```
 
 Portable installs should treat `$HOME/.codex`, `$HOME/.agents`, and `$PWD/.fpf-update` as defaults only. Use explicit paths when the agent runtime does not own those locations:
 
 ```bash
-FPF_LATEST_SKILL_DIR="/absolute/path/to/fpf-latest" \
+FPF_WORK_GUIDE_SKILL_DIR="/absolute/path/to/fpf-work-guide" \
 FPF_CACHE_HOME="/absolute/path/to/fpf-cache" \
 FPF_UPDATE_STATE_DIR="/absolute/path/to/fpf-state" \
-bash "$FPF_LATEST_SKILL_DIR/scripts/update_fpf_context.sh"
+bash "$FPF_WORK_GUIDE_SKILL_DIR/scripts/update_fpf_context.sh"
 ```
 
 Use exact cache paths only when the FPF specification and protocol repository must live in separate locations:
@@ -106,7 +147,7 @@ This repository includes a repo-local plugin marketplace at:
 The plugin artifacts live at:
 
 ```text
-plugins/fpf-latest
+plugins/fpf-work-guide
 ```
 
 Each plugin bundles its public skill only. Plugins do not include personal launchers, LaunchAgents, session-start hooks, workspace jobs, cache, logs, local state files, private overlays, or generated outputs.
@@ -115,26 +156,30 @@ Each plugin bundles its public skill only. Plugins do not include personal launc
 
 Read [skill-artifact-model.md](skill-artifact-model.md) before packaging or redistributing skills. The installed operational copy under `$HOME/.agents/skills`, `$REPO_ROOT/.agents/skills`, `${CODEX_HOME:-$HOME/.codex}/skills`, or another agent-specific runtime location is not the same artifact as the public staged copy under `skills/`.
 
-`fpf-latest` is the public skill. Local launchers, session-start hooks, LaunchAgents, workspace jobs, `.fpf-update/`, and `~/.local/state/codex-fpf/` are personal automation around that skill. They are not a public skill overlay and must not be installed or published as part of `skills/fpf-latest`.
+`fpf-work-guide` is the public skill. Local launchers, session-start hooks, LaunchAgents, workspace jobs, `.fpf-update/`, and `~/.local/state/codex-fpf/` are personal automation around that skill. They are not a public skill overlay and must not be installed or published as part of `skills/fpf-work-guide`.
 
-Public installation may document that such automation can exist, but the staged skill contract remains the portable `fpf-latest` skill plus its bundled scripts.
+Public installation may document that such automation can exist, but the staged skill contract remains the portable `fpf-work-guide` skill plus its bundled scripts.
 
 If a workspace path is symlinked, read-only, shared by several agents, or ephemeral, pass an explicit `FPF_UPDATE_STATE_DIR` from the launcher or hook instead of relying on `$PWD/.fpf-update`. This keeps diagnostics and migration notes stable even when the shell reports the physical target path.
 
 ## Runtime State
 
-`fpf-latest` uses local state files to decide whether the refresh gate should fetch from GitHub, skip because the TTL has not expired, or block because cache validation failed. These files are runtime state, not skill source.
+`fpf-work-guide` uses local state files to decide whether the refresh gate should fetch from GitHub, skip because the TTL has not expired, or block because cache validation failed. These files are runtime state, not skill source.
 
 Common state locations:
 
 ```text
 $PWD/.fpf-update/latest.env
+$PWD/.fpf-update/latest-output.env
 $PWD/.fpf-update/environment.env
 ~/.local/state/codex-fpf/latest.env
+~/.local/state/codex-fpf/latest-output.env
 ~/.local/state/codex-fpf/environment.env
 ```
 
-The workspace `.fpf-update/` state is usually used when the skill runs inside a repository or workspace. The `~/.local/state/codex-fpf/` state is commonly used by personal launchers or session-start hooks. Both can exist at the same time; always inspect `FPF_REFRESH_STATE_PATH` and `FPF_ENV_CHECK_STATE_PATH` in the gate output before deciding which state file controlled a run.
+`latest.env` is durable refresh-gate state written by `update_fpf_context.*`. `latest-output.env` is the last captured gate output written by local wrapper jobs such as a session-start launcher. Do not use wrapper output as the durable TTL state unless the gate reports it as the actual state source.
+
+The workspace `.fpf-update/` state is usually used when the skill runs inside a repository or workspace. The `~/.local/state/codex-fpf/` state is commonly used by personal launchers or session-start hooks. Both can exist at the same time. By default a gate run reads only its configured `FPF_REFRESH_STATE_DIR`/`FPF_UPDATE_STATE_DIR` state file; it reads a secondary launcher/global state file only when `FPF_REFRESH_AUTO_STATE_FILE` is explicitly set. Always inspect `FPF_REFRESH_STATE_PATH`, `FPF_REFRESH_LAST_ATTEMPT_STATE_PATH`, and `FPF_ENV_CHECK_STATE_PATH` before deciding which state file controlled a run.
 
 The portable doctor also reports path modes:
 
@@ -163,6 +208,6 @@ export FPF_ENV_STATE_DIR="$FPF_UPDATE_STATE_DIR"
 
 ## Skill-Specific Notes
 
-`fpf-latest` expects Bash, `git`, and network access when a refresh is required. If network access is unavailable but a valid cache already exists, it can use the current cached copy and disclose that status. Its scripts may run `git reset --hard` only in the default dedicated cache path, in a marked `.fpf-cache-repo` cache directory, or when `FPF_ALLOW_NONSTANDARD_CACHE_RESET=1` is explicitly set.
+`fpf-work-guide` expects Git and network access when a refresh is required. On Unix-like shells it uses Bash and standard Unix utilities. On native Windows it uses the bundled PowerShell scripts. If network access is unavailable but a valid cache already exists, it can use the current cached copy and disclose that status. Its scripts may run `git reset --hard` only when the cache directory contains a valid `.fpf-cache-repo` marker whose kind, repository URL, and branch match the configured cache, when the cache repository's `origin` remote matches the configured FPF/protocol repository URL, or when `FPF_ALLOW_NONSTANDARD_CACHE_RESET=1` is explicitly set.
 
-This public repository currently stages only `fpf-latest`. Other local or private skills should stay outside the public staged `skills/` tree unless they are deliberately promoted later.
+This public repository currently stages only `fpf-work-guide`. Other local or private skills should stay outside the public staged `skills/` tree unless they are deliberately promoted later.

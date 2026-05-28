@@ -4,7 +4,7 @@ This index lists the public Codex skills currently staged in this repository.
 
 | Skill | Purpose | Main use case | Runtime notes |
 | --- | --- | --- | --- |
-| [`fpf-latest`](skills/fpf-latest/) | Maintain and use current cached FPF context and Codex FPF protocols. | FPF-backed reasoning, planning, review, coding, and source-backed answers. | Codex/macOS-first. Requires Bash and `git` for refresh; WSL supported, Git Bash best effort, native PowerShell/CMD unsupported. Personal launchers/hooks are local automation, not a public skill overlay. |
+| [`fpf-work-guide`](skills/fpf-work-guide/) | Maintain and use current cached FPF context and Codex FPF protocols. | FPF-backed reasoning, planning, review, coding, and source-backed answers. | Cross-platform shell entrypoints: Bash, PowerShell, and CMD wrappers. Requires `git` for refresh. Personal launchers/hooks are local automation, not a public skill overlay. |
 
 ## Discoverability Rule
 

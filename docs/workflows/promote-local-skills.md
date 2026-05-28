@@ -30,7 +30,7 @@ The local skill is the operational copy used by Codex. The staged public skill i
 
 ## Artifact Layer Boundary
 
-`fpf-latest` has one public skill surface: `skills/fpf-latest`. Personal session-start automation, workspace launchers, LaunchAgents, local state directories, and update jobs are local operational infrastructure around that skill. They are not a public skill overlay and are not promoted into `skills/`.
+`fpf-work-guide` has one public skill surface: `skills/fpf-work-guide`. Personal session-start automation, workspace launchers, LaunchAgents, local state directories, and update jobs are local operational infrastructure around that skill. They are not a public skill overlay and are not promoted into `skills/`.
 
 This matters for review: a diff may mention local automation in docs, but no public skill should depend on `bin/codex-fpf`, `jobs/fpf-update`, `.fpf-update/`, `~/.local/state/codex-fpf/`, or a user-specific LaunchAgent.
 
@@ -63,6 +63,7 @@ scripts/promote-skills-from-local.sh
 
 ```bash
 scripts/validate-skills.sh
+scripts/validate-plugins.sh
 ```
 
 5. Review the diff:

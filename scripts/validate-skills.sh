@@ -4,6 +4,7 @@ set -eu
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 skills_dir="$repo_root/skills"
 manifest="$skills_dir/promote-manifest.yaml"
+only_skill="${SKILLS_VALIDATE_ONLY:-}"
 failed=0
 
 . "$repo_root/scripts/lib/skills-publication.sh"
@@ -13,22 +14,38 @@ if [ ! -d "$skills_dir" ]; then
   exit 1
 fi
 
-if find "$repo_root" -name .DS_Store -print | grep -q .; then
-  echo "ERROR: .DS_Store files are present" >&2
-  find "$repo_root" -name .DS_Store -print >&2
-  failed=1
-fi
+scan_generated_artifacts() {
+  label="$1"
+  shift
 
-if find "$repo_root" -name '*.pyc' -print | grep -q .; then
-  echo "ERROR: .pyc files are present" >&2
-  find "$repo_root" -name '*.pyc' -print >&2
-  failed=1
-fi
+  if find "$@" -name .DS_Store -print | grep -q .; then
+    echo "ERROR: .DS_Store files are present under $label" >&2
+    find "$@" -name .DS_Store -print >&2
+    failed=1
+  fi
 
-if find "$repo_root" -name __pycache__ -type d -print | grep -q .; then
-  echo "ERROR: __pycache__ directories are present" >&2
-  find "$repo_root" -name __pycache__ -type d -print >&2
-  failed=1
+  if find "$@" -name '*.pyc' -print | grep -q .; then
+    echo "ERROR: .pyc files are present under $label" >&2
+    find "$@" -name '*.pyc' -print >&2
+    failed=1
+  fi
+
+  if find "$@" -name __pycache__ -type d -print | grep -q .; then
+    echo "ERROR: __pycache__ directories are present under $label" >&2
+    find "$@" -name __pycache__ -type d -print >&2
+    failed=1
+  fi
+}
+
+if [ -n "$only_skill" ]; then
+  assert_safe_skill_name "$only_skill" || failed=1
+  if [ ! -d "$skills_dir/$only_skill" ]; then
+    echo "ERROR: requested skill is missing: skills/$only_skill" >&2
+    failed=1
+  fi
+  scan_generated_artifacts "skills/$only_skill and scripts" "$skills_dir/$only_skill" "$repo_root/scripts"
+else
+  scan_generated_artifacts "repository" "$repo_root"
 fi
 
 if [ ! -f "$manifest" ]; then
@@ -40,6 +57,9 @@ for skill_dir in "$skills_dir"/*; do
   [ -d "$skill_dir" ] || continue
 
   dir_name=$(basename "$skill_dir")
+  if [ -n "$only_skill" ] && [ "$dir_name" != "$only_skill" ]; then
+    continue
+  fi
   skill_md="$skill_dir/SKILL.md"
 
   if [ ! -f "$skill_md" ]; then
@@ -86,9 +106,51 @@ for skill_dir in "$skills_dir"/*; do
     echo "ERROR: $dir_name is missing from skills-index.md" >&2
     failed=1
   fi
+
+  if [ "$dir_name" = "fpf-work-guide" ]; then
+    for reference in \
+      references/chunk-lookup.md \
+      references/diagnostics.md \
+      references/protocol-trust.md \
+      references/source-selection.md
+    do
+      if [ ! -f "$skill_dir/$reference" ]; then
+        echo "ERROR: fpf-work-guide is missing canonical reference: $reference" >&2
+        failed=1
+      elif ! grep -q "$reference" "$skill_md"; then
+        echo "ERROR: fpf-work-guide/SKILL.md does not link canonical reference: $reference" >&2
+        failed=1
+      fi
+    done
+
+    for script_file in \
+      scripts/update_fpf_context.sh \
+      scripts/update_fpf_spec.sh \
+      scripts/update_fpf_protocols.sh \
+      scripts/check_fpf_environment.sh \
+      scripts/fpf-work-guide-doctor \
+      scripts/fpf_common.ps1 \
+      scripts/update_fpf_context.ps1 \
+      scripts/update_fpf_spec.ps1 \
+      scripts/update_fpf_protocols.ps1 \
+      scripts/check_fpf_environment.ps1 \
+      scripts/fpf-work-guide-doctor.ps1 \
+      scripts/update_fpf_context.cmd \
+      scripts/fpf-work-guide-doctor.cmd
+    do
+      if [ ! -f "$skill_dir/$script_file" ]; then
+        echo "ERROR: fpf-work-guide is missing cross-platform script: $script_file" >&2
+        failed=1
+      fi
+    done
+
+    if ! "$repo_root/scripts/validate-fpf-work-guide-cross-platform.sh"; then
+      failed=1
+    fi
+  fi
 done
 
-if [ -f "$manifest" ]; then
+if [ -z "$only_skill" ] && [ -f "$manifest" ]; then
   for skill_name in $(manifest_skills "$manifest"); do
     assert_safe_skill_name "$skill_name" || failed=1
     if [ ! -d "$skills_dir/$skill_name" ]; then

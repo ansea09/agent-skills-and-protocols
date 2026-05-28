@@ -38,7 +38,7 @@ canonical_files:
   skill_promotion_manifest: skills/promote-manifest.yaml
 
 skills:
-  fpf_latest: skills/fpf-latest/SKILL.md
+  fpf_work_guide: skills/fpf-work-guide/SKILL.md
 
 process_models:
   assistant_user_interaction:

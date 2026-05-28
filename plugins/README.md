@@ -8,6 +8,6 @@ Current plugins:
 
 | Plugin | Purpose | Runtime notes |
 | --- | --- | --- |
-| [`fpf-latest`](fpf-latest/) | Distributes the public `fpf-latest` skill as an installable Codex plugin. | Skill-only package. No bundled hooks, apps, or MCP servers. Requires Bash and Git for fresh refresh. |
+| [`fpf-work-guide`](fpf-work-guide/) | Distributes the public `fpf-work-guide` skill as an installable Codex plugin. | Skill-only package. No bundled hooks, apps, or MCP servers. Includes Bash, PowerShell, and CMD wrapper entrypoints. Requires Git for fresh refresh. |
 
 The repo-local marketplace is defined at [`../.agents/plugins/marketplace.json`](../.agents/plugins/marketplace.json).

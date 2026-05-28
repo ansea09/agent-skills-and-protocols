@@ -5,10 +5,10 @@
   },
   "plugins": [
     {
-      "name": "fpf-latest",
+      "name": "fpf-work-guide",
       "source": {
         "source": "local",
-        "path": "./plugins/fpf-latest"
+        "path": "./plugins/fpf-work-guide"
       },
       "policy": {
         "installation": "AVAILABLE",
