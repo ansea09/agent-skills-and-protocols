@@ -148,6 +148,53 @@ for skill_dir in "$skills_dir"/*; do
       failed=1
     fi
   fi
+
+  if [ "$dir_name" = "doc-to-md" ]; then
+    if ! grep -q "## Document Roles" "$skill_md"; then
+      echo "ERROR: doc-to-md/SKILL.md must declare document roles" >&2
+      failed=1
+    fi
+
+    for reference in \
+      references/workflow-profiles.md \
+      references/diagnostics.md \
+      references/scenario-boundaries.md \
+      references/audit-bundle.md \
+      references/ocr-paths.md \
+      references/support-matrix.md \
+      references/python-profiles.md \
+      references/lock-refresh.md \
+      references/markitdown-upgrade.md \
+      references/threat-model.md \
+      references/publishing.md
+    do
+      if [ ! -f "$skill_dir/$reference" ]; then
+        echo "ERROR: doc-to-md is missing canonical reference: $reference" >&2
+        failed=1
+      elif ! grep -q "$reference" "$skill_md"; then
+        echo "ERROR: doc-to-md/SKILL.md does not link canonical reference: $reference" >&2
+        failed=1
+      fi
+    done
+
+    if ! "$repo_root/scripts/validate-doc-to-md-compatibility.py" "$skill_dir"; then
+      failed=1
+    fi
+
+    for profile_file in \
+      requirements-core.macos-arm64-py313.hashes.txt \
+      requirements-book.macos-arm64-py313.hashes.txt \
+      requirements-ocr.macos-arm64-py313.hashes.txt \
+      requirements-core.macos-intel-py312.txt \
+      requirements-core.macos-intel-py312.hashes.txt \
+      requirements-book.macos-intel-py312.hashes.txt
+    do
+      if [ ! -f "$skill_dir/$profile_file" ]; then
+        echo "ERROR: doc-to-md is missing maintained profile file: $profile_file" >&2
+        failed=1
+      fi
+    done
+  fi
 done
 
 if [ -z "$only_skill" ] && [ -f "$manifest" ]; then

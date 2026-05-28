@@ -4,6 +4,8 @@ Status: Accepted
 
 Date: 2026-05-26 19:08:10 +0300
 
+Last updated: 2026-05-28
+
 ## Context
 
 `fpf-work-guide` is the skill that lets Codex and compatible agent runtimes use the current cached First Principles Framework (FPF) context and the FPF Codex protocol repository during day-to-day work.
@@ -14,6 +16,8 @@ The skill must satisfy two different needs:
 - Public distribution: another user should be able to install or adapt the public skill without receiving personal launchers, machine-local state, cache, logs, or private automation.
 
 The architecture must also keep role, method, work, artifact, process, and runtime boundaries separate. A script or shell process is an execution carrier, not the same thing as an acting system or a published skill artifact.
+
+This ADR is also the compact architecture-review evidence carrier for architecture characteristics, quanta, fitness functions, and known evidence gaps. A separate architecture-review reference is intentionally not used while the system remains small enough for one decision record to stay readable.
 
 ## Decision
 
@@ -306,6 +310,72 @@ The gate is intentionally a verification trigger, not an automatic author. It ca
 
 The public skill and plugin must not depend on this private doc-sync gate. The gate belongs to personal maintenance automation around the skill.
 
+### 18. Keep architecture-review evidence in this ADR
+
+Architecture review should not rely on reconstructing the design only from shell scripts, PowerShell scripts, `SKILL.md`, and scattered references. For the current size of `fpf-work-guide`, the review evidence belongs directly in this ADR rather than in a separate architecture-review reference file. That keeps one decision source and reduces documentation drift.
+
+If `fpf-work-guide` later grows into several independently released workflows, gains a larger Windows-specific implementation surface, or gets regular external architecture audits, the team may extract this section into a dedicated review artifact. Until then, this ADR is the architecture decision and review-evidence source.
+
+### Architecture Characteristics
+
+The selected driving characteristics are intentionally narrow:
+
+| Characteristic | Scope | Evidence |
+| --- | --- | --- |
+| Freshness transparency | FPF spec, chunks, protocols, and final answer basis | Refresh gate emits fresh/cached/missing/degraded/stale states; cached content must not be called latest. |
+| Cache safety | FPF and protocol cache repositories | `.fpf-cache-repo` marker validation, remote verification, and guarded `git reset --hard`. |
+| Instruction-source provenance | Protocol repository and selected checklists/SOPs | Protocol provenance fields, protocol trust policy, and registry-first loading. |
+| Portability honesty | Public skill, Bash path, PowerShell path, CMD wrappers, support claims | Replaceable path defaults, path-mode diagnostics, and support wording that separates implemented from release-verified. |
+| Runtime diagnosability | Refresh gate, environment checks, doctors, diagnostics | Human-readable diagnostics only when trust or action changes; machine-readable env fields for state, cache, chunks, and protocols. |
+| Cross-platform parity | Bash and PowerShell implementations | Shared environment-variable contract and cross-platform fixture validation. |
+| Artifact hygiene | Staged skill, plugin artifact, installed copy, personal automation, cache/state | Source-only plugin, staged/plugin validation, and explicit exclusion of private state, launchers, logs, and caches. |
+| Evolvability | Refresh, chunk lookup, protocol routing, diagnostics, publication checks | Separate quanta, ADR alternatives, reference docs, and doc-sync gate for architecture-significant changes. |
+
+Secondary governed concerns are source quality, temporal claim adequacy, answer-protocol discipline, and external network availability. These are governed through protocol trust, source-selection guidance, refresh-gate diagnostics, and manual review rather than being treated as separate runtime features.
+
+### Architecture Quanta
+
+`fpf-work-guide` has multiple quanta:
+
+- public source artifact: `skills/fpf-work-guide/`;
+- plugin distribution artifact: `plugins/fpf-work-guide/`;
+- FPF context refresh runtime: `update_fpf_context.*`, `update_fpf_spec.*`, `update_fpf_protocols.*`, cache repositories, refresh locks, and refresh state;
+- FPF source lookup runtime: chunk layout contract, chunk index/metadata, source commit validation, and `FPF-Spec.md` fallback;
+- protocol instruction runtime: protocol cache, registry, selected checklists/SOPs, provenance fields, and protocol trust policy;
+- environment and diagnostic runtime: `check_fpf_environment.*`, `fpf-work-guide-doctor*`, path-mode fields, and user-facing diagnostic references;
+- cross-platform wrapper runtime: Bash scripts, PowerShell scripts, and CMD wrappers that delegate to PowerShell;
+- personal automation layer: session-start launchers, hooks, wrapper-captured output, local state, and doc-sync automation;
+- publication and promotion lane: staged/plugin validation, marketplace metadata, and manual release review.
+
+These quanta deliberately have different support boundaries and validation checks. A passing public source gate does not prove a user's cache is fresh; plugin installation does not prove GitHub access; Bash validation does not prove native Windows behavior; and personal session-start automation is not part of the public plugin contract.
+
+### Fitness Functions
+
+| Quality | Check | Cadence | Evidence | Failure action |
+| --- | --- | --- | --- | --- |
+| Artifact hygiene | Staged skill and plugin artifact validate and remain synchronized. | Every release and PR touching `fpf-work-guide` | `scripts/validate-skills.sh`, `scripts/validate-plugins.sh` | Resync or repair source/plugin artifact before publication. |
+| Cross-platform lifecycle parity | Bash lifecycle fixtures pass; PowerShell fixtures pass when `pwsh` is available. | Every release and script change | `scripts/validate-fpf-work-guide-cross-platform.sh` | Fix parity drift or downgrade support claim before publication. |
+| Windows release verification | PowerShell and CMD lanes run on a Windows or `pwsh` host when Windows is claimed as release-verified. | Before claiming Windows release verification | `FPF_VALIDATE_POWERSHELL=required FPF_VALIDATE_CMD=required scripts/validate-fpf-work-guide-cross-platform.sh` on an appropriate host | Keep Windows as implemented/candidate rather than release-verified. |
+| Chunk-source safety | Chunk source commit must match `FPF_SPEC_COMMIT` before chunk-first use; stale chunks force full-spec-first mode. | Every release and chunk lookup change | Cross-platform stale/degraded fixture assertions for `FPF_CHUNKS_SOURCE_COMMIT`, `FPF_CHUNKS_STATUS`, and `FPF_CHUNKS_MODE` | Fix chunk detection or require full-spec fallback before FPF-backed answers. |
+| Cache reset containment | Cache reset is allowed only for verified cache repositories or explicit nonstandard reset opt-in. | Every release and cache script change | Cross-platform reset guard and marker validation fixtures | Block destructive cache operations until marker/remote validation is correct. |
+| Protocol provenance | Protocol outputs include repository URL, branch, remote URL, trust status, and commit. | Every release and protocol refresh change | Cross-platform protocol provenance fixture assertions | Do not treat protocols as authoritative until provenance is restored. |
+| State diagnosability | Refresh state, previous-attempt source, active lock, and unavailable state directory are distinguishable. | Every release and state/launcher change | Lifecycle fixtures for recent-cache, active-refresh, and state-dir-unavailable | Fix state reporting or disclose degraded state explicitly. |
+| Portable environment evidence | Doctor reports path-policy mode and portable environment status. | Every release and install-path change | `fpf-work-guide-doctor` / `fpf-work-guide-doctor.ps1`, cross-platform doctor fixtures | Fix path policy or downgrade portability claim. |
+| Documentation drift control | Architecture-significant implementation changes trigger review of ADR and private implementation docs. | Every architecture-significant change | `jobs/fpf-doc-sync/check.sh` in the personal workspace | Update docs or explicitly record why no documentation update was needed before writing a new baseline. |
+
+### Known Risks And Evidence Gaps
+
+| Risk or gap | Impact | Current mitigation | Trigger for new work |
+| --- | --- | --- | --- |
+| PowerShell and CMD behavior are not proven by local macOS Bash validation when `pwsh` or Windows is unavailable. | Windows support can be overclaimed. | Support wording separates implemented from release-verified; validation can require PowerShell/CMD lanes. | Before public release notes claim Windows verification. |
+| Bash and PowerShell duplicate core refresh behavior. | Semantic drift can appear between platforms. | Shared environment contract and golden fixture assertions. | Any refresh, cache, protocol, state, or diagnostics change. |
+| Protocol repository is an active instruction source and defaults to a moving branch. | Freshness improves, but reproducibility and supply-chain confidence can be weaker. | Provenance fields, protocol trust policy, and cache-only/pinned-branch options for higher-impact use. | High-impact work, shared installation, or protocol behavior change. |
+| Chunk caches can be stale relative to `FPF-Spec.md`. | Pattern-specific answers could use outdated pattern text if source matching fails. | `FPF_CHUNKS_SOURCE_COMMIT` check and full-spec-first mode on mismatch. | New chunk generator, new mirror layout, or stale chunks observed in normal use. |
+| Session-start refresh is outside the public skill. | Users may expect automatic startup refresh after installing the plugin. | Public docs define the skill boundary and treat launchers/hooks as personal automation examples only. | Publishing a supported launcher or making lifecycle integration part of the public contract. |
+| State path and symlink behavior can be confusing. | Agents can read stale or unexpected state if multiple state locations exist. | Explicit state path variables and path-mode diagnostics. | Shared workspaces, read-only workspaces, symlinked directories, or launcher migration. |
+| Fresh mode depends on Git and GitHub availability. | The skill may need to use current cached copies or block FPF-backed work. | Cache fallback policy with explicit warnings and missing-cache blocking. | Network-restricted environments or first install without cache. |
+| The doc-sync gate is personal maintenance automation, not public CI. | Public branch publication can still rely on maintainer discipline. | Validation rules and release review keep the boundary explicit. | Multiple maintainers, repeated doc drift, or formal release automation. |
+
 ## Consequences
 
 ### Positive consequences
@@ -319,6 +389,7 @@ The public skill and plugin must not depend on this private doc-sync gate. The g
 - Destructive Git operations are constrained to known cache repositories.
 - Wrapper output and durable gate state no longer collide, so status tooling can inspect the last run without corrupting TTL state.
 - Plugin distribution gives another user a clean installation boundary.
+- Architecture review evidence is discoverable in the same ADR as the decision record.
 
 ### Costs and tradeoffs
 
@@ -331,6 +402,7 @@ The public skill and plugin must not depend on this private doc-sync gate. The g
 - Diagnostics are intentionally selective, so routine cache use is visible in engineering basis rather than always shown as a prominent message.
 - Method and architecture changes gain a local documentation drift check, but the check still requires human or agent review of the actual content.
 - The protocol repository is an active instruction source, so freshness and trust policy must be handled more strictly than ordinary documentation.
+- Architecture characteristics, quanta, fitness functions, and evidence gaps must stay aligned with scripts and reference docs when the implementation changes.
 
 ## Alternatives Considered
 
@@ -382,6 +454,7 @@ Manual review must verify:
 - architecture-significant `fpf-work-guide` changes pass the personal doc-sync gate or explicitly record why no documentation update was needed
 - protocol repository provenance and trust policy are documented when protocol behavior changes
 - Windows support claims say which validation lane has passed; CI claims do not imply native Windows verification unless a Windows runner actually executed the PowerShell/CMD lane
+- architecture characteristics, quanta, fitness functions, and known risks are updated when a change alters architecture boundaries, validation evidence, or support claims
 
 ## Open Follow-Ups
 

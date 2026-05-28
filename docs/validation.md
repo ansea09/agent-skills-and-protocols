@@ -7,6 +7,27 @@ scripts/validate-skills.sh
 scripts/validate-plugins.sh
 ```
 
+For a `doc-to-md` public source/plugin release, run the stricter source gate:
+
+```bash
+scripts/validate-doc-to-md-release.sh
+```
+
+The source gate uses staged requirements, staged wrappers, and either a
+temporary runtime or a reusable `DOC_TO_MD_CI_RUNTIME` cache root. It does not
+require the public skill to be installed under `${CODEX_HOME:-$HOME/.codex}`.
+For public publication evidence, require online dependency SCA:
+
+```bash
+DOC_TO_MD_SCA_MODE=required scripts/validate-doc-to-md-release.sh
+```
+
+For a local promotion from an installed operational copy, run:
+
+```bash
+scripts/validate-doc-to-md-release.sh --promotion
+```
+
 The validation checks:
 
 - every directory under `skills/` contains `SKILL.md`;
@@ -16,7 +37,12 @@ The validation checks:
 - no `.DS_Store`, `__pycache__`, or `.pyc` files are present;
 - every staged skill is listed in `skills-index.md`;
 - every skill listed in `skills/promote-manifest.yaml` exists under `skills/`;
-- no high-risk private markers are present under `skills/`.
+- no high-risk private markers are present under `skills/`;
+- `doc-to-md` frontmatter compatibility matches
+  `skills/doc-to-md/references/support-matrix.md`;
+- `doc-to-md` frontmatter hash profiles are documented in
+  `skills/doc-to-md/references/python-profiles.md` and have matching
+  `requirements-*.hashes.txt` files.
 
 For `fpf-work-guide`, `scripts/validate-skills.sh` runs
 `scripts/validate-fpf-work-guide-cross-platform.sh`. That gate always runs Bash
@@ -41,7 +67,32 @@ Plugin validation checks:
 - the manifest `name` matches the plugin directory name;
 - bundled skills under `plugins/<name>/skills/` contain valid `SKILL.md` files;
 - the repo-local marketplace `.agents/plugins/marketplace.json` lists the plugin;
-- no high-risk private markers are present under `plugins/`.
+- no high-risk private markers are present under `plugins/`;
+- bundled plugin skills match their staged `skills/<name>/` source.
+
+`doc-to-md` release validation additionally checks:
+
+- staged `skills/doc-to-md` matches bundled
+  `plugins/doc-to-md/skills/doc-to-md`;
+- source mode does not require an installed operational copy;
+- source mode builds or reuses repo-scoped CI runtimes from staged
+  requirements and staged wrappers;
+- promotion mode additionally checks that staged `skills/doc-to-md` matches the
+  installed operational copy at `${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md`,
+  unless `DOC_TO_MD_INSTALLED_SKILL_DIR` points elsewhere;
+- `mdown-doctor --json`, `mdown-book --doctor --json`, and
+  `mdown-ocrpdf --doctor --json` validate against
+  `skills/doc-to-md/schemas/*.schema.json`;
+- the dependency license/runtime audit runs for core, book, and OCR profiles;
+- `DOC_TO_MD_SCA_MODE=required` additionally fails closed if online package
+  vulnerability metadata cannot be checked;
+- the dependency maintenance monitor has a fixture-backed smoke check for
+  OCR/PDF drift signals;
+- the synthetic regression corpus matches expected Markdown snapshots before a
+  MarkItDown upgrade is published;
+- the generated audit bundle regression verifies PDF page/image/link evidence;
+- promotion mode additionally checks installed `mdown-book --doctor --json` and
+  `mdown-ocrpdf --doctor --json` as releasable runtime evidence.
 
 Manual review checklist:
 
@@ -49,6 +100,18 @@ Manual review checklist:
 - The skill does not expose secrets, tokens, local private paths, or private data.
 - `fpf-work-guide` installation docs include the one-time portable doctor command.
 - `fpf-work-guide` behavior docs define `substantive task`, non-substantive interactions, and the agent-side task-admission start event with examples.
+- `doc-to-md` documentation describes one public skill with reusable workflow profiles, not a required `doc-to-md-private` companion skill.
+- `doc-to-md` frontmatter contains a short `compatibility` summary aligned with `references/support-matrix.md`.
+- `doc-to-md` Python minor-version claims are profile-specific and documented in `references/python-profiles.md`; unlisted Python minors stay candidate/unverified.
+- `doc-to-md` keeps personal OCR language preferences and local defaults in private local policy files, outside staged skill and plugin artifacts.
+- `doc-to-md` plugin copy is synchronized with `skills/doc-to-md/`, including reference files such as `workflow-profiles.md` and `local-policy-migration.md`.
+- `doc-to-md` installed, staged, and plugin copies have no release drift.
+- `doc-to-md` MarkItDown upgrades run `skills/doc-to-md/scripts/regression_corpus.py` and compare snapshot diffs before publishing.
+- `doc-to-md` MarkItDown upgrades follow `skills/doc-to-md/references/markitdown-upgrade.md`; `magika 1.x` is not promoted alone until upstream MarkItDown metadata allows it.
+- `doc-to-md` public review includes `skills/doc-to-md/references/threat-model.md`; trusted-local guardrails are not represented as sandboxing.
+- `doc-to-md` does not add a high-fidelity textbook parser to core; higher-quality textbook parsing stays in a separate experimental workflow until it has its own runtime, support matrix, and release gate.
+- `doc-to-md` user-facing diagnostics are documented in `references/diagnostics.md` and cover runtime, doctor, guardrail, output quality, audit, OCR, write-safety, platform, and publication boundaries.
+- `doc-to-md` docs state that `eng+rus` is an English/Russian OCR choice when the language packs are installed, not a universal default.
 - Installation docs distinguish modern Codex skill discovery locations such as `.agents/skills` from local legacy/current compatibility paths such as `${CODEX_HOME:-$HOME/.codex}/skills`.
 - Installation docs state that plugins are the distribution path for reusable skills shared beyond local authoring or a single repo-scoped workflow.
 - `fpf-work-guide` states its compatibility contract: Codex/macOS-first, Git required for fresh refresh, Bash path supported on Unix-like shells, native Windows PowerShell implemented through `.ps1` scripts, CMD implemented through `.cmd` wrappers, cache fallback supported, WSL supported, Git Bash best effort, and Windows/CI claims marked release-verified only when the relevant validation lane has passed.
