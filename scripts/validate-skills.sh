@@ -207,9 +207,16 @@ if [ -z "$only_skill" ] && [ -f "$manifest" ]; then
   done
 fi
 
-if ! scan_private_markers "$skills_dir"; then
-  echo "ERROR: private markers found under skills/" >&2
-  failed=1
+if [ -n "$only_skill" ]; then
+  if ! scan_private_markers "$skills_dir/$only_skill"; then
+    echo "ERROR: private markers found under skills/$only_skill" >&2
+    failed=1
+  fi
+else
+  if ! scan_private_markers "$skills_dir"; then
+    echo "ERROR: private markers found under skills/" >&2
+    failed=1
+  fi
 fi
 
 if [ "$failed" -ne 0 ]; then
