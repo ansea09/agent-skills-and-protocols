@@ -4,11 +4,11 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 . (Join-Path -Path $ScriptDir -ChildPath "fpf_common.ps1")
 
 $HomeDir = Get-FpfHome
-$RepoUrl = Get-FpfEnv "FPF_PROTOCOLS_REPO_URL" "https://github.com/ansea09/codex-skills-and-protocols.git"
+$RepoUrl = Get-FpfEnv "FPF_PROTOCOLS_REPO_URL" "https://github.com/ansea09/agent-skills-and-protocols.git"
 $Branch = Get-FpfEnv "FPF_PROTOCOLS_BRANCH" "main"
 $CodexHomeDir = Get-FpfEnv "CODEX_HOME" (Join-FpfPath $HomeDir @(".codex"))
 $DefaultCacheHome = Get-FpfEnv "FPF_CACHE_HOME" (Join-FpfPath $CodexHomeDir @("cache"))
-$DefaultCacheDir = Join-FpfPath $DefaultCacheHome @("codex-skills-and-protocols")
+$DefaultCacheDir = Join-FpfPath $DefaultCacheHome @("agent-skills-and-protocols")
 $CacheDir = Get-FpfEnv "FPF_PROTOCOLS_CACHE_DIR" $DefaultCacheDir
 $CacheMarker = Join-FpfPath $CacheDir @(".fpf-cache-repo")
 $ExpectedCacheKind = "fpf-protocols-cache"
@@ -88,7 +88,7 @@ if ($RefreshMode -ne "refresh") {
 if (-not (Test-FpfCommandAvailable "git")) {
   if (Test-Path -LiteralPath $RegistryPath -PathType Leaf) {
     $script:Status = "cached"
-    $script:Warning = "Git is unavailable; using the last cached Codex skills/protocols."
+    $script:Warning = "Git is unavailable; using the last cached agent skills/protocols."
     Write-Result (Get-CachedCommit)
     exit 0
   }
@@ -109,13 +109,13 @@ if (-not (Test-Path -LiteralPath $GitDir -PathType Container)) {
   } else {
     if (Test-Path -LiteralPath $RegistryPath -PathType Leaf) {
       $script:Status = "cached"
-      $script:Warning = "Could not clone the Codex skills/protocols from GitHub; using the last cached protocols."
+      $script:Warning = "Could not clone the agent skills/protocols from GitHub; using the last cached protocols."
       $commit = Get-FpfGitOutput @("-C", $CacheDir, "rev-parse", "HEAD")
       if (-not $commit) { $commit = "unknown" }
       Write-Result $commit
       exit 0
     }
-    $script:Detail = "Could not clone the Codex skills/protocols from GitHub and no cached protocols exist."
+    $script:Detail = "Could not clone the agent skills/protocols from GitHub and no cached protocols exist."
     Write-Result "none"
     exit 2
   }
@@ -142,13 +142,13 @@ if (-not (Test-Path -LiteralPath $GitDir -PathType Container)) {
   } else {
     if (Test-Path -LiteralPath $RegistryPath -PathType Leaf) {
       $script:Status = "cached"
-      $script:Warning = "Could not update the Codex skills/protocols from GitHub; using the last cached protocols."
+      $script:Warning = "Could not update the agent skills/protocols from GitHub; using the last cached protocols."
       $commit = Get-FpfGitOutput @("-C", $CacheDir, "rev-parse", "HEAD")
       if (-not $commit) { $commit = "unknown" }
       Write-Result $commit
       exit 0
     }
-    $script:Detail = "Could not update the Codex skills/protocols from GitHub and no cached protocols exist."
+    $script:Detail = "Could not update the agent skills/protocols from GitHub and no cached protocols exist."
     Write-Result "none"
     exit 2
   }

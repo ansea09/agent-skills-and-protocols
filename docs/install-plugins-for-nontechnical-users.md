@@ -32,7 +32,7 @@ Codex должен будет попросить разрешение, если 
 ```text
 Установи мне Codex plugin из публичного репозитория:
 
-https://github.com/ansea09/codex-skills-and-protocols
+https://github.com/ansea09/agent-skills-and-protocols
 
 Сначала уточни, что я хочу установить:
 
@@ -85,41 +85,41 @@ https://github.com/ansea09/codex-skills-and-protocols
 1. Создай локальную папку для plugin marketplace.
 
    На macOS или WSL:
-   ~/CodexPlugins/codex-skills-and-protocols
+   ~/CodexPlugins/agent-skills-and-protocols
 
    На Windows PowerShell:
-   ~/CodexPlugins/codex-skills-and-protocols
+   ~/CodexPlugins/agent-skills-and-protocols
 
    Используй path syntax текущей ОС. Не запускай Bash-only команды в Windows native.
 
 2. Если репозиторий ещё не скачан, скачай его.
 
    На macOS или WSL:
-   git clone https://github.com/ansea09/codex-skills-and-protocols.git ~/CodexPlugins/codex-skills-and-protocols
+   git clone https://github.com/ansea09/agent-skills-and-protocols.git ~/CodexPlugins/agent-skills-and-protocols
 
    На Windows PowerShell используй эквивалентный путь в профиле пользователя.
 
 3. Если репозиторий уже скачан, обнови его.
 
    На macOS или WSL:
-   git -C ~/CodexPlugins/codex-skills-and-protocols pull --ff-only
+   git -C ~/CodexPlugins/agent-skills-and-protocols pull --ff-only
 
    На Windows PowerShell используй эквивалентный путь в профиле пользователя.
 
 4. Подключи repo как локальный Codex marketplace.
 
    На macOS или WSL:
-   codex plugin marketplace add ~/CodexPlugins/codex-skills-and-protocols
+   codex plugin marketplace add ~/CodexPlugins/agent-skills-and-protocols
 
    На Windows PowerShell используй эквивалентный путь в профиле пользователя.
 
 5. Установи выбранные plugin:
 
    Для fpf-work-guide:
-   codex plugin add fpf-work-guide@codex-skills-and-protocols
+   codex plugin add fpf-work-guide@agent-skills-and-protocols
 
    Для doc-to-md, только если я явно выбрала/выбрал его:
-   codex plugin add doc-to-md@codex-skills-and-protocols
+   codex plugin add doc-to-md@agent-skills-and-protocols
 
 6. Проверь установку:
    codex plugin marketplace list

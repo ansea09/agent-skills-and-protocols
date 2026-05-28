@@ -1,7 +1,7 @@
 {
-  "name": "codex-skills-and-protocols",
+  "name": "agent-skills-and-protocols",
   "interface": {
-    "displayName": "Codex Skills and Protocols"
+    "displayName": "Agent Skills and Protocols"
   },
   "plugins": [
     {

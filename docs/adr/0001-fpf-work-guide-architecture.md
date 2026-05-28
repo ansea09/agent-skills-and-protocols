@@ -23,7 +23,7 @@ This ADR is also the compact architecture-review evidence carrier for architectu
 
 ### 1. Keep `fpf-work-guide` as the public skill boundary
 
-The public `fpf-work-guide` skill is the portable instruction and script bundle. It defines how an agent refreshes or validates FPF context, selects Codex skills/protocols, reads FPF chunks, and discloses cache/freshness status.
+The public `fpf-work-guide` skill is the portable instruction and script bundle. It defines how an agent refreshes or validates FPF context, selects agent skills/protocols, reads FPF chunks, and discloses cache/freshness status.
 
 Personal automation around the skill is not part of the public skill. This includes local launchers, session-start hooks, LaunchAgents, workspace jobs, `.fpf-update/`, cache directories, logs, and machine-local environment files.
 

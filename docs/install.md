@@ -200,7 +200,7 @@ Use exact cache paths only when the FPF specification and protocol repository mu
 
 ```bash
 export FPF_SPEC_CACHE_DIR="/absolute/path/to/fpf-spec-mirror"
-export FPF_PROTOCOLS_CACHE_DIR="/absolute/path/to/codex-skills-and-protocols"
+export FPF_PROTOCOLS_CACHE_DIR="/absolute/path/to/agent-skills-and-protocols"
 ```
 
 Use exact state paths only when refresh state and environment state need separate lifecycle or permissions:

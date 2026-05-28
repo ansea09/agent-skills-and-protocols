@@ -21,7 +21,7 @@ Use these provenance fields when deciding whether protocol instructions are acce
 The default repository is:
 
 ```text
-https://github.com/ansea09/codex-skills-and-protocols.git
+https://github.com/ansea09/agent-skills-and-protocols.git
 ```
 
 The default branch is `main`.

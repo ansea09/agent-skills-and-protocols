@@ -74,7 +74,7 @@ Forbidden inverse relations:
 - Claude Code install profile: `claude-code/fpf-work-guide/`.
 - Installed operational copy: `$HOME/.agents/skills/fpf-work-guide/`, `$REPO_ROOT/.agents/skills/fpf-work-guide/`, `${CODEX_HOME:-$HOME/.codex}/skills/fpf-work-guide/`, or another agent-specific runtime location.
 - Runtime dependency layer: shell utilities and `git`.
-- Cache and state layer: `${FPF_CACHE_HOME:-${CODEX_HOME:-$HOME/.codex}/cache}/fpf-spec-mirror`, `${FPF_CACHE_HOME:-${CODEX_HOME:-$HOME/.codex}/cache}/codex-skills-and-protocols`, `.fpf-update/`, and `~/.local/state/codex-fpf/`.
+- Cache and state layer: `${FPF_CACHE_HOME:-${CODEX_HOME:-$HOME/.codex}/cache}/fpf-spec-mirror`, `${FPF_CACHE_HOME:-${CODEX_HOME:-$HOME/.codex}/cache}/agent-skills-and-protocols`, `.fpf-update/`, and `~/.local/state/codex-fpf/`.
 - Personal automation layer: workspace launchers, session-start hooks, LaunchAgents, and update jobs that call `fpf-work-guide`.
 
 `fpf-work-guide` personal automation is not a public skill overlay. It must not be staged under `skills/fpf-work-guide/`, and the public skill must not require it.

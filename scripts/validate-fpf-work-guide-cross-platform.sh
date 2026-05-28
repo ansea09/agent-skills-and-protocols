@@ -13,7 +13,7 @@ stale_chunks_sha="3333333333333333333333333333333333333333"
 unknown_chunks_sha="4444444444444444444444444444444444444444"
 protocols_sha="5555555555555555555555555555555555555555"
 expected_spec_url="https://github.com/ansea09/fpf-spec-mirror.git"
-expected_protocols_url="https://github.com/ansea09/codex-skills-and-protocols.git"
+expected_protocols_url="https://github.com/ansea09/agent-skills-and-protocols.git"
 wrong_url="https://example.invalid/not-the-cache.git"
 
 fail() {

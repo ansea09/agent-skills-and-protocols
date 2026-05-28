@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -u
 
-REPO_URL="${FPF_PROTOCOLS_REPO_URL:-https://github.com/ansea09/codex-skills-and-protocols.git}"
+REPO_URL="${FPF_PROTOCOLS_REPO_URL:-https://github.com/ansea09/agent-skills-and-protocols.git}"
 BRANCH="${FPF_PROTOCOLS_BRANCH:-main}"
 CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
 DEFAULT_CACHE_HOME="${FPF_CACHE_HOME:-$CODEX_HOME_DIR/cache}"
-DEFAULT_CACHE_DIR="$DEFAULT_CACHE_HOME/codex-skills-and-protocols"
+DEFAULT_CACHE_DIR="$DEFAULT_CACHE_HOME/agent-skills-and-protocols"
 CACHE_DIR="${FPF_PROTOCOLS_CACHE_DIR:-$DEFAULT_CACHE_DIR}"
 CACHE_MARKER="$CACHE_DIR/.fpf-cache-repo"
 EXPECTED_CACHE_KIND="fpf-protocols-cache"
@@ -161,7 +161,7 @@ fi
 if ! command -v git >/dev/null 2>&1; then
   if [ -f "$REGISTRY_PATH" ]; then
     status="cached"
-    warning="Git is unavailable; using the last cached Codex skills/protocols."
+    warning="Git is unavailable; using the last cached agent skills/protocols."
     print_result "$(cached_commit)"
     exit 0
   fi
@@ -178,12 +178,12 @@ if [ ! -d "$CACHE_DIR/.git" ]; then
   else
     if [ -f "$REGISTRY_PATH" ]; then
       status="cached"
-      warning="Could not clone the Codex skills/protocols from GitHub; using the last cached protocols."
+      warning="Could not clone the agent skills/protocols from GitHub; using the last cached protocols."
       commit="$(git -C "$CACHE_DIR" rev-parse HEAD 2>/dev/null || printf 'unknown')"
       print_result "$commit"
       exit 0
     fi
-    detail="Could not clone the Codex skills/protocols from GitHub and no cached protocols exist."
+    detail="Could not clone the agent skills/protocols from GitHub and no cached protocols exist."
     print_result "none"
     exit 2
   fi
@@ -207,12 +207,12 @@ else
   else
     if [ -f "$REGISTRY_PATH" ]; then
       status="cached"
-      warning="Could not update the Codex skills/protocols from GitHub; using the last cached protocols."
+      warning="Could not update the agent skills/protocols from GitHub; using the last cached protocols."
       commit="$(git -C "$CACHE_DIR" rev-parse HEAD 2>/dev/null || printf 'unknown')"
       print_result "$commit"
       exit 0
     fi
-    detail="Could not update the Codex skills/protocols from GitHub and no cached protocols exist."
+    detail="Could not update the agent skills/protocols from GitHub and no cached protocols exist."
     print_result "none"
     exit 2
   fi

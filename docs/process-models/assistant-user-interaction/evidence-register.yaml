@@ -111,9 +111,9 @@ sources:
       - viewpoint bundle
       - evidence graph
 
-  - id: codex-skills-and-protocols
-    title: Codex Skills and Protocols
-    repository: ansea09/codex-skills-and-protocols
+  - id: agent-skills-and-protocols
+    title: Agent Skills and Protocols
+    repository: ansea09/agent-skills-and-protocols
     source_type: local_repository
     checked_on: 2026-05-23
     commit_before_change: fd5e4f556bf588f684372c107f199c059bd8435e

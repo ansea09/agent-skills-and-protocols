@@ -1,4 +1,4 @@
-# Codex Skills and Protocols
+# Agent Skills and Protocols
 
 Russian version: [`README.ru.md`](README.ru.md)
 

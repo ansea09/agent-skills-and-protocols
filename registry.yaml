@@ -1,8 +1,8 @@
 schema_version: 1
-repository: ansea09/codex-skills-and-protocols
+repository: ansea09/agent-skills-and-protocols
 default_branch: main
 purpose: >
-  Codex procedure layer for current FPF-backed task classification,
+  Agent procedure and packaging layer for current FPF-backed task classification,
   protocol routing, mandatory checklist execution, SOP explanations,
   examples, engineering-basis disclosure, and staged skill publication.
 

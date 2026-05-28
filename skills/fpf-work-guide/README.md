@@ -1,7 +1,7 @@
 # fpf-work-guide
 
 Public Codex skill for refreshing or validating the current FPF context and
-using the `codex-skills-and-protocols` repository as the FPF-backed procedure
+using the `agent-skills-and-protocols` repository as the FPF-backed procedure
 layer for substantive Codex work.
 
 This README is for users and maintainers. `SKILL.md` is the executable routing
