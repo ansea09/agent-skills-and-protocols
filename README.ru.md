@@ -16,7 +16,7 @@ English version: [`README.md`](README.md)
 
 | Skill | Что делает | Когда использовать | С чего начать |
 | --- | --- | --- | --- |
-| [`fpf-work-guide`](skills/fpf-work-guide/) | Поддерживает и использует текущий cached FPF context и Codex FPF protocols. | FPF-backed reasoning, планирование, review, coding и source-backed answers. | [`skills/fpf-work-guide/README.md`](skills/fpf-work-guide/README.md) или [`plugins/fpf-work-guide`](plugins/fpf-work-guide/) |
+| [`fpf-work-guide`](skills/fpf-work-guide/) | Повышает качество ответов LLM за счёт актуального FPF-контекста и Codex FPF-протоколов, которые проверяются перед содержательной работой. | FPF-backed reasoning, планирование, review, coding и source-backed answers. | [`skills/fpf-work-guide/README.md`](skills/fpf-work-guide/README.md) или [`plugins/fpf-work-guide`](plugins/fpf-work-guide/) |
 | [`doc-to-md`](skills/doc-to-md/) | Конвертирует trusted local documents в Markdown через MarkItDown, с optional PDF audit bundles и optional OCR preprocessing. | Локальная конвертация документов, textbook-like PDF audit, OCR для scanned PDF, Markdown intermediate перед анализом. | [`skills/doc-to-md/README.md`](skills/doc-to-md/README.md) или [`plugins/doc-to-md`](plugins/doc-to-md/) |
 
 Полный список skills: [`skills-index.md`](skills-index.md).
