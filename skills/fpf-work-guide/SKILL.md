@@ -196,7 +196,7 @@ If `FPF_CHUNKS_MODE=blocked`, explain that neither chunk-first lookup nor full-s
 
 If `FPF_CHUNKS_MODE=full-spec-fallback`, continue only with `FPF_SPEC_PATH` and disclose that chunks are unavailable or structurally incomplete.
 
-If `FPF_CHUNKS_MODE=full-spec-first`, use `FPF_SPEC_PATH` before chunks and disclose that chunk source commit does not match `FPF_SPEC_COMMIT` when the answer depends on FPF pattern content.
+If `FPF_CHUNKS_MODE=full-spec-first`, use `FPF_SPEC_PATH` before chunks and disclose that chunk source commit does not match `FPF_SPEC_SOURCE_COMMIT` when the answer depends on FPF pattern content.
 
 If `FPF_PROTOCOLS_STATUS=missing`, explain that no local FPF Codex protocol cache exists and ask the user to allow a GitHub fetch or provide the repository files.
 
@@ -227,7 +227,7 @@ Do not print the full checklist unless the user asks for an audit trace. For ord
 
 Use `references/chunk-lookup.md` as the canonical chunk lookup procedure.
 
-Use chunks as the primary FPF source only when `FPF_CHUNKS_MODE=chunk-first`. If `FPF_CHUNKS_MODE=full-spec-first`, the chunks are present but stale relative to `FPF_SPEC_COMMIT`; use `FPF_SPEC_PATH` first. If `FPF_CHUNKS_MODE=full-spec-fallback`, use targeted reads against `FPF_SPEC_PATH`. If `FPF_CHUNKS_MODE=blocked`, stop FPF-backed work until a valid source is available.
+Use chunks as the primary FPF source only when `FPF_CHUNKS_MODE=chunk-first`. If `FPF_CHUNKS_MODE=full-spec-first`, the chunks are present but stale relative to `FPF_SPEC_SOURCE_COMMIT`; use `FPF_SPEC_PATH` first. If `FPF_CHUNKS_MODE=full-spec-fallback`, use targeted reads against `FPF_SPEC_PATH`. If `FPF_CHUNKS_MODE=blocked`, stop FPF-backed work until a valid source is available.
 
 For every substantive response, apply these baseline distinctions:
 
@@ -256,7 +256,7 @@ Do not lie or fill gaps with invented facts. If a claim is unknown, say so. If a
 End substantive answers with a concise engineering basis:
 
 - FPF refresh gate: decision, reason, TTL, and next eligible refresh time.
-- FPF spec source: local path, commit, and whether it was fresh or cached.
+- FPF spec source: local path, mirror repository commit, upstream source commit, and whether it was fresh or cached.
 - FPF chunks source: local path, source commit, status, mode, and whether chunk-first, full-spec-first, or full-spec fallback was used.
 - FPF protocol source: local path, repository URL, branch, remote URL, cache trust status, commit, and whether it was fresh or cached.
 - selected protocol and completion status.

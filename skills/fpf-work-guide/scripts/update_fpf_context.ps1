@@ -241,6 +241,10 @@ function Write-RefreshState {
   if (-not $specStatus) { $specStatus = "unknown" }
   $specCommit = Read-FpfOutputValue $script:SpecOutput "FPF_SPEC_COMMIT"
   if (-not $specCommit) { $specCommit = "unknown" }
+  $specRepoCommit = Read-FpfOutputValue $script:SpecOutput "FPF_SPEC_REPO_COMMIT"
+  if (-not $specRepoCommit) { $specRepoCommit = $specCommit }
+  $specSourceCommit = Read-FpfOutputValue $script:SpecOutput "FPF_SPEC_SOURCE_COMMIT"
+  if (-not $specSourceCommit) { $specSourceCommit = "unknown" }
   $protocolsStatus = Read-FpfOutputValue $script:ProtocolsOutput "FPF_PROTOCOLS_STATUS"
   if (-not $protocolsStatus) { $protocolsStatus = "unknown" }
   $protocolsCommit = Read-FpfOutputValue $script:ProtocolsOutput "FPF_PROTOCOLS_COMMIT"
@@ -256,6 +260,8 @@ function Write-RefreshState {
     "FPF_REFRESH_NEXT_ELIGIBLE_AT=$(Format-FpfEpoch $NextEpoch)",
     "FPF_SPEC_STATUS=$specStatus",
     "FPF_SPEC_COMMIT=$specCommit",
+    "FPF_SPEC_REPO_COMMIT=$specRepoCommit",
+    "FPF_SPEC_SOURCE_COMMIT=$specSourceCommit",
     "FPF_PROTOCOLS_STATUS=$protocolsStatus",
     "FPF_PROTOCOLS_COMMIT=$protocolsCommit"
   )

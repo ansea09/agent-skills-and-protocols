@@ -100,6 +100,7 @@ EOF
 make_spec_cache() {
   cache_dir="$tmp_root/$1"
   chunks_sha="$2"
+  spec_source_sha="${3:-$chunks_sha}"
 
   mkdir -p \
     "$cache_dir/.git" \
@@ -108,6 +109,11 @@ make_spec_cache() {
     "$cache_dir/fpf_chunks/non_patterns"
 
   printf '# FPF Spec fixture\n' > "$cache_dir/FPF-Spec.md"
+  if [ "$spec_source_sha" != "none" ]; then
+    cat > "$cache_dir/fpf-source.env" <<EOF
+FPF_SPEC_SOURCE_COMMIT=$spec_source_sha
+EOF
+  fi
   cat > "$cache_dir/fpf_chunks/000-index.md" <<EOF
 # FPF pattern-aware chunks index
 
@@ -259,6 +265,8 @@ run_pwsh_doctor() {
 assert_aligned_output() {
   output="$1"
   assert_field "$output" FPF_SPEC_COMMIT "$aligned_sha"
+  assert_field "$output" FPF_SPEC_REPO_COMMIT "$aligned_sha"
+  assert_field "$output" FPF_SPEC_SOURCE_COMMIT "$aligned_sha"
   assert_field "$output" FPF_CHUNKS_SOURCE_COMMIT "$aligned_sha"
   assert_field "$output" FPF_CHUNKS_STATUS ready
   assert_field "$output" FPF_CHUNKS_MODE chunk-first
@@ -267,6 +275,8 @@ assert_aligned_output() {
 assert_stale_output() {
   output="$1"
   assert_field "$output" FPF_SPEC_COMMIT "$stale_spec_sha"
+  assert_field "$output" FPF_SPEC_REPO_COMMIT "$stale_spec_sha"
+  assert_field "$output" FPF_SPEC_SOURCE_COMMIT "$stale_spec_sha"
   assert_field "$output" FPF_CHUNKS_SOURCE_COMMIT "$stale_chunks_sha"
   assert_field "$output" FPF_CHUNKS_STATUS stale
   assert_field "$output" FPF_CHUNKS_MODE full-spec-first
@@ -275,6 +285,8 @@ assert_stale_output() {
 assert_unknown_spec_output() {
   output="$1"
   assert_field "$output" FPF_SPEC_COMMIT unknown
+  assert_field "$output" FPF_SPEC_REPO_COMMIT unknown
+  assert_field "$output" FPF_SPEC_SOURCE_COMMIT unknown
   assert_field "$output" FPF_CHUNKS_SOURCE_COMMIT "$unknown_chunks_sha"
   assert_field "$output" FPF_CHUNKS_STATUS degraded
   assert_field "$output" FPF_CHUNKS_MODE full-spec-fallback
@@ -498,12 +510,12 @@ aligned_git="$(make_fake_git aligned "$aligned_sha" "$expected_spec_url")"
 aligned_bash_output="$(run_bash_spec "$aligned_cache" "$aligned_git")"
 assert_aligned_output "$aligned_bash_output"
 
-stale_cache="$(make_spec_cache stale "$stale_chunks_sha")"
+stale_cache="$(make_spec_cache stale "$stale_chunks_sha" "$stale_spec_sha")"
 stale_git="$(make_fake_git stale "$stale_spec_sha" "$expected_spec_url")"
 stale_bash_output="$(run_bash_spec "$stale_cache" "$stale_git")"
 assert_stale_output "$stale_bash_output"
 
-unknown_cache="$(make_spec_cache unknown "$unknown_chunks_sha")"
+unknown_cache="$(make_spec_cache unknown "$unknown_chunks_sha" none)"
 rm -rf "$unknown_cache/.git"
 unknown_bash_output="$(FPF_SPEC_CACHE_DIR="$unknown_cache" FPF_REFRESH_MODE=cache-only bash "$skill_dir/scripts/update_fpf_spec.sh")"
 assert_unknown_spec_output "$unknown_bash_output"
@@ -533,7 +545,7 @@ if command -v pwsh >/dev/null 2>&1; then
   assert_field "$protocols_pwsh_output" FPF_PROTOCOLS_STATUS cached
   assert_protocols_provenance_output "$protocols_pwsh_output" "$protocols_sha" "$expected_protocols_url" remote-matches
 
-  for key in FPF_SPEC_COMMIT FPF_CHUNKS_SOURCE_COMMIT FPF_CHUNKS_STATUS FPF_CHUNKS_MODE; do
+  for key in FPF_SPEC_COMMIT FPF_SPEC_REPO_COMMIT FPF_SPEC_SOURCE_COMMIT FPF_CHUNKS_SOURCE_COMMIT FPF_CHUNKS_STATUS FPF_CHUNKS_MODE; do
     bash_value="$(printf '%s\n' "$stale_bash_output" | field_value "$key")"
     pwsh_value="$(printf '%s\n' "$stale_pwsh_output" | field_value "$key")"
     if [ "$bash_value" != "$pwsh_value" ]; then

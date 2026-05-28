@@ -10,6 +10,7 @@ CACHE_DIR="${FPF_SPEC_CACHE_DIR:-$DEFAULT_CACHE_DIR}"
 CACHE_MARKER="$CACHE_DIR/.fpf-cache-repo"
 EXPECTED_CACHE_KIND="fpf-spec-cache"
 SPEC_PATH="$CACHE_DIR/FPF-Spec.md"
+SPEC_SOURCE_METADATA_PATH="${FPF_SPEC_SOURCE_METADATA_PATH:-$CACHE_DIR/fpf-source.env}"
 CHUNKS_LAYOUT_MANIFEST_PATH="${FPF_CHUNKS_LAYOUT_MANIFEST_PATH:-$CACHE_DIR/fpf-chunks-layout.env}"
 REFRESH_MODE="${FPF_REFRESH_MODE:-${FPF_UPDATE_MODE:-refresh}}"
 
@@ -37,6 +38,8 @@ chunks_mode="blocked"
 chunks_warning=""
 chunks_detail=""
 chunks_source_commit="unknown"
+spec_source_commit="unknown"
+spec_source_commit_source="unknown"
 
 manifest_value() {
   local key="$1"
@@ -163,6 +166,72 @@ append_missing_chunk_entrypoint() {
   fi
 }
 
+is_hex_commit() {
+  local value="$1"
+  [ -n "$value" ] || return 1
+  case "$value" in
+    *[!0-9a-fA-F]*) return 1 ;;
+  esac
+  return 0
+}
+
+set_spec_source_commit() {
+  local source_commit
+  local spec_path_commit chunks_index_commit chunks_manifest_commit
+  spec_source_commit="unknown"
+  spec_source_commit_source="unknown"
+
+  source_commit="${FPF_SPEC_SOURCE_COMMIT:-}"
+
+  if is_hex_commit "$source_commit"; then
+    spec_source_commit="$source_commit"
+    spec_source_commit_source="env"
+    return
+  fi
+
+  if [ -r "$SPEC_SOURCE_METADATA_PATH" ]; then
+    source_commit="$(awk -F= '
+      /^[[:space:]]*#/ || /^[[:space:]]*$/ { next }
+      {
+        lhs = $1
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", lhs)
+        if (lhs == "FPF_SPEC_SOURCE_COMMIT" || lhs == "UPSTREAM_SHA") {
+          value = substr($0, index($0, "=") + 1)
+          gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+          sub(/\r$/, "", value)
+          print value
+          exit
+        }
+      }
+    ' "$SPEC_SOURCE_METADATA_PATH")"
+    if is_hex_commit "$source_commit"; then
+      spec_source_commit="$source_commit"
+      spec_source_commit_source="metadata"
+      return
+    fi
+  fi
+
+  if [ "$chunks_source_commit" != "unknown" ]; then
+    spec_path_commit="$(path_last_commit "FPF-Spec.md")"
+    chunks_index_commit="$(path_last_commit "$chunks_root_rel/$chunks_index_rel")"
+    chunks_manifest_commit="$(path_last_commit "$chunks_root_rel/manifest.json")"
+
+    if [ -n "$spec_path_commit" ] \
+      && { [ "$spec_path_commit" = "$chunks_index_commit" ] || [ "$spec_path_commit" = "$chunks_manifest_commit" ]; }; then
+      spec_source_commit="$chunks_source_commit"
+      spec_source_commit_source="inferred-from-aligned-mirror-paths"
+      return
+    fi
+  fi
+}
+
+path_last_commit() {
+  local rel_path="$1"
+  if command -v git >/dev/null 2>&1 && [ -d "$CACHE_DIR/.git" ]; then
+    git -C "$CACHE_DIR" log -n 1 --format=%H -- "$rel_path" 2>/dev/null || true
+  fi
+}
+
 detect_chunks_source_commit() {
   local source_commit
   source_commit=""
@@ -199,12 +268,14 @@ detect_chunks_source_commit() {
 }
 
 validate_chunks() {
-  local spec_commit="$1"
+  local spec_repo_commit="$1"
   chunks_status="missing"
   chunks_mode="blocked"
   chunks_warning=""
   chunks_detail=""
   chunks_source_commit="unknown"
+  spec_source_commit="unknown"
+  spec_source_commit_source="unknown"
 
   if ! load_chunk_layout; then
     chunks_status="degraded"
@@ -259,6 +330,7 @@ validate_chunks() {
   fi
 
   chunks_source_commit="$(detect_chunks_source_commit)"
+  set_spec_source_commit
   if [ "$chunks_source_commit" = "unknown" ]; then
     chunks_status="degraded"
     if [ -f "$SPEC_PATH" ]; then
@@ -273,30 +345,30 @@ validate_chunks() {
     return
   fi
 
-  if [ "$spec_commit" = "unknown" ] || [ "$spec_commit" = "none" ]; then
+  if [ "$spec_source_commit" = "unknown" ]; then
     chunks_status="degraded"
     if [ -f "$SPEC_PATH" ]; then
       chunks_mode="full-spec-fallback"
-      chunks_warning="FPF specification commit is unavailable; cannot verify chunk source commit, so use FPF-Spec.md fallback for pattern lookup."
-      chunks_detail="FPF chunks source commit is $chunks_source_commit, but FPF spec commit is $spec_commit."
+      chunks_warning="FPF specification source commit is unavailable; cannot verify chunk source commit, so use FPF-Spec.md fallback for pattern lookup."
+      chunks_detail="FPF chunks source commit is $chunks_source_commit, FPF spec repo commit is $spec_repo_commit, but FPF spec source commit is unknown."
     else
       chunks_mode="blocked"
-      chunks_warning="FPF specification commit is unavailable and FPF-Spec.md is unavailable."
-      chunks_detail="FPF chunks source commit is $chunks_source_commit, but FPF spec commit is $spec_commit."
+      chunks_warning="FPF specification source commit is unavailable and FPF-Spec.md is unavailable."
+      chunks_detail="FPF chunks source commit is $chunks_source_commit, FPF spec repo commit is $spec_repo_commit, but FPF spec source commit is unknown."
     fi
     return
   fi
 
-  if [ "$chunks_source_commit" != "$spec_commit" ]; then
+  if [ "$chunks_source_commit" != "$spec_source_commit" ]; then
     chunks_status="stale"
     if [ -f "$SPEC_PATH" ]; then
       chunks_mode="full-spec-first"
       chunks_warning="FPF chunks were generated from a different specification commit; use FPF-Spec.md first and disclose the stale chunk cache."
-      chunks_detail="FPF chunks source commit $chunks_source_commit does not match FPF spec commit $spec_commit."
+      chunks_detail="FPF chunks source commit $chunks_source_commit does not match FPF spec source commit $spec_source_commit."
     else
       chunks_mode="blocked"
       chunks_warning="FPF chunks were generated from a different specification commit and FPF-Spec.md is unavailable."
-      chunks_detail="FPF chunks source commit $chunks_source_commit does not match FPF spec commit $spec_commit."
+      chunks_detail="FPF chunks source commit $chunks_source_commit does not match FPF spec source commit $spec_source_commit."
     fi
     return
   fi
@@ -315,6 +387,9 @@ print_result() {
   local commit="$1"
   validate_chunks "$commit"
   printf 'FPF_SPEC_PATH=%s\n' "$SPEC_PATH"
+  printf 'FPF_SPEC_REPO_COMMIT=%s\n' "$commit"
+  printf 'FPF_SPEC_SOURCE_COMMIT=%s\n' "$spec_source_commit"
+  printf 'FPF_SPEC_SOURCE_COMMIT_SOURCE=%s\n' "$spec_source_commit_source"
   printf 'FPF_SPEC_COMMIT=%s\n' "$commit"
   printf 'FPF_SPEC_STATUS=%s\n' "$status"
   if [ -n "$warning" ]; then

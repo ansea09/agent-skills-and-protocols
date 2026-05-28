@@ -40,7 +40,10 @@ Portable doctor fields use the `FPF_PORTABLE_CHECK_*` prefix.
 ## FPF Specification Fields
 
 - `FPF_SPEC_PATH`: local path to `FPF-Spec.md`.
-- `FPF_SPEC_COMMIT`: repository commit used for the answer, or `unknown`.
+- `FPF_SPEC_REPO_COMMIT`: mirror repository commit used for the answer, or `unknown`.
+- `FPF_SPEC_SOURCE_COMMIT`: upstream FPF commit that produced `FPF-Spec.md`, or `unknown`.
+- `FPF_SPEC_SOURCE_COMMIT_SOURCE`: how the source commit was determined: `env`, `metadata`, `inferred-from-aligned-mirror-paths`, or `unknown`.
+- `FPF_SPEC_COMMIT`: backward-compatible alias for `FPF_SPEC_REPO_COMMIT`.
 - `FPF_SPEC_STATUS`: `fresh`, `cached`, or `missing`.
 - `FPF_SPEC_WARNING`: warning to disclose when cached content is used because refresh failed.
 - `FPF_SPEC_DETAIL`: blocking or diagnostic detail.
@@ -59,13 +62,13 @@ If `FPF_SPEC_STATUS=missing`, FPF-backed work is blocked until the user allows a
 - `FPF_CHUNKS_BY_PATTERN_DIR`: pattern chunk directory.
 - `FPF_CHUNKS_BY_SECTION_DIR`: section or cluster chunk directory.
 - `FPF_CHUNKS_NON_PATTERNS_DIR`: chunks without pattern bodies.
-- `FPF_CHUNKS_SOURCE_COMMIT`: specification commit declared by chunk metadata or index, or `unknown`.
+- `FPF_CHUNKS_SOURCE_COMMIT`: upstream FPF commit declared by chunk metadata or index, or `unknown`.
 - `FPF_CHUNKS_STATUS`: `ready`, `degraded`, `stale`, or `missing`.
 - `FPF_CHUNKS_MODE`: `chunk-first`, `full-spec-first`, `full-spec-fallback`, or `blocked`.
 - `FPF_CHUNKS_WARNING`: warning to disclose when chunk lookup is degraded or stale.
 - `FPF_CHUNKS_DETAIL`: concrete missing, degraded, or stale chunk detail.
 
-If `FPF_CHUNKS_STATUS=stale`, use `FPF_SPEC_PATH` first. Do not treat chunks as the primary FPF source unless the user explicitly asks to inspect the stale chunk cache.
+If `FPF_CHUNKS_STATUS=stale`, use `FPF_SPEC_PATH` first. Do not treat chunks as the primary FPF source unless the user explicitly asks to inspect the stale chunk cache. Chunks are fresh only when `FPF_CHUNKS_SOURCE_COMMIT` matches `FPF_SPEC_SOURCE_COMMIT`; they do not need to match `FPF_SPEC_REPO_COMMIT`.
 
 ## Protocol Fields
 

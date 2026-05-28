@@ -224,13 +224,15 @@ write_state() {
   local reason="$3"
   local next_epoch="$4"
   local tmp_file
-  local spec_status spec_commit protocols_status protocols_commit
+  local spec_status spec_commit spec_repo_commit spec_source_commit protocols_status protocols_commit
 
   mkdir -p "$STATE_DIR" 2>/dev/null || return 1
   tmp_file="$STATE_FILE.$$"
 
   spec_status="$(printf '%s\n' "$spec_output" | read_output_value FPF_SPEC_STATUS 2>/dev/null || true)"
   spec_commit="$(printf '%s\n' "$spec_output" | read_output_value FPF_SPEC_COMMIT 2>/dev/null || true)"
+  spec_repo_commit="$(printf '%s\n' "$spec_output" | read_output_value FPF_SPEC_REPO_COMMIT 2>/dev/null || true)"
+  spec_source_commit="$(printf '%s\n' "$spec_output" | read_output_value FPF_SPEC_SOURCE_COMMIT 2>/dev/null || true)"
   protocols_status="$(printf '%s\n' "$protocols_output" | read_output_value FPF_PROTOCOLS_STATUS 2>/dev/null || true)"
   protocols_commit="$(printf '%s\n' "$protocols_output" | read_output_value FPF_PROTOCOLS_COMMIT 2>/dev/null || true)"
 
@@ -244,6 +246,8 @@ write_state() {
     printf 'FPF_REFRESH_NEXT_ELIGIBLE_AT=%s\n' "$(format_epoch "$next_epoch")"
     printf 'FPF_SPEC_STATUS=%s\n' "${spec_status:-unknown}"
     printf 'FPF_SPEC_COMMIT=%s\n' "${spec_commit:-unknown}"
+    printf 'FPF_SPEC_REPO_COMMIT=%s\n' "${spec_repo_commit:-${spec_commit:-unknown}}"
+    printf 'FPF_SPEC_SOURCE_COMMIT=%s\n' "${spec_source_commit:-unknown}"
     printf 'FPF_PROTOCOLS_STATUS=%s\n' "${protocols_status:-unknown}"
     printf 'FPF_PROTOCOLS_COMMIT=%s\n' "${protocols_commit:-unknown}"
   } > "$tmp_file" && mv "$tmp_file" "$STATE_FILE"

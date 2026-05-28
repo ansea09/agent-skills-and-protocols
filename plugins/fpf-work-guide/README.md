@@ -28,7 +28,7 @@ The bundled skill is Codex/macOS-first and includes a native Windows PowerShell 
 
 Native Windows PowerShell is implemented through the `.ps1` scripts. CMD is implemented through thin `.cmd` wrappers that delegate to PowerShell. Treat Windows as release-verified only after the PowerShell/CMD validation lane has passed on the target host or CI runner. WSL Bash is supported. Git Bash on Windows is best effort.
 
-FPF chunks are primary only when their declared source commit matches `FPF_SPEC_COMMIT`. If chunks are stale, the skill uses full-spec-first behavior and reports `FPF_CHUNKS_SOURCE_COMMIT`.
+FPF chunks are primary only when their declared source commit matches `FPF_SPEC_SOURCE_COMMIT`. `FPF_SPEC_REPO_COMMIT` identifies the mirror repository commit and is not used for chunk freshness. If chunks are stale, the skill uses full-spec-first behavior and reports `FPF_CHUNKS_SOURCE_COMMIT`.
 
 The protocol repository is treated as an instruction source. Its commit and cached/fresh status are part of the runtime trust boundary.
 

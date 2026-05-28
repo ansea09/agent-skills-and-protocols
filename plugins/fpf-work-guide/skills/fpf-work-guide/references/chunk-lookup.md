@@ -6,7 +6,7 @@ Use this reference when `FPF_CHUNKS_MODE` allows chunk reads.
 
 - `FPF_CHUNKS_STATUS=ready` and `FPF_CHUNKS_MODE=chunk-first`: use chunks as the primary FPF source.
 - `FPF_CHUNKS_STATUS=degraded` and `FPF_CHUNKS_MODE=chunk-first`: required chunk entrypoints exist, but optional metadata is missing. Use the index and direct paths.
-- `FPF_CHUNKS_STATUS=stale` and `FPF_CHUNKS_MODE=full-spec-first`: use `FPF_SPEC_PATH` first. Chunks exist, but their declared source commit does not match `FPF_SPEC_COMMIT`.
+- `FPF_CHUNKS_STATUS=stale` and `FPF_CHUNKS_MODE=full-spec-first`: use `FPF_SPEC_PATH` first. Chunks exist, but their declared source commit does not match `FPF_SPEC_SOURCE_COMMIT`.
 - `FPF_CHUNKS_MODE=full-spec-fallback`: do not rely on chunk layout. Use targeted `rg` and `sed` reads against `FPF_SPEC_PATH`.
 - `FPF_CHUNKS_MODE=blocked`: do not claim FPF-backed reasoning until the user provides a valid source or allows a fetch.
 
@@ -37,14 +37,20 @@ Manifest paths must be non-empty relative paths, must not start with `/`, must n
 
 ## Source Commit Check
 
-Chunk lookup is primary only when both the chunk source commit and `FPF_SPEC_COMMIT` can be determined and they match.
+Chunk lookup is primary only when both `FPF_CHUNKS_SOURCE_COMMIT` and `FPF_SPEC_SOURCE_COMMIT` can be determined and they match.
 
 The refresh scripts determine `FPF_CHUNKS_SOURCE_COMMIT` from:
 
 1. `Commit SHA: \`...\`` in `FPF_CHUNKS_INDEX_PATH`;
 2. `"commit_sha": "..."` in `FPF_CHUNKS_METADATA_PATH`.
 
-If either commit is missing or unknown, use full-spec fallback. If both commits are known and differ, use full-spec-first mode and disclose stale chunks when relevant.
+The refresh scripts determine `FPF_SPEC_SOURCE_COMMIT` from:
+
+1. explicit `FPF_SPEC_SOURCE_COMMIT` environment override;
+2. `FPF_SPEC_SOURCE_COMMIT=...` or `UPSTREAM_SHA=...` in `fpf-source.env`;
+3. legacy inference from `FPF_CHUNKS_SOURCE_COMMIT` only when `FPF-Spec.md` and chunk entrypoints were updated by the same mirror repository commit.
+
+If either source commit is missing or unknown, use full-spec fallback. If both source commits are known and differ, use full-spec-first mode and disclose stale chunks when relevant. `FPF_SPEC_REPO_COMMIT` is the mirror repository commit and is not used for source/chunk freshness comparison.
 
 ## Pattern Lookup
 

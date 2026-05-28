@@ -13,6 +13,7 @@ $CacheDir = Get-FpfEnv "FPF_SPEC_CACHE_DIR" $DefaultCacheDir
 $CacheMarker = Join-FpfPath $CacheDir @(".fpf-cache-repo")
 $ExpectedCacheKind = "fpf-spec-cache"
 $SpecPath = Join-FpfPath $CacheDir @("FPF-Spec.md")
+$SpecSourceMetadataPath = Get-FpfEnv "FPF_SPEC_SOURCE_METADATA_PATH" (Join-FpfPath $CacheDir @("fpf-source.env"))
 $ChunksLayoutManifestPath = Get-FpfEnv "FPF_CHUNKS_LAYOUT_MANIFEST_PATH" (Join-FpfPath $CacheDir @("fpf-chunks-layout.env"))
 $RefreshMode = Get-FpfEnv "FPF_REFRESH_MODE" (Get-FpfEnv "FPF_UPDATE_MODE" "refresh")
 
@@ -40,6 +41,8 @@ $script:ChunksMode = "blocked"
 $script:ChunksWarning = ""
 $script:ChunksDetail = ""
 $script:ChunksSourceCommit = "unknown"
+$script:SpecSourceCommit = "unknown"
+$script:SpecSourceCommitSource = "unknown"
 
 function Set-ChunkPaths {
   $script:ChunksPath = Join-FpfPath $CacheDir @($script:ChunksRootRel)
@@ -149,6 +152,65 @@ function Add-MissingChunkEntrypoint {
   }
 }
 
+function Test-HexCommit {
+  param([string]$Value)
+  return (-not [string]::IsNullOrEmpty($Value)) -and ($Value -match '^[0-9a-fA-F]+$')
+}
+
+function Get-MetadataSourceCommit {
+  $sourceCommit = Get-FpfEnv "FPF_SPEC_SOURCE_COMMIT" ""
+  if (Test-HexCommit $sourceCommit) {
+    $script:SpecSourceCommitSource = "env"
+    return $sourceCommit
+  }
+
+  if (Test-Path -LiteralPath $SpecSourceMetadataPath -PathType Leaf) {
+    $sourceCommit = Read-FpfLooseKeyValue $SpecSourceMetadataPath "FPF_SPEC_SOURCE_COMMIT"
+    if (-not $sourceCommit) {
+      $sourceCommit = Read-FpfLooseKeyValue $SpecSourceMetadataPath "UPSTREAM_SHA"
+    }
+    if (Test-HexCommit $sourceCommit) {
+      $script:SpecSourceCommitSource = "metadata"
+      return $sourceCommit
+    }
+  }
+
+  return $null
+}
+
+function Get-PathLastCommit {
+  param([Parameter(Mandatory = $true)][string]$RelativePath)
+
+  if ((Test-FpfCommandAvailable "git") -and (Test-Path -LiteralPath (Join-FpfPath $CacheDir @(".git")) -PathType Container)) {
+    $commit = Get-FpfGitOutput @("-C", $CacheDir, "log", "-n", "1", "--format=%H", "--", $RelativePath)
+    if ($commit) {
+      return $commit
+    }
+  }
+  return ""
+}
+
+function Get-SpecSourceCommit {
+  $sourceCommit = Get-MetadataSourceCommit
+  if (Test-HexCommit $sourceCommit) {
+    return $sourceCommit
+  }
+
+  if ($script:ChunksSourceCommit -ne "unknown") {
+    $specPathCommit = Get-PathLastCommit "FPF-Spec.md"
+    $chunksIndexCommit = Get-PathLastCommit "$($script:ChunksRootRel)/$($script:ChunksIndexRel)"
+    $chunksManifestCommit = Get-PathLastCommit "$($script:ChunksRootRel)/manifest.json"
+
+    if ((-not [string]::IsNullOrEmpty($specPathCommit)) -and (($specPathCommit -eq $chunksIndexCommit) -or ($specPathCommit -eq $chunksManifestCommit))) {
+      $script:SpecSourceCommitSource = "inferred-from-aligned-mirror-paths"
+      return $script:ChunksSourceCommit
+    }
+  }
+
+  $script:SpecSourceCommitSource = "unknown"
+  return "unknown"
+}
+
 function Get-ChunksSourceCommit {
   if (Test-Path -LiteralPath $script:ChunksIndexPath -PathType Leaf) {
     try {
@@ -183,6 +245,8 @@ function Test-Chunks {
   $script:ChunksWarning = ""
   $script:ChunksDetail = ""
   $script:ChunksSourceCommit = "unknown"
+  $script:SpecSourceCommit = "unknown"
+  $script:SpecSourceCommitSource = "unknown"
 
   if (-not (Load-ChunkLayout)) {
     $script:ChunksStatus = "degraded"
@@ -237,6 +301,7 @@ function Test-Chunks {
   }
 
   $script:ChunksSourceCommit = Get-ChunksSourceCommit
+  $script:SpecSourceCommit = Get-SpecSourceCommit
   if ($script:ChunksSourceCommit -eq "unknown") {
     $script:ChunksStatus = "degraded"
     if (Test-Path -LiteralPath $SpecPath -PathType Leaf) {
@@ -251,30 +316,30 @@ function Test-Chunks {
     return
   }
 
-  if ($SpecCommit -eq "unknown" -or $SpecCommit -eq "none") {
+  if ($script:SpecSourceCommit -eq "unknown") {
     $script:ChunksStatus = "degraded"
     if (Test-Path -LiteralPath $SpecPath -PathType Leaf) {
       $script:ChunksMode = "full-spec-fallback"
-      $script:ChunksWarning = "FPF specification commit is unavailable; cannot verify chunk source commit, so use FPF-Spec.md fallback for pattern lookup."
-      $script:ChunksDetail = "FPF chunks source commit is $($script:ChunksSourceCommit), but FPF spec commit is $SpecCommit."
+      $script:ChunksWarning = "FPF specification source commit is unavailable; cannot verify chunk source commit, so use FPF-Spec.md fallback for pattern lookup."
+      $script:ChunksDetail = "FPF chunks source commit is $($script:ChunksSourceCommit), FPF spec repo commit is $SpecCommit, but FPF spec source commit is unknown."
     } else {
       $script:ChunksMode = "blocked"
-      $script:ChunksWarning = "FPF specification commit is unavailable and FPF-Spec.md is unavailable."
-      $script:ChunksDetail = "FPF chunks source commit is $($script:ChunksSourceCommit), but FPF spec commit is $SpecCommit."
+      $script:ChunksWarning = "FPF specification source commit is unavailable and FPF-Spec.md is unavailable."
+      $script:ChunksDetail = "FPF chunks source commit is $($script:ChunksSourceCommit), FPF spec repo commit is $SpecCommit, but FPF spec source commit is unknown."
     }
     return
   }
 
-  if ($script:ChunksSourceCommit -ne $SpecCommit) {
+  if ($script:ChunksSourceCommit -ne $script:SpecSourceCommit) {
     $script:ChunksStatus = "stale"
     if (Test-Path -LiteralPath $SpecPath -PathType Leaf) {
       $script:ChunksMode = "full-spec-first"
       $script:ChunksWarning = "FPF chunks were generated from a different specification commit; use FPF-Spec.md first and disclose the stale chunk cache."
-      $script:ChunksDetail = "FPF chunks source commit $($script:ChunksSourceCommit) does not match FPF spec commit $SpecCommit."
+      $script:ChunksDetail = "FPF chunks source commit $($script:ChunksSourceCommit) does not match FPF spec source commit $($script:SpecSourceCommit)."
     } else {
       $script:ChunksMode = "blocked"
       $script:ChunksWarning = "FPF chunks were generated from a different specification commit and FPF-Spec.md is unavailable."
-      $script:ChunksDetail = "FPF chunks source commit $($script:ChunksSourceCommit) does not match FPF spec commit $SpecCommit."
+      $script:ChunksDetail = "FPF chunks source commit $($script:ChunksSourceCommit) does not match FPF spec source commit $($script:SpecSourceCommit)."
     }
     return
   }
@@ -294,6 +359,9 @@ function Write-Result {
 
   Test-Chunks $Commit
   Write-Output "FPF_SPEC_PATH=$SpecPath"
+  Write-Output "FPF_SPEC_REPO_COMMIT=$Commit"
+  Write-Output "FPF_SPEC_SOURCE_COMMIT=$($script:SpecSourceCommit)"
+  Write-Output "FPF_SPEC_SOURCE_COMMIT_SOURCE=$($script:SpecSourceCommitSource)"
   Write-Output "FPF_SPEC_COMMIT=$Commit"
   Write-Output "FPF_SPEC_STATUS=$($script:Status)"
   if ($script:Warning -ne "") { Write-Output "FPF_SPEC_WARNING=$($script:Warning)" }

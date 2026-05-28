@@ -36,8 +36,12 @@ Initial public `fpf-work-guide` release after the rename from `fpf-latest`.
 - Strengthened cache reset guards so `.fpf-cache-repo` is valid only when its
   kind, repository URL, and branch match the configured cache.
 - Added chunk source commit validation through `FPF_CHUNKS_SOURCE_COMMIT`.
-- Added `full-spec-first` behavior when chunk source commit differs from
-  `FPF_SPEC_COMMIT`.
+- Split FPF spec provenance into `FPF_SPEC_REPO_COMMIT` and
+  `FPF_SPEC_SOURCE_COMMIT`; chunk freshness now compares
+  `FPF_CHUNKS_SOURCE_COMMIT` with `FPF_SPEC_SOURCE_COMMIT`, not with the mirror
+  repository commit.
+- Added `full-spec-first` behavior when chunk source commit differs from the FPF
+  spec source commit.
 - Added user-facing diagnostics documentation for refresh, environment, chunk,
   and protocol trust states.
 - Added a public behavior model for task admission, substantive task start,
