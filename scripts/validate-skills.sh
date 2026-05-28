@@ -223,4 +223,8 @@ if [ "$failed" -ne 0 ]; then
   exit 1
 fi
 
+if [ -z "$only_skill" ]; then
+  "$repo_root/scripts/validate-claude-code-profiles.sh"
+fi
+
 echo "OK: staged skills passed structural validation"

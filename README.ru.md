@@ -6,6 +6,7 @@
 
 - установить reusable Codex skill;
 - установить skill как Codex plugin;
+- установить Claude Code profile для поддерживаемого public skill;
 - посмотреть, как skill упакован перед использованием;
 - открыть issue или PR по установке, документации или portability;
 - адаптировать публичный skill под свой workflow без копирования приватного локального состояния.
@@ -49,6 +50,19 @@ Plugin installation - основной способ распространени
 - [`plugins/doc-to-md`](plugins/doc-to-md/) - plugin package для публичного `doc-to-md` skill.
 
 Если ваш Codex поддерживает repo-local plugin marketplace discovery, подключите marketplace из этого репозитория. Для нетехнической установки используйте готовый prompt из [`docs/install-plugins-for-nontechnical-users.md`](docs/install-plugins-for-nontechnical-users.md).
+
+## Установка в Claude Code
+
+Claude Code использует другие extension mechanisms, не Codex plugins. Для
+Claude Code используйте source-only install profiles:
+
+[`claude-code/`](claude-code/)
+
+Текущий профиль:
+
+- [`claude-code/fpf-work-guide`](claude-code/fpf-work-guide/) - устанавливает
+  Claude Code slash commands и subagent, которые вызывают публичный
+  `fpf-work-guide` skill.
 
 ## Ручная установка
 
@@ -133,6 +147,7 @@ scripts/validate-plugins.sh
 | --- | --- | --- |
 | [`.agents/`](.agents/) | Machine-readable Codex agent configuration. Сейчас содержит repo-local plugin marketplace metadata. | Codex/plugin tooling и maintainers. |
 | [`docs/`](docs/) | Installation docs, validation docs, architecture notes, ADRs, process models и examples. | Users, reviewers, maintainers. |
+| [`claude-code/`](claude-code/) | Source-only Claude Code install profiles для public skills. | Claude Code users и maintainers. |
 | [`plugins/`](plugins/) | Installable Codex plugin packages с публичными skills. | Пользователи plugin installation и maintainers packaging. |
 | [`protocols/`](protocols/) | FPF-backed response protocol definitions, routing rules, checklists, SOPs и templates. | Пользователи, которые хотят смотреть protocol internals. |
 | [`scripts/`](scripts/) | Validation, promotion, drift-check и release-gate scripts. | Maintainers и contributors. |
@@ -149,6 +164,11 @@ Local-only state directories вроде `.fpf-update/` могут появлят
 Staged public copy в `skills/` - это не то же самое, что installed operational copy в `$HOME/.agents/skills`, `${CODEX_HOME:-$HOME/.codex}/skills` или другой runtime-директории агента.
 
 Plugin packages в `plugins/` включают только public skill source. Они не должны содержать personal launchers, LaunchAgents, session-start hooks, workspace jobs, cache, logs, local state, private overlays, private local policy files, runtime venvs, OCR binaries или generated outputs.
+
+Claude Code install profiles в `claude-code/` - это source-only adapters. Они
+устанавливают Claude Code slash commands, subagents или settings snippets,
+которые вызывают public staged skill scripts. Это не Codex plugins и не
+отдельные реализации skills.
 
 Перед packaging, redistribution или review skill artifacts используйте:
 

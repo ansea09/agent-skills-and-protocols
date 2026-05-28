@@ -142,6 +142,51 @@ set "FPF_WORK_GUIDE_SKILL_DIR=C:\absolute\path\to\fpf-work-guide"
 "%FPF_WORK_GUIDE_SKILL_DIR%\scripts\update_fpf_context.cmd"
 ```
 
+## Claude Code Install Profiles
+
+Codex plugins are not Claude Code plugins. For Claude Code, use source-only
+install profiles under:
+
+```text
+claude-code/
+```
+
+Current profile:
+
+```text
+claude-code/fpf-work-guide
+```
+
+The `fpf-work-guide` Claude Code profile installs user slash commands, a
+subagent, and a user-local copy of the public staged skill source. It does not
+install a Codex plugin and does not use the Codex plugin marketplace.
+
+On macOS, Linux, WSL, or Git Bash, run from the repository root:
+
+```bash
+bash claude-code/fpf-work-guide/install.sh
+```
+
+On native Windows PowerShell, run from the repository root:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\claude-code\fpf-work-guide\install.ps1
+```
+
+The profile installs source-only files under `~/.claude`:
+
+```text
+~/.claude/fpf-work-guide/skill
+~/.claude/commands/fpf-context.md
+~/.claude/commands/fpf-doctor.md
+~/.claude/agents/fpf-work-guide.md
+```
+
+macOS Claude Code is the supported happy path for the profile. WSL and Git Bash
+are best effort. Native Windows PowerShell entrypoints are implemented through
+the underlying skill scripts and PowerShell installer, but remain
+experimental/unverified until a Windows validation lane passes.
+
 Portable installs should treat `$HOME/.codex`, `$HOME/.agents`, and `$PWD/.fpf-update` as defaults only. Use explicit paths when the agent runtime does not own those locations:
 
 ```bash

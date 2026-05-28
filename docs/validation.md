@@ -7,6 +7,13 @@ scripts/validate-skills.sh
 scripts/validate-plugins.sh
 ```
 
+`scripts/validate-skills.sh` also validates the source-only Claude Code install
+profiles under `claude-code/`. To run that lane directly:
+
+```bash
+scripts/validate-claude-code-profiles.sh
+```
+
 For a `doc-to-md` public source/plugin release, run the stricter source gate:
 
 ```bash
@@ -69,6 +76,17 @@ Plugin validation checks:
 - the repo-local marketplace `.agents/plugins/marketplace.json` lists the plugin;
 - no high-risk private markers are present under `plugins/`;
 - bundled plugin skills match their staged `skills/<name>/` source.
+
+Claude Code profile validation checks:
+
+- each maintained profile contains its README, installer, slash-command
+  templates, and subagent file;
+- Bash installers parse and pass `--check` without writing to `~/.claude`;
+- PowerShell installers pass `-Check` when `pwsh` is available;
+- slash-command templates call the public `fpf-work-guide` refresh gate and
+  doctor scripts;
+- Claude Code profiles remain source-only adapter artifacts and do not bundle
+  cache, state, private overlays, or generated outputs.
 
 `doc-to-md` release validation additionally checks:
 

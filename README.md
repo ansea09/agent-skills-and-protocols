@@ -7,6 +7,7 @@ Installable Codex skills, plugin packages, and FPF-backed protocol docs for repr
 Use this repository when you want to:
 
 - install a reusable Codex skill;
+- install a Claude Code profile for a supported public skill;
 - inspect how a skill is packaged before using it;
 - open an issue or PR to improve a skill;
 - adapt a public skill to your own workflow without copying private local state.
@@ -39,6 +40,17 @@ Available plugin packages:
 - [`plugins/doc-to-md`](plugins/doc-to-md/) - plugin package for the public `doc-to-md` skill.
 
 If your Codex setup supports repo-local plugin marketplace discovery, point it at this repository's marketplace metadata. If not, use the manual skill-folder install below.
+
+## Install In Claude Code
+
+Claude Code uses different extension mechanisms from Codex plugins. For Claude
+Code, use source-only install profiles under [`claude-code/`](claude-code/).
+
+Current profile:
+
+- [`claude-code/fpf-work-guide`](claude-code/fpf-work-guide/) - installs
+  Claude Code slash commands and a subagent that invoke the public
+  `fpf-work-guide` skill.
 
 ## Install Manually
 
@@ -96,6 +108,7 @@ More detail: [`docs/validation.md`](docs/validation.md).
 | --- | --- | --- |
 | [`.agents/`](.agents/) | Machine-readable Codex agent configuration. Currently contains repo-local plugin marketplace metadata. | Codex/plugin tooling and maintainers checking plugin discovery. |
 | [`docs/`](docs/) | Installation docs, validation docs, architecture notes, ADRs, process models, and examples. | Users, reviewers, maintainers. |
+| [`claude-code/`](claude-code/) | Source-only Claude Code install profiles for public skills. | Claude Code users and maintainers validating adapter packaging. |
 | [`plugins/`](plugins/) | Installable Codex plugin packages that bundle public skills for distribution. | Users installing via plugin and maintainers validating packaging. |
 | [`protocols/`](protocols/) | FPF-backed response protocol definitions, routing rules, checklists, SOPs, and templates. | Users who want to inspect the reasoning protocol internals. |
 | [`scripts/`](scripts/) | Validation, promotion, drift-check, and release-gate scripts. | Maintainers and contributors. |
@@ -135,6 +148,11 @@ Before any substantive answer, code edit, review, research task, plan, or delega
 The staged public copy under `skills/` is not the same artifact as an installed operational copy under `$HOME/.agents/skills`, `${CODEX_HOME:-$HOME/.codex}/skills`, or another agent-specific runtime location.
 
 Plugin packages under `plugins/` bundle public skill source only. They must not include personal launchers, LaunchAgents, session-start hooks, workspace jobs, cache, logs, local state, private overlays, private local policy files, runtime venvs, OCR binaries, or generated outputs.
+
+Claude Code install profiles under `claude-code/` are source-only adapters. They
+install Claude Code slash commands, subagents, or settings snippets that call
+public staged skill scripts. They are not Codex plugins and must not fork public
+skill behavior.
 
 Use [`docs/skill-artifact-model.md`](docs/skill-artifact-model.md) as the public repository contract before packaging, redistributing, or reviewing skill artifacts.
 
