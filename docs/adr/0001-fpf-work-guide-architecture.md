@@ -53,6 +53,21 @@ The repository distinguishes:
 
 Public staged skills and plugin artifacts may depend on documented runtime prerequisites, but must not depend on private overlays, personal automation, cache/state, generated outputs, or machine-specific paths.
 
+When the author's personal installed runtime copy is intended to follow the
+public staged source, the staged source is the sync source of truth. The
+maintenance lane verifies that boundary explicitly with:
+
+```bash
+scripts/check-skills-drift.sh --installed-runtime --skill fpf-work-guide
+```
+
+For repository renames, the installed runtime and protocol cache path should
+follow the public source name. The `agent-skills-and-protocols` rename therefore
+uses `${CODEX_HOME:-$HOME/.codex}/cache/agent-skills-and-protocols` as the
+default protocol cache path. An old protocol cache may be retained as a backup,
+but the active cache marker and Git remote must match the configured protocol
+repository URL and branch.
+
 ### 4. Keep `README.md` user-facing and `SKILL.md` executable
 
 `skills/fpf-work-guide/README.md` is the user and maintainer entrypoint for installation, portable invocation, Windows entrypoints, diagnostics, release notes, and publication boundaries.
@@ -369,6 +384,7 @@ These quanta deliberately have different support boundaries and validation check
 | Protocol provenance | Protocol outputs include repository URL, branch, remote URL, trust status, and commit. | Every release and protocol refresh change | Cross-platform protocol provenance fixture assertions | Do not treat protocols as authoritative until provenance is restored. |
 | State diagnosability | Refresh state, previous-attempt source, active lock, and unavailable state directory are distinguishable. | Every release and state/launcher change | Lifecycle fixtures for recent-cache, active-refresh, and state-dir-unavailable | Fix state reporting or disclose degraded state explicitly. |
 | Portable environment evidence | Doctor reports path-policy mode and portable environment status. | Every release and install-path change | `fpf-work-guide-doctor` / `fpf-work-guide-doctor.ps1`, cross-platform doctor fixtures | Fix path policy or downgrade portability claim. |
+| Personal runtime drift | Installed personal runtime copy matches staged source when staged source is the intended source of truth. | After public rename, reinstall, or personal runtime resync | `scripts/check-skills-drift.sh --installed-runtime --skill fpf-work-guide` | Resync installed copy from staged source or document an intentional local divergence outside the public skill directory. |
 | Documentation drift control | Architecture-significant implementation changes trigger review of ADR and private implementation docs. | Every architecture-significant change | `jobs/fpf-doc-sync/check.sh` in the personal workspace | Update docs or explicitly record why no documentation update was needed before writing a new baseline. |
 
 ### Known Risks And Evidence Gaps
@@ -456,6 +472,7 @@ Manual review must verify:
 - `git reset --hard` remains guarded behind dedicated-cache checks
 - reset guards require a valid cache marker, matching remote, or explicit `FPF_ALLOW_NONSTANDARD_CACHE_RESET=1`
 - cache marker validation checks marker kind, repository URL, and branch for both Bash and PowerShell paths
+- personal installed runtime sync uses `scripts/check-skills-drift.sh --installed-runtime --skill fpf-work-guide` when staged source is intended to be the runtime source of truth
 - wrapper automation writes captured output to `latest-output.env`, not to the durable refresh state file `latest.env`
 - `FPF_REFRESH_AUTO_STATE_FILE` is explicit opt-in and `FPF_REFRESH_LAST_ATTEMPT_STATE_PATH` is emitted
 - symlink-sensitive launchers or hooks pass `FPF_UPDATE_STATE_DIR` explicitly when needed

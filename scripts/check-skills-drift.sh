@@ -6,6 +6,7 @@ skills_dir="$repo_root/skills"
 manifest="$skills_dir/promote-manifest.yaml"
 local_skills_dir="${LOCAL_SKILLS_DIR:-${CODEX_HOME:-$HOME/.codex}/skills}"
 selected_skills=""
+check_mode="promotion"
 failed=0
 
 . "$repo_root/scripts/lib/skills-publication.sh"
@@ -14,9 +15,14 @@ usage() {
   cat <<'USAGE'
 Usage:
   scripts/check-skills-drift.sh [--skill NAME ...]
+  scripts/check-skills-drift.sh --installed-runtime [--skill NAME ...]
 
 Compares sanitized local auto-promotable skills with their staged public copies.
 Curated and staged-only skills are reported as skipped.
+
+With --installed-runtime, compares installed runtime skill copies with staged
+public copies. Use this after syncing a personal installed skill from staged
+source.
 USAGE
 }
 
@@ -28,6 +34,10 @@ while [ "$#" -gt 0 ]; do
       selected_skills="${selected_skills}${selected_skills:+
 }$2"
       shift 2
+      ;;
+    --installed-runtime)
+      check_mode="installed-runtime"
+      shift
       ;;
     --help|-h)
       usage
@@ -61,7 +71,12 @@ for skill_name in $selected_skills; do
     continue
   fi
 
-  if [ "$mode" != "auto" ]; then
+  if [ "$check_mode" != "installed-runtime" ] && [ "$mode" != "auto" ]; then
+    echo "SKIP: $skill_name mode=$mode"
+    continue
+  fi
+
+  if [ "$check_mode" = "installed-runtime" ] && [ "$mode" = "staged-only" ]; then
     echo "SKIP: $skill_name mode=$mode"
     continue
   fi
@@ -70,6 +85,38 @@ for skill_name in $selected_skills; do
   staged_dir="$skills_dir/$skill_name"
   work_dir="$tmp_root/$skill_name-work"
   sanitized_dir="$work_dir/$skill_name"
+
+  if [ "$check_mode" = "installed-runtime" ]; then
+    installed_work_dir="$tmp_root/$skill_name-installed-work"
+    staged_work_dir="$tmp_root/$skill_name-staged-work"
+    installed_sanitized_dir="$installed_work_dir/$skill_name"
+    staged_sanitized_dir="$staged_work_dir/$skill_name"
+
+    if [ ! -d "$source_dir" ]; then
+      echo "DRIFT: $skill_name installed runtime skill missing: $source_dir" >&2
+      failed=1
+      continue
+    fi
+
+    if [ ! -d "$staged_dir" ]; then
+      echo "DRIFT: $skill_name staged skill missing: $staged_dir" >&2
+      failed=1
+      continue
+    fi
+
+    copy_sanitized_skill "$source_dir" "$installed_work_dir" "$skill_name"
+    copy_sanitized_skill "$staged_dir" "$staged_work_dir" "$skill_name"
+
+    if diff -qr "$installed_sanitized_dir" "$staged_sanitized_dir" >/dev/null; then
+      echo "OK: $skill_name installed-runtime"
+    else
+      echo "DRIFT: $skill_name installed runtime differs from staged source"
+      diff -qr "$installed_sanitized_dir" "$staged_sanitized_dir" || true
+      failed=1
+    fi
+
+    continue
+  fi
 
   if [ ! -d "$source_dir" ]; then
     echo "DRIFT: $skill_name local skill missing: $source_dir" >&2

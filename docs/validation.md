@@ -164,5 +164,6 @@ Manual review checklist:
 - `fpf-work-guide` and other FPF-backed skills disclose cached/fresh status rather than claiming "latest" when only cache is available.
 - `fpf-work-guide` treats `fpf-chunks-layout.env` as a parsed key/value layout contract, never as sourced shell code.
 - `fpf-work-guide` has been tested for at least: normal cache-only run, invalid state path fallback, staged/plugin/runtime copy sync, and plugin/skill structural validation.
+- Personal runtime sync for `fpf-work-guide` runs `scripts/check-skills-drift.sh --installed-runtime --skill fpf-work-guide` after syncing the installed skill from staged source.
 - The repository README, `skills-index.md`, install instructions, and collaboration scenario still describe the same staged scope.
 - Auto-promotable skills are safe to regenerate from local copies; curated skills keep their public-safe edits.

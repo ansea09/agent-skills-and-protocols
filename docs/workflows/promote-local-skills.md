@@ -49,7 +49,7 @@ The publication manifest is [`../../skills/promote-manifest.yaml`](../../skills/
 ## Workflow
 
 1. Update and test the local skill in Codex.
-2. Run drift detection:
+2. Run promotion drift detection:
 
 ```bash
 scripts/check-skills-drift.sh
@@ -86,6 +86,28 @@ git diff -- skills plugins skills-index.md docs examples scripts registry.yaml R
 
 7. Update root README, skill README, plugin README, `skills-index.md`, install docs, validation docs, registry anchors, and use cases when the public surface changed.
 8. Commit and push only after manual review.
+
+## Personal Runtime Sync Check
+
+Use this check when the installed personal runtime copy should follow the
+staged public source, for example after a public rename or after reinstalling a
+skill from this repository:
+
+```bash
+scripts/check-skills-drift.sh --installed-runtime --skill fpf-work-guide
+```
+
+This check compares the installed skill at
+`${LOCAL_SKILLS_DIR:-${CODEX_HOME:-$HOME/.codex}/skills}/fpf-work-guide` with
+`skills/fpf-work-guide` after removing generated artifacts such as `.DS_Store`,
+`__pycache__`, and `.pyc`. It does not promote local edits into the public
+repository. It only answers whether the installed runtime copy and staged
+source have drifted.
+
+If the check reports drift and the staged source is the intended source of
+truth, sync the installed copy from `skills/fpf-work-guide`, then rerun the
+check. Keep private overlays, cache, state files, launcher hooks, and generated
+runtime artifacts outside the skill directory.
 
 ## Safety Rules
 

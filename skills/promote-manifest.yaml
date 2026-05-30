@@ -25,4 +25,5 @@ required_checks:
   - doc_to_md_compatibility_semantic_check
   - doc_to_md_machine_readable_doctor_check
   - doc_to_md_regression_snapshot_check_before_markitdown_upgrade
+  - installed_runtime_staged_drift_check_for_personal_sync
   - manual_git_diff_review
