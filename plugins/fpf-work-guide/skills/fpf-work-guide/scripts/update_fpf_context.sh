@@ -368,11 +368,21 @@ else
   fi
 fi
 
+if [ "$mode" = "cache-only" ] \
+  && sandbox_network_disabled \
+  && [ "$last_attempt_reason" = "sandbox-network-disabled" ]; then
+  reason="sandbox-network-disabled"
+fi
+
 if [ "$mode" = "cache-only" ]; then
+  cache_only_detail=""
+  if [ "$reason" = "sandbox-network-disabled" ]; then
+    cache_only_detail="Codex sandbox network is disabled; using cache-only validation instead of GitHub refresh."
+  fi
   next_eligible_epoch=$((last_attempt_epoch + TTL_SECONDS))
   run_context_scripts "cache-only"
   if [ "$spec_code" -eq 0 ] && [ "$protocols_code" -eq 0 ]; then
-    print_result "skipped_recent" "$reason" "$last_attempt_epoch" "$next_eligible_epoch"
+    print_result "skipped_recent" "$reason" "$last_attempt_epoch" "$next_eligible_epoch" "$cache_only_detail"
     exit 0
   fi
 
