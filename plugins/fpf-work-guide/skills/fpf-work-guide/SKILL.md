@@ -174,6 +174,7 @@ The gate is the only component that decides whether to refresh from GitHub or us
 - refresh immediately when `FPF_REFRESH_FORCE=1`, for example from the external session-start hook or launcher.
 - refresh when no valid cache exists.
 - refresh when the last refresh attempt is older than `FPF_REFRESH_TTL_SECONDS`.
+- if `CODEX_SANDBOX_NETWORK_DISABLED=1`, do not attempt GitHub refresh from inside the Codex sandbox; use cache-only validation and report `FPF_REFRESH_REASON=sandbox-network-disabled`.
 - otherwise do not contact GitHub; validate and use the current cached copy.
 
 Read the script output before doing the substantive work. The canonical field reference is `references/diagnostics.md`.
@@ -187,6 +188,8 @@ If `FPF_REFRESH_DECISION=skipped_recent`, do not say that an update was attempte
 If `FPF_REFRESH_DECISION=blocked`, explain why FPF-backed work is blocked and ask the user only for the action needed to restore a valid cache or allow a fetch.
 
 If `FPF_REFRESH_REASON=state-dir-unavailable`, explain that the refresh gate could not create or write the local state directory. If cache-only validation succeeded, continue with the current cached copy and say refresh state was not durable. If cache-only validation failed, ask the user to fix write permissions or set `FPF_UPDATE_STATE_DIR` to a writable directory.
+
+If `FPF_REFRESH_REASON=sandbox-network-disabled`, say that Codex sandbox networking is disabled and the gate used cache-only validation instead of trying GitHub. Do not describe this as a failed GitHub refresh.
 
 If `FPF_ENV_CHECK_STATUS=blocked`, explain `FPF_ENV_CHECK_SUMMARY`, `FPF_ENV_CHECK_ACTION`, and `FPF_ENV_CHECK_CONSEQUENCE` before any other FPF diagnostic.
 

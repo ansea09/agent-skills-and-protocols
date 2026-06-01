@@ -83,6 +83,14 @@ Forbidden inverse relations:
 
 When state is unavailable, the refresh gate must classify that as `state-dir-unavailable`. It must not report it as `active-refresh`, because an unwritable state path and a real concurrent refresh are different operational conditions.
 
+When Codex exposes `CODEX_SANDBOX_NETWORK_DISABLED=1`, the refresh gate treats
+that as a runtime boundary, not as a broken GitHub remote. It uses cache-only
+validation and reports `sandbox-network-disabled`; fresh cache updates must come
+from an external refresher, launcher, hook, or another explicitly network-enabled
+path.
+Such a state record may suppress repeated in-sandbox attempts, but it must not
+block a later network-enabled refresh.
+
 The public behavior model for task admission, substantive versus non-substantive interactions, and refresh-gate event semantics is [fpf-work-guide-behavior-model.md](fpf-work-guide-behavior-model.md). It is public skill documentation, not a personal automation layer.
 
 The Claude Code install profile installs Claude Code slash commands and a

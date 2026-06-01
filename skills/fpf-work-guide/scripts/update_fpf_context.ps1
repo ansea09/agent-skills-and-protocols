@@ -55,6 +55,10 @@ function Test-StateDirReady {
   return $false
 }
 
+function Test-SandboxNetworkDisabled {
+  return (Get-FpfEnv "CODEX_SANDBOX_NETWORK_DISABLED" "0") -eq "1"
+}
+
 function Invoke-ChildScript {
   param(
     [Parameter(Mandatory = $true)][string]$Path,
@@ -334,14 +338,18 @@ try {
 
   $script:NowEpoch = Get-FpfEpochSeconds
   $lastAttemptEpoch = Read-FpfKeyValue $StateFile "LAST_REFRESH_ATTEMPT_EPOCH"
+  $lastAttemptReason = Read-FpfKeyValue $StateFile "LAST_REFRESH_REASON"
   if (-not (Test-FpfUInt $lastAttemptEpoch)) {
+    $lastAttemptEpoch = ""
+  } elseif ($lastAttemptReason -eq "sandbox-network-disabled" -and -not (Test-SandboxNetworkDisabled)) {
     $lastAttemptEpoch = ""
   } else {
     $script:LastAttemptStatePath = $StateFile
   }
   if ($lastAttemptEpoch -eq "" -and $AutoStateFile -ne "") {
     $autoAttemptEpoch = Read-FpfKeyValue $AutoStateFile "LAST_REFRESH_ATTEMPT_EPOCH"
-    if (Test-FpfUInt $autoAttemptEpoch) {
+    $autoAttemptReason = Read-FpfKeyValue $AutoStateFile "LAST_REFRESH_REASON"
+    if ((Test-FpfUInt $autoAttemptEpoch) -and -not ($autoAttemptReason -eq "sandbox-network-disabled" -and -not (Test-SandboxNetworkDisabled))) {
       $lastAttemptEpoch = $autoAttemptEpoch
       $script:LastAttemptStatePath = $AutoStateFile
     }
@@ -373,6 +381,25 @@ try {
     }
     $mode = "refresh"
     $reason = "missing-cache"
+  }
+
+  if ($mode -eq "refresh" -and (Test-SandboxNetworkDisabled)) {
+    $attemptEpoch = $script:NowEpoch
+    $nextEligibleEpoch = [int64]$attemptEpoch + [int64]$TtlSeconds
+    Invoke-ContextScripts "cache-only"
+
+    if ($script:SpecCode -eq 0 -and $script:ProtocolsCode -eq 0) {
+      try { Write-RefreshState $attemptEpoch "skipped_recent" "sandbox-network-disabled" $nextEligibleEpoch } catch { }
+      Write-RefreshResult "skipped_recent" "sandbox-network-disabled" $attemptEpoch $nextEligibleEpoch "Codex sandbox network is disabled; using cache-only validation instead of GitHub refresh."
+      exit 0
+    }
+
+    try { Write-RefreshState $attemptEpoch "blocked" "sandbox-network-disabled" $nextEligibleEpoch } catch { }
+    if (-not $script:EnvironmentChecked) {
+      [void](Invoke-EnvironmentCheck)
+    }
+    Write-RefreshResult "blocked" "sandbox-network-disabled" $attemptEpoch $nextEligibleEpoch "Codex sandbox network is disabled and cache-only validation failed."
+    exit 2
   }
 
   if ($lastAttemptEpoch -ne "") {

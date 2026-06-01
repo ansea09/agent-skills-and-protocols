@@ -162,6 +162,8 @@ Common diagnostic cases include:
 - degraded environment check;
 - stale chunks and full-spec-first mode;
 - ambiguous protocol cache provenance;
+- Codex sandbox networking disabled, with cache-only validation used instead
+  of a GitHub refresh;
 - missing GitHub/network access when no valid cache exists.
 
 ## Release Notes
