@@ -59,10 +59,12 @@ For `fpf-work-guide`, `scripts/validate-skills.sh` runs
 `scripts/validate-fpf-work-guide-cross-platform.sh`. That gate always runs Bash
 golden-output fixtures for chunk source commit behavior, protocol cache output,
 context-gate lifecycle, doctor output, lock handling, unavailable state
-directories, cache reset guards, cache marker content validation, protocol
-provenance fields, and CMD wrapper delegation. If `pwsh` is available, it also
+directories, sandbox-network-disabled fallback, cache reset guards, cache marker
+content validation, protocol provenance fields, and CMD wrapper delegation. If
+`pwsh` is available, it also
 runs the PowerShell spec updater, protocol updater, context gate, doctor, lock
-behavior, state-dir-unavailable behavior, and cache reset guard through
+behavior, state-dir-unavailable behavior, sandbox-network-disabled fallback, and
+cache reset guard through
 `pwsh -NoProfile -File ...` on the same fixture shape. These local tests prove
 implementation parity for the exercised fixtures; native Windows release claims
 still require a Windows or `pwsh` validation lane, and CMD release claims require
@@ -151,6 +153,7 @@ Manual review checklist:
 - `fpf-work-guide` protects `git reset --hard` behind a valid cache marker with matching kind/repository/branch, matching remote verification, or explicit `FPF_ALLOW_NONSTANDARD_CACHE_RESET=1`.
 - `fpf-work-guide` emits protocol provenance fields: `FPF_PROTOCOLS_REPO_URL`, `FPF_PROTOCOLS_BRANCH`, `FPF_PROTOCOLS_REMOTE_URL`, and `FPF_PROTOCOLS_CACHE_TRUST_STATUS`.
 - `fpf-work-guide` keeps durable gate state (`latest.env`) separate from wrapper-captured gate output (`latest-output.env`).
+- `fpf-work-guide` reports `FPF_REFRESH_REASON=sandbox-network-disabled` and uses cache-only validation when Codex disables sandbox networking.
 - `fpf-work-guide` treats `FPF_REFRESH_AUTO_STATE_FILE` as explicit opt-in and emits `FPF_REFRESH_LAST_ATTEMPT_STATE_PATH`.
 - Personal automation around `fpf-work-guide` is documented as local infrastructure, not as a public skill overlay or staged skill dependency.
 - Symlinked workspaces use explicit `FPF_UPDATE_STATE_DIR` in launchers/hooks when stable human-facing diagnostics matter.

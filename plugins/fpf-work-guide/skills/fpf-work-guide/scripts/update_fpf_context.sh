@@ -95,6 +95,10 @@ state_dir_ready() {
   return 0
 }
 
+sandbox_network_disabled() {
+  [ "${CODEX_SANDBOX_NETWORK_DISABLED:-0}" = "1" ]
+}
+
 run_context_scripts() {
   local mode="$1"
 
@@ -315,6 +319,7 @@ fi
 now_epoch="$(date +%s)"
 last_attempt_epoch=""
 last_attempt_state_source=""
+last_attempt_reason=""
 for state_candidate in "$STATE_FILE" ${AUTO_STATE_FILE:+"$AUTO_STATE_FILE"}; do
   [ -f "$state_candidate" ] || continue
   candidate_epoch="$(awk -F= '
@@ -326,9 +331,22 @@ for state_candidate in "$STATE_FILE" ${AUTO_STATE_FILE:+"$AUTO_STATE_FILE"}; do
       exit(found ? 0 : 1)
     }
   ' "$state_candidate" 2>/dev/null || true)"
+  candidate_reason="$(awk -F= '
+    $1 == "LAST_REFRESH_REASON" {
+      print substr($0, index($0, "=") + 1)
+      found = 1
+    }
+    END {
+      exit(found ? 0 : 1)
+    }
+  ' "$state_candidate" 2>/dev/null || true)"
   if is_uint "$candidate_epoch"; then
+    if [ "$candidate_reason" = "sandbox-network-disabled" ] && ! sandbox_network_disabled; then
+      continue
+    fi
     last_attempt_epoch="$candidate_epoch"
     last_attempt_state_source="$state_candidate"
+    last_attempt_reason="$candidate_reason"
     break
   fi
 done
@@ -360,6 +378,25 @@ if [ "$mode" = "cache-only" ]; then
 
   mode="refresh"
   reason="missing-cache"
+fi
+
+if [ "$mode" = "refresh" ] && sandbox_network_disabled; then
+  attempt_epoch="$now_epoch"
+  next_eligible_epoch=$((attempt_epoch + TTL_SECONDS))
+  run_context_scripts "cache-only"
+
+  if [ "$spec_code" -eq 0 ] && [ "$protocols_code" -eq 0 ]; then
+    write_state "$attempt_epoch" "skipped_recent" "sandbox-network-disabled" "$next_eligible_epoch" || true
+    print_result "skipped_recent" "sandbox-network-disabled" "$attempt_epoch" "$next_eligible_epoch" "Codex sandbox network is disabled; using cache-only validation instead of GitHub refresh."
+    exit 0
+  fi
+
+  write_state "$attempt_epoch" "blocked" "sandbox-network-disabled" "$next_eligible_epoch" || true
+  if [ "$environment_checked" -eq 0 ]; then
+    run_environment_check || true
+  fi
+  print_result "blocked" "sandbox-network-disabled" "$attempt_epoch" "$next_eligible_epoch" "Codex sandbox network is disabled and cache-only validation failed."
+  exit 2
 fi
 
 if ! acquire_lock; then

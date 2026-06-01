@@ -26,6 +26,8 @@ Those are local operational infrastructure around the skill. They must be instal
 
 The bundled skill is Codex/macOS-first and includes a native Windows PowerShell path. Fresh refresh requires Git and GitHub network access. The Bash path requires Bash and standard Unix utilities. The native Windows path uses the bundled `.ps1` scripts. Cache fallback is supported when FPF and protocol caches already exist.
 
+When Codex exposes `CODEX_SANDBOX_NETWORK_DISABLED=1`, the refresh gate uses cache-only validation and reports `FPF_REFRESH_REASON=sandbox-network-disabled` instead of attempting a GitHub refresh from inside the sandbox.
+
 Native Windows PowerShell is implemented through the `.ps1` scripts. CMD is implemented through thin `.cmd` wrappers that delegate to PowerShell. Treat Windows as release-verified only after the PowerShell/CMD validation lane has passed on the target host or CI runner. WSL Bash is supported. Git Bash on Windows is best effort.
 
 FPF chunks are primary only when their declared source commit matches `FPF_SPEC_SOURCE_COMMIT`. `FPF_SPEC_REPO_COMMIT` identifies the mirror repository commit and is not used for chunk freshness. If chunks are stale, the skill uses full-spec-first behavior and reports `FPF_CHUNKS_SOURCE_COMMIT`.

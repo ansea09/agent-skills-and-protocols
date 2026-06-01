@@ -113,3 +113,13 @@ Diagnostic triggers:
 - unsafe paths or metadata conflicts affected lookup.
 
 Routine TTL skips belong in the engineering basis, not as prominent warnings.
+
+`FPF_REFRESH_REASON=sandbox-network-disabled` means Codex is running with
+`CODEX_SANDBOX_NETWORK_DISABLED=1`. The gate intentionally used cache-only
+validation instead of attempting a GitHub refresh from inside the sandbox. This
+is not a GitHub outage. A launcher, hook, or other external refresher may still
+refresh the cache outside the sandbox.
+
+This state suppresses repeated in-sandbox refresh attempts, but a later
+network-enabled gate run can still refresh instead of treating the sandbox
+record as successful TTL freshness evidence.

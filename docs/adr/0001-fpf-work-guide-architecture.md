@@ -89,6 +89,17 @@ The gate refreshes when:
 
 Otherwise it validates and uses the current cached copy without contacting GitHub.
 
+When the Codex runtime exposes `CODEX_SANDBOX_NETWORK_DISABLED=1`, the gate must
+not attempt a GitHub refresh from inside the sandbox. If refresh would otherwise
+be required, the gate runs cache-only validation and reports
+`FPF_REFRESH_REASON=sandbox-network-disabled`. If valid caches exist, work may
+continue against the current cached copy with explicit cached/fresh disclosure.
+If cache-only validation fails, FPF-backed work is blocked until an external
+refresher, launcher, hook, or user-approved network path refreshes the cache.
+A durable state record with `LAST_REFRESH_REASON=sandbox-network-disabled`
+suppresses repeated in-sandbox refresh attempts, but a later network-enabled
+gate run must not treat that record as successful TTL freshness evidence.
+
 The default TTL is 6 hours (`21600` seconds). A session-start launcher or hook may force refresh on startup, but normal skill invocation must not fetch on every use.
 
 The public task-admission threshold, substantive-task definition, and event vocabulary are defined in [../fpf-work-guide-behavior-model.md](../fpf-work-guide-behavior-model.md). In short, a raw user message is not itself the start event for the public skill; the public skill boundary starts at agent-side admission of a normalized task as substantive work.
@@ -383,6 +394,7 @@ These quanta deliberately have different support boundaries and validation check
 | Cache reset containment | Cache reset is allowed only for verified cache repositories or explicit nonstandard reset opt-in. | Every release and cache script change | Cross-platform reset guard and marker validation fixtures | Block destructive cache operations until marker/remote validation is correct. |
 | Protocol provenance | Protocol outputs include repository URL, branch, remote URL, trust status, and commit. | Every release and protocol refresh change | Cross-platform protocol provenance fixture assertions | Do not treat protocols as authoritative until provenance is restored. |
 | State diagnosability | Refresh state, previous-attempt source, active lock, and unavailable state directory are distinguishable. | Every release and state/launcher change | Lifecycle fixtures for recent-cache, active-refresh, and state-dir-unavailable | Fix state reporting or disclose degraded state explicitly. |
+| Sandbox-aware refresh behavior | Codex sandbox network disablement must not be reported as a GitHub refresh failure when valid cache-only validation can run. | Every refresh-gate or Codex runtime boundary change | Cross-platform sandbox-network-disabled lifecycle fixture | Use external refresher/launcher/hook for fresh cache, or block FPF-backed work if cache-only validation fails. |
 | Portable environment evidence | Doctor reports path-policy mode and portable environment status. | Every release and install-path change | `fpf-work-guide-doctor` / `fpf-work-guide-doctor.ps1`, cross-platform doctor fixtures | Fix path policy or downgrade portability claim. |
 | Personal runtime drift | Installed personal runtime copy matches staged source when staged source is the intended source of truth. | After public rename, reinstall, or personal runtime resync | `scripts/check-skills-drift.sh --installed-runtime --skill fpf-work-guide` | Resync installed copy from staged source or document an intentional local divergence outside the public skill directory. |
 | Documentation drift control | Architecture-significant implementation changes trigger review of ADR and private implementation docs. | Every architecture-significant change | `jobs/fpf-doc-sync/check.sh` in the personal workspace | Update docs or explicitly record why no documentation update was needed before writing a new baseline. |

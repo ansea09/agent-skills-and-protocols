@@ -197,7 +197,9 @@ run_bash_context() {
     FPF_SPEC_CACHE_DIR="$spec_cache" \
     FPF_PROTOCOLS_CACHE_DIR="$protocols_cache" \
     FPF_REFRESH_STATE_DIR="$state_dir" \
+    FPF_REFRESH_AUTO_STATE_FILE= \
     FPF_ENV_STATE_DIR="$env_state_dir" \
+    CODEX_SANDBOX_NETWORK_DISABLED=0 \
     "$@" \
     bash "$skill_dir/scripts/update_fpf_context.sh"
 }
@@ -245,7 +247,9 @@ run_pwsh_context() {
     FPF_SPEC_CACHE_DIR="$spec_cache" \
     FPF_PROTOCOLS_CACHE_DIR="$protocols_cache" \
     FPF_REFRESH_STATE_DIR="$state_dir" \
+    FPF_REFRESH_AUTO_STATE_FILE= \
     FPF_ENV_STATE_DIR="$env_state_dir" \
+    CODEX_SANDBOX_NETWORK_DISABLED=0 \
     "$@" \
     pwsh -NoProfile -File "$skill_dir/scripts/update_fpf_context.ps1"
 }
@@ -327,6 +331,14 @@ assert_active_lock_output() {
   assert_field "$output" FPF_PROTOCOLS_STATUS cached
 }
 
+assert_sandbox_network_disabled_output() {
+  output="$1"
+  assert_field "$output" FPF_REFRESH_DECISION skipped_recent
+  assert_field "$output" FPF_REFRESH_REASON sandbox-network-disabled
+  assert_field "$output" FPF_SPEC_STATUS cached
+  assert_field "$output" FPF_PROTOCOLS_STATUS cached
+}
+
 assert_doctor_output() {
   output="$1"
   assert_field "$output" FPF_ENV_CHECK_STATUS ok
@@ -398,6 +410,12 @@ FPF_PROTOCOLS_COMMIT=$protocols_sha
 EOF
   active_lock_output="$(run_bash_context "$spec_cache" "$protocols_cache" "$lock_state_dir" "$env_state_dir" "$fake_git" env FPF_REFRESH_FORCE=1)"
   assert_active_lock_output "$active_lock_output"
+
+  sandbox_state_dir="$tmp_root/bash-sandbox-state"
+  sandbox_output="$(run_bash_context "$spec_cache" "$protocols_cache" "$sandbox_state_dir" "$env_state_dir" "$fake_git" env CODEX_SANDBOX_NETWORK_DISABLED=1 FPF_REFRESH_FORCE=1)"
+  assert_sandbox_network_disabled_output "$sandbox_output"
+  sandbox_retry_output="$(run_bash_context "$spec_cache" "$protocols_cache" "$sandbox_state_dir" "$env_state_dir" "$fake_git" env FPF_PROTOCOLS_REPO_URL="$expected_spec_url")"
+  assert_context_attempted_output "$sandbox_retry_output"
 
   doctor_output="$(run_bash_doctor "$spec_cache" "$protocols_cache" "$tmp_root/bash-doctor/environment.env" "$fake_git")"
   assert_doctor_output "$doctor_output"
@@ -500,6 +518,12 @@ FPF_PROTOCOLS_COMMIT=$protocols_sha
 EOF
   active_lock_output="$(run_pwsh_context "$spec_cache" "$protocols_cache" "$lock_state_dir" "$env_state_dir" "$fake_git" env FPF_REFRESH_FORCE=1)"
   assert_active_lock_output "$active_lock_output"
+
+  sandbox_state_dir="$tmp_root/pwsh-sandbox-state"
+  sandbox_output="$(run_pwsh_context "$spec_cache" "$protocols_cache" "$sandbox_state_dir" "$env_state_dir" "$fake_git" env CODEX_SANDBOX_NETWORK_DISABLED=1 FPF_REFRESH_FORCE=1)"
+  assert_sandbox_network_disabled_output "$sandbox_output"
+  sandbox_retry_output="$(run_pwsh_context "$spec_cache" "$protocols_cache" "$sandbox_state_dir" "$env_state_dir" "$fake_git" env FPF_PROTOCOLS_REPO_URL="$expected_spec_url")"
+  assert_context_attempted_output "$sandbox_retry_output"
 
   doctor_output="$(run_pwsh_doctor "$spec_cache" "$protocols_cache" "$tmp_root/pwsh-doctor/environment.env" "$fake_git")"
   assert_doctor_output "$doctor_output"
