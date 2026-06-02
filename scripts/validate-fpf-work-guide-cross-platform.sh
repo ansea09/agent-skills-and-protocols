@@ -414,6 +414,8 @@ EOF
   sandbox_state_dir="$tmp_root/bash-sandbox-state"
   sandbox_output="$(run_bash_context "$spec_cache" "$protocols_cache" "$sandbox_state_dir" "$env_state_dir" "$fake_git" env CODEX_SANDBOX_NETWORK_DISABLED=1 FPF_REFRESH_FORCE=1)"
   assert_sandbox_network_disabled_output "$sandbox_output"
+  sandbox_repeat_output="$(run_bash_context "$spec_cache" "$protocols_cache" "$sandbox_state_dir" "$env_state_dir" "$fake_git" env CODEX_SANDBOX_NETWORK_DISABLED=1)"
+  assert_sandbox_network_disabled_output "$sandbox_repeat_output"
   sandbox_retry_output="$(run_bash_context "$spec_cache" "$protocols_cache" "$sandbox_state_dir" "$env_state_dir" "$fake_git" env FPF_PROTOCOLS_REPO_URL="$expected_spec_url")"
   assert_context_attempted_output "$sandbox_retry_output"
 
@@ -522,6 +524,8 @@ EOF
   sandbox_state_dir="$tmp_root/pwsh-sandbox-state"
   sandbox_output="$(run_pwsh_context "$spec_cache" "$protocols_cache" "$sandbox_state_dir" "$env_state_dir" "$fake_git" env CODEX_SANDBOX_NETWORK_DISABLED=1 FPF_REFRESH_FORCE=1)"
   assert_sandbox_network_disabled_output "$sandbox_output"
+  sandbox_repeat_output="$(run_pwsh_context "$spec_cache" "$protocols_cache" "$sandbox_state_dir" "$env_state_dir" "$fake_git" env CODEX_SANDBOX_NETWORK_DISABLED=1)"
+  assert_sandbox_network_disabled_output "$sandbox_repeat_output"
   sandbox_retry_output="$(run_pwsh_context "$spec_cache" "$protocols_cache" "$sandbox_state_dir" "$env_state_dir" "$fake_git" env FPF_PROTOCOLS_REPO_URL="$expected_spec_url")"
   assert_context_attempted_output "$sandbox_retry_output"
 

@@ -372,11 +372,19 @@ try {
     }
   }
 
+  if ($mode -eq "cache-only" -and (Test-SandboxNetworkDisabled) -and $lastAttemptReason -eq "sandbox-network-disabled") {
+    $reason = "sandbox-network-disabled"
+  }
+
   if ($mode -eq "cache-only") {
     $nextEligibleEpoch = [int64]$lastAttemptEpoch + [int64]$TtlSeconds
+    $cacheOnlyDetail = ""
+    if ($reason -eq "sandbox-network-disabled") {
+      $cacheOnlyDetail = "Codex sandbox network is disabled; using cache-only validation instead of GitHub refresh."
+    }
     Invoke-ContextScripts "cache-only"
     if ($script:SpecCode -eq 0 -and $script:ProtocolsCode -eq 0) {
-      Write-RefreshResult "skipped_recent" $reason $lastAttemptEpoch $nextEligibleEpoch
+      Write-RefreshResult "skipped_recent" $reason $lastAttemptEpoch $nextEligibleEpoch $cacheOnlyDetail
       exit 0
     }
     $mode = "refresh"

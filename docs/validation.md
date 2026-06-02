@@ -154,6 +154,7 @@ Manual review checklist:
 - `fpf-work-guide` emits protocol provenance fields: `FPF_PROTOCOLS_REPO_URL`, `FPF_PROTOCOLS_BRANCH`, `FPF_PROTOCOLS_REMOTE_URL`, and `FPF_PROTOCOLS_CACHE_TRUST_STATUS`.
 - `fpf-work-guide` keeps durable gate state (`latest.env`) separate from wrapper-captured gate output (`latest-output.env`).
 - `fpf-work-guide` reports `FPF_REFRESH_REASON=sandbox-network-disabled` and uses cache-only validation when Codex disables sandbox networking.
+- Repeated in-sandbox cache-only runs preserve `FPF_REFRESH_REASON=sandbox-network-disabled` instead of reporting a generic TTL skip.
 - `fpf-work-guide` treats `FPF_REFRESH_AUTO_STATE_FILE` as explicit opt-in and emits `FPF_REFRESH_LAST_ATTEMPT_STATE_PATH`.
 - Personal automation around `fpf-work-guide` is documented as local infrastructure, not as a public skill overlay or staged skill dependency.
 - Symlinked workspaces use explicit `FPF_UPDATE_STATE_DIR` in launchers/hooks when stable human-facing diagnostics matter.

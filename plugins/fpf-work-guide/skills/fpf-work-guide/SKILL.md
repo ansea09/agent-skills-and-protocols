@@ -183,7 +183,7 @@ If `FPF_SPEC_STATUS=missing`, explain that no local FPF cache exists and ask the
 
 Never describe FPF or protocols as latest when `FPF_SPEC_STATUS=cached` or `FPF_PROTOCOLS_STATUS=cached`; say `current cached copy` instead.
 
-If `FPF_REFRESH_DECISION=skipped_recent`, do not say that an update was attempted. Say that the gate used cache-only validation because the TTL has not expired.
+If `FPF_REFRESH_DECISION=skipped_recent`, do not say that an update was attempted. Explain the skip by `FPF_REFRESH_REASON`: for `recent-cache`, say the TTL has not expired; for `sandbox-network-disabled`, say Codex sandbox networking is disabled and the gate used cache-only validation instead of trying GitHub.
 
 If `FPF_REFRESH_DECISION=blocked`, explain why FPF-backed work is blocked and ask the user only for the action needed to restore a valid cache or allow a fetch.
 

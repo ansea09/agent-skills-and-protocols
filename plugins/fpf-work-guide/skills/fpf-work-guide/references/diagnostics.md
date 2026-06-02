@@ -123,3 +123,7 @@ refresh the cache outside the sandbox.
 This state suppresses repeated in-sandbox refresh attempts, but a later
 network-enabled gate run can still refresh instead of treating the sandbox
 record as successful TTL freshness evidence.
+
+If `FPF_REFRESH_DECISION=skipped_recent` appears with this reason, do not explain
+the skip as an ordinary TTL skip. The user-facing cause is still the Codex
+sandbox network boundary.
