@@ -9,7 +9,7 @@ cleanly.
 
 | Scenario | Why it fits | Expected result | Route |
 | --- | --- | --- | --- |
-| Trusted local DOCX, PPTX, XLS, XLSX, HTML, CSV, JSON, XML, text-like files, and ZIP archives containing supported local files | These are in the narrow core scope and use the pinned MarkItDown runtime. | Markdown suitable for reading, search, ingestion, or follow-up analysis. | `mdown input -o output.md`, then cheap verification with `wc`, `du`, and `sed`. |
+| Trusted local DOCX, PPTX, XLS, XLSX, simple EPUB, HTML, CSV, JSON, XML, text-like files, and ZIP archives containing supported local files | These are in the narrow core scope and use the pinned MarkItDown runtime. | Markdown suitable for reading, search, ingestion, or follow-up analysis. | `mdown input -o output.md`, then cheap verification with `wc`, `du`, and `sed`. |
 | Trusted born-digital PDFs with mostly selectable text | Text extraction is the main need and the PDF is not primarily scanned or image-only. | Markdown text extraction, with quality dependent on the original PDF structure. | `mdown input.pdf -o output.md`; use `mdown-book` when page/image/link evidence matters. |
 | Textbook-like born-digital PDFs where audit evidence matters more than layout reproduction | The book workflow is an audit bundle, not a layout reconstruction engine. | `content.md`, `audit.md`, `assets/`, `manifest.json`, and `conversion-report.md`. | `mdown-book source.pdf -o source-audit-bundle`. |
 | Trusted scanned PDFs when OCR is explicitly needed and language data is installed | OCR is handled as a separate local preprocessing step. | A derived searchable OCR PDF plus a normal audit bundle after rerunning the book workflow. | `mdown-ocrpdf scanned.pdf -o scanned-ocr.pdf`, then `mdown-book scanned-ocr.pdf -o scanned-audit-bundle`. |
@@ -21,6 +21,7 @@ cleanly.
 | Scenario | Caveat | Required expectation |
 | --- | --- | --- |
 | Large trusted local documents | Timeout and input-size limits are guardrails only. They do not cap memory, temporary storage, page count, or ZIP expansion. | Raise limits only for trusted sources and expect manual verification. |
+| EPUB with complex CSS layout, image-heavy chapters, footnotes, sidebars, MathML, SVG, or media assets | The core route converts EPUB spine XHTML to Markdown; it is not an EPUB asset/audit bundle or publication-quality layout reconstruction. | Treat simple EPUB support as reading-order text extraction. Use manual review for assets, internal links, footnotes, and complex structures. |
 | Mixed-language OCR | Tesseract language packs are external system data and are not rebuilt from the Python lockfile. | Choose a source-specific language string and run `mdown-ocrpdf --doctor` first. |
 | Formula-heavy, table-heavy, or diagram-heavy textbooks | The audit bundle can expose quality risk, but it does not reconstruct formulas, tables, captions, vector diagrams, or image placement with high fidelity. | Treat output as a reviewable extraction bundle, not a publication-quality textbook conversion. |
 | PDFs where links or image placement must appear inline in running Markdown | The current workflow records link and image evidence separately. | Use `manifest.json` and `audit.md`; do not promise inline placement. |

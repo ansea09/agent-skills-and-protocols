@@ -26,6 +26,9 @@ audit bundles are local operational artifacts and are not release payloads.
   under `${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md`.
 - Added machine-readable doctor output contracts for core, book, and OCR
   doctors, with JSON Schema validation in the release gate.
+- Added simple EPUB as an officially documented core conversion format, backed
+  by selftest and synthetic regression snapshots. Complex EPUB layout, assets,
+  footnotes, MathML, SVG, and media remain caveated rather than promised.
 - Added synthetic regression coverage for ordinary conversion formats and PDF
   audit-bundle evidence.
 - Documented the trusted-local threat model: this skill is not a sandbox and is

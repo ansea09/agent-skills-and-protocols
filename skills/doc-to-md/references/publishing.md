@@ -85,7 +85,7 @@ OCR/PDF drift such as a newer OCRmyPDF release without changing pins or
 promoting an installed runtime.
 - Run `scripts/selftest_doc_to_md.py` with the core runtime Python.
 - Confirm the selftest covers the claimed core smoke formats: HTML, PDF, DOCX,
-  XLS, XLSX, PPTX, CSV, JSON, XML, and ZIP.
+  XLS, XLSX, PPTX, EPUB, CSV, JSON, XML, and ZIP.
 - Before accepting a MarkItDown upgrade, run
   `scripts/regression_corpus.py` and review snapshot diffs. Accepted output
   changes must update snapshots in the same reviewed release change.

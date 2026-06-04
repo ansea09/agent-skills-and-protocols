@@ -1,6 +1,6 @@
 ---
 name: doc-to-md
-description: Public core for converting trusted local documents and data files to Markdown using the installed Microsoft MarkItDown wrapper, with reusable workflow profiles for standard local documents and textbook-like PDF audit/OCR. Use when Codex is asked to convert, extract, ingest, normalize, or preview content from local PDF, Word, Excel, PowerPoint, HTML, CSV, JSON, XML, ZIP, or similar files as Markdown; when the user mentions MarkItDown; when converting textbook-like PDFs with images or links; when OCR may be needed; or when a clean Markdown intermediate is useful before analysis.
+description: Public core for converting trusted local documents and data files to Markdown using the installed Microsoft MarkItDown wrapper, with reusable workflow profiles for standard local documents and textbook-like PDF audit/OCR. Use when Codex is asked to convert, extract, ingest, normalize, or preview content from local PDF, Word, Excel, PowerPoint, EPUB, HTML, CSV, JSON, XML, ZIP, or similar files as Markdown; when the user mentions MarkItDown; when converting textbook-like PDFs with images or links; when OCR may be needed; or when a clean Markdown intermediate is useful before analysis.
 compatibility:
   primary_runtime: "Codex on macOS arm64"
   supported_runtimes:
@@ -78,7 +78,7 @@ Current support contract: Codex on macOS arm64 is supported for core, book, and 
 
 Use the local wrapper `markitdown-local`, which runs the pinned core MarkItDown venv at `${DOC_TO_MD_TOOLS_DIR:-${CODEX_HOME:-$HOME/.codex}/tools}/markitdown-core-venv`. The short command `mdown` is a symlink to the same wrapper. Prefer local-file conversion with `-o/--output` so the wrapper can protect the previous output from normal process failures, then perform focused verification.
 
-Core scope is intentionally narrow: local PDF, DOCX, PPTX, XLS, XLSX, HTML, CSV, JSON, XML, text-like files, and ZIP extraction. Audio, YouTube, Azure, OCR plugins, and LLM-backed image description are advanced modes and are not part of the default runtime.
+Core scope is intentionally narrow: local PDF, DOCX, PPTX, XLS, XLSX, simple EPUB, HTML, CSV, JSON, XML, text-like files, and ZIP extraction. Audio, YouTube, Azure, OCR plugins, and LLM-backed image description are advanced modes and are not part of the default runtime.
 
 For textbook-like local PDFs where page traceability, embedded raster images, link records, and quality warnings matter, use the separate PDF audit bundle wrapper `mdown-book`. It runs from `${DOC_TO_MD_TOOLS_DIR:-${CODEX_HOME:-$HOME/.codex}/tools}/doc-to-md-book-venv`, calls the pinned core wrapper first, and keeps PyMuPDF out of the core runtime. This is not inline placement or high-fidelity PDF reconstruction.
 
@@ -91,7 +91,7 @@ Choose the route before running commands. If the case is ambiguous, read
 
 | Situation | Default action | Canonical detail |
 | --- | --- | --- |
-| Trusted local DOCX, PPTX, XLS/XLSX, HTML, CSV, JSON, XML, text-like file, ZIP, or born-digital PDF | `mdown input-file -o output-file.md` | `references/workflow-profiles.md` |
+| Trusted local DOCX, PPTX, XLS/XLSX, simple EPUB, HTML, CSV, JSON, XML, text-like file, ZIP, or born-digital PDF | `mdown input-file -o output-file.md` | `references/workflow-profiles.md` |
 | Textbook-like PDF, image-heavy PDF, link-sensitive PDF, formula/table-heavy PDF, or uncertain PDF quality | `mdown-book source.pdf -o source-audit-bundle` | `references/audit-bundle.md` |
 | Scanned or low-text PDF after audit evidence, or explicit trusted OCR request | `mdown-ocrpdf scanned.pdf -o scanned-ocr.pdf`, then rerun `mdown-book` | `references/ocr-paths.md` |
 | Audit/OCR evidence prepared for external transfer | Export sanitized reports or bundles before sharing | `references/publishing.md` |
@@ -118,7 +118,7 @@ Use the installed wrapper path if PATH is unavailable:
 
 The supported output path is `-o/--output`. The core wrapper writes through a temporary file only when it controls the output path through `-o/--output`; this protects the previous output from normal process failures but is not a crash/power-loss or multi-writer guarantee. Shell redirection such as `mdown input > output.md` is not a supported write path for this skill because the shell opens and truncates the destination before the wrapper runs. Stdout mode is only for inspection or explicit piping where truncation risk is acceptable. The default core guardrails are `MARKITDOWN_TIMEOUT_SECONDS=600` and `MARKITDOWN_MAX_INPUT_MB=512`; these are timeout and input-size limits only, not memory, temporary-storage, page-count, or ZIP-expansion limits. Raise or disable them only for trusted large conversions.
 
-The core selftest covers HTML, PDF, DOCX, XLS, XLSX, PPTX, CSV, JSON, XML, ZIP, protected `-o` failure behavior, and stdout warnings. It is a smoke test for the runtime profile, not a quality benchmark for every possible document.
+The core selftest covers HTML, PDF, DOCX, XLS, XLSX, PPTX, EPUB, CSV, JSON, XML, ZIP, protected `-o` failure behavior, and stdout warnings. It is a smoke test for the runtime profile, not a quality benchmark for every possible document.
 
 ## PDF Audit Bundle
 

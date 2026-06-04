@@ -161,7 +161,7 @@ For skill maintainers:
 - review the dependency diff and license boundary before publishing;
 - compare generated Markdown and audit/OCR reports before and after refresh;
 - when `--core-markitdown` is used, compare DOCX, PPTX, XLS/XLSX, HTML, PDF,
-  CSV/JSON/XML/ZIP smoke outputs using `scripts/regression_corpus.py`, plus at
+  EPUB, CSV/JSON/XML/ZIP smoke outputs using `scripts/regression_corpus.py`, plus at
   least one real PDF;
 - regenerate platform hash files only for platforms actually tested;
 - do not claim Windows/native or other unsupported hash profiles just because

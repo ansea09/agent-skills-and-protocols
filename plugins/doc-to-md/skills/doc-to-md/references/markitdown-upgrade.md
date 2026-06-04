@@ -77,8 +77,8 @@ python3 scripts/regression_corpus.py
 python3 scripts/audit_bundle_regression.py
 ```
 
-Review snapshot diffs for HTML, PDF, DOCX, XLS, XLSX, PPTX, CSV, JSON, XML, and
-ZIP. For PDF-sensitive changes, also run at least one non-private real
+Review snapshot diffs for HTML, PDF, DOCX, XLS, XLSX, PPTX, EPUB, CSV, JSON,
+XML, and ZIP. For PDF-sensitive changes, also run at least one non-private real
 born-digital PDF and inspect the generated Markdown manually.
 
 Accepted output changes must update snapshots in the same reviewed change:
