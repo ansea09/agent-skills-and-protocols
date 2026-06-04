@@ -22,10 +22,12 @@ installation.
 - Treat shell redirection (`mdown input > output.md`) as unsupported for file
   writes because it is not atomic and can truncate an existing destination.
 - Publish and review the support matrix. Current contract: Codex/macOS arm64 is
-  supported for core, book, and OCR; Codex/Intel macOS is supported for core
-  and book on Python 3.12; Claude Code/macOS is experimental unless installer
-  shims record `DOC_TO_MD_SKILL_DIR` and runtime paths are configured, WSL is a
-  candidate, and native Windows PowerShell/CMD is unsupported.
+  supported for core workflows, including `mdown` and `mdown-epub`, plus book
+  and OCR; Codex/Intel macOS is supported for core workflows, including
+  `mdown-epub`, plus book on Python 3.12; Claude Code/macOS is experimental
+  unless installer shims record `DOC_TO_MD_SKILL_DIR` and runtime paths are
+  configured, WSL is a candidate, and native Windows PowerShell/CMD is
+  unsupported.
 - Publish and review `references/python-profiles.md`. Do not claim a Python
   minor version as supported because a different minor version passed. New
   Python minors start as candidate/unverified until their own profile evidence
@@ -38,14 +40,16 @@ installation.
   unless a user explicitly installs and enables them.
 - Include `THIRD_PARTY_NOTICES.md` and review license compatibility before
   distributing modified copies.
-- Run `mdown-doctor`, `mdown-book --doctor` when book support is installed, and
-  `mdown-ocrpdf --doctor` when OCR support is installed.
+- Run `mdown-doctor`, `mdown-epub --doctor`, `mdown-book --doctor` when book
+  support is installed, and `mdown-ocrpdf --doctor` when OCR support is
+  installed.
 - For release evidence and CI, validate `mdown-doctor --json`,
-  `mdown-book --doctor --json`, and `mdown-ocrpdf --doctor --json` against the
-  JSON Schemas in `schemas/`. Core and book doctors must return a zero exit code
-  with status `ok` or `warn`; OCR may report `fail` in source CI when external
-  OCR system dependencies are intentionally absent, but the JSON contract must
-  still validate.
+  `mdown-epub --doctor --json`, `mdown-book --doctor --json`, and
+  `mdown-ocrpdf --doctor --json` against the JSON Schemas in `schemas/`. Core,
+  EPUB, and book doctors must return a zero exit code with status `ok` or
+  `warn`; OCR may report `fail` in source CI when external OCR system
+  dependencies are intentionally absent, but the JSON contract must still
+  validate.
 - Before publishing, run the repository release gate:
 
 ```bash
@@ -83,7 +87,8 @@ mdown-dependency-monitor --json --no-write
 This signal is intentionally separate from MarkItDown auto-prepare. It can show
 OCR/PDF drift such as a newer OCRmyPDF release without changing pins or
 promoting an installed runtime.
-- Run `scripts/selftest_doc_to_md.py` with the core runtime Python.
+- Run `scripts/selftest_doc_to_md.py` and `scripts/epub_bundle_regression.py`
+  with the core runtime Python.
 - Confirm the selftest covers the claimed core smoke formats: HTML, PDF, DOCX,
   XLS, XLSX, PPTX, EPUB, CSV, JSON, XML, and ZIP.
 - Before accepting a MarkItDown upgrade, run
@@ -91,6 +96,9 @@ promoting an installed runtime.
   changes must update snapshots in the same reviewed release change.
 - For audit bundle behavior, run `scripts/audit_bundle_regression.py`; it uses a
   generated PDF fixture with text, an embedded image, and a URI link.
+- For EPUB LLM bundle behavior, run `scripts/epub_bundle_regression.py`; it uses
+  a synthetic EPUB fixture with images, footnotes, internal/external links,
+  complex tables, SVG, MathML, nested asset paths, and LLM entrypoints.
 - Keep `references/diagnostics.md` aligned with wrapper behavior, doctor
   checks, audit warnings, OCR boundaries, and publication boundaries.
 - Before transferring generated audit bundles or OCR reports outside the local
@@ -110,7 +118,8 @@ For stricter public redistribution, use platform-specific hash-locked
 requirements or a lockfile produced by the package manager used by the project
 (`uv.lock`, `pip-tools` hashes, or an equivalent mechanism). This skill
 currently publishes `macos-arm64-py313` hash files for core, book, and OCR, and
-`macos-intel-py312` hash files for core and book. Use
+`macos-intel-py312` hash files for core and book. The `core` profile includes
+`mdown-epub`; EPUB bundle support is not a separate hash-profile component. Use
 `scripts/install.sh --hash-locked` only when a matching profile exists.
 
 Support claims are profile-specific. A normal pinned install on an unlisted

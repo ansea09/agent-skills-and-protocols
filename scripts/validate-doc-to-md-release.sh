@@ -95,6 +95,19 @@ check_dir() {
   fi
 }
 
+clean_python_cache() {
+  label="$1"
+  path="$2"
+  if [ ! -d "$path" ]; then
+    return 0
+  fi
+  if find "$path" -name __pycache__ -type d -print | grep -q . || find "$path" -name "*.pyc" -type f -print | grep -q .; then
+    echo "WARN: removing generated Python cache under $label doc-to-md skill copy"
+    find "$path" -name __pycache__ -type d -prune -exec rm -rf {} +
+    find "$path" -name "*.pyc" -type f -exec rm -f {} +
+  fi
+}
+
 check_diff() {
   label="$1"
   left="$2"
@@ -187,6 +200,12 @@ if [ "$mode" = "promotion" ]; then
   check_dir "installed" "$installed_skill"
 fi
 
+clean_python_cache staged "$staged_skill"
+clean_python_cache plugin "$plugin_skill"
+if [ "$mode" = "promotion" ]; then
+  clean_python_cache installed "$installed_skill"
+fi
+
 if [ "$failed" -eq 0 ]; then
   check_diff "staged and plugin copies" "$staged_skill" "$plugin_skill"
   if [ "$mode" = "promotion" ]; then
@@ -240,6 +259,18 @@ run_core_book() {
     DOC_TO_MD_BOOK_SCRIPT="$staged_skill/scripts/mdown_book.py" \
     DOC_TO_MD_BOOK_REQUIREMENTS="$staged_skill/requirements-book.txt" \
     MDOWN_BOOK_BIN="$staged_skill/scripts/mdown-book" \
+    "$@"
+}
+
+run_core_epub() {
+  env \
+    MARKITDOWN_VENV="$core_venv" \
+    MARKITDOWN_BIN="$core_venv/bin/markitdown" \
+    MARKITDOWN_PYTHON="$core_python" \
+    MARKITDOWN_REQUIREMENTS="$staged_skill/requirements-core.txt" \
+    MARKITDOWN_WRAPPER="$staged_skill/scripts/markitdown-local" \
+    DOC_TO_MD_EPUB_REQUIREMENTS="$staged_skill/requirements-core.txt" \
+    DOC_TO_MD_EPUB_SCRIPT="$staged_skill/scripts/mdown_epub.py" \
     "$@"
 }
 
@@ -308,6 +339,7 @@ if [ "$failed" -eq 0 ]; then
   fi
 
   run_core "$staged_skill/scripts/regression_corpus.py" || failed=1
+  run_core_epub "$staged_skill/scripts/epub_bundle_regression.py" || failed=1
   run_core_book "$staged_skill/scripts/audit_bundle_regression.py" || failed=1
 
   validate_doctor_json \
@@ -323,6 +355,13 @@ if [ "$failed" -eq 0 ]; then
     "source book" \
     no-fail \
     run_core_book "$staged_skill/scripts/mdown-book" --doctor --json
+
+  validate_doctor_json \
+    "$staged_skill/schemas/mdown-epub-doctor.schema.json" \
+    mdown-epub \
+    "source EPUB" \
+    no-fail \
+    run_core_epub "$staged_skill/scripts/mdown-epub" --doctor --json
 
   validate_doctor_json \
     "$staged_skill/schemas/mdown-ocrpdf-doctor.schema.json" \
@@ -348,6 +387,15 @@ if [ "$mode" = "promotion" ]; then
     validate_doctor_json "$staged_skill/schemas/mdown-book-doctor.schema.json" mdown-book "installed book" no-fail "$HOME/.local/bin/mdown-book" --doctor --json
   else
     echo "ERROR: mdown-book not found for promotion gate" >&2
+    failed=1
+  fi
+
+  if command -v mdown-epub >/dev/null 2>&1; then
+    validate_doctor_json "$staged_skill/schemas/mdown-epub-doctor.schema.json" mdown-epub "installed EPUB" no-fail mdown-epub --doctor --json
+  elif [ -x "$HOME/.local/bin/mdown-epub" ]; then
+    validate_doctor_json "$staged_skill/schemas/mdown-epub-doctor.schema.json" mdown-epub "installed EPUB" no-fail "$HOME/.local/bin/mdown-epub" --doctor --json
+  else
+    echo "ERROR: mdown-epub not found for promotion gate" >&2
     failed=1
   fi
 

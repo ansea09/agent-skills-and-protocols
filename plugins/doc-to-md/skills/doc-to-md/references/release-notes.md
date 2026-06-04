@@ -10,6 +10,15 @@ audit bundles are local operational artifacts and are not release payloads.
 
 ## Unreleased
 
+- Added `mdown-epub`, a core-runtime EPUB LLM textbook bundle workflow. It
+  produces `LLM_README.md`, `content.md`, chapter files, asset indexes, link
+  records, audit evidence, and machine-readable manifests for Codex, Claude Code,
+  and other local agent runtimes.
+- Added EPUB bundle JSON schemas and synthetic regression coverage for images,
+  footnotes, internal/external links, complex tables, SVG, MathML, nested asset
+  paths, and runtime-neutral entrypoints.
+- Simple EPUB conversion remains in the standard `mdown input.epub -o output.md`
+  path.
 - Added script-first maintenance checks for MarkItDown upstream drift and
   PDF/OCR dependency drift. `no-action` stays quiet; actionable changes are
   reported through local status files and script-owned messages.
@@ -51,6 +60,7 @@ instruction says the local runtime changed:
 ```bash
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --rebuild --all
 mdown-doctor --json
+mdown-epub --doctor --json
 mdown-book --doctor --json
 mdown-ocrpdf --doctor --json
 ```

@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "required": ["schema_version", "tool", "links"],
+  "properties": {
+    "schema_version": { "type": "integer" },
+    "tool": { "const": "mdown-epub" },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_chapter", "original_href", "kind", "rewritten_href"],
+        "properties": {
+          "source_chapter": { "type": "string" },
+          "original_href": { "type": "string" },
+          "kind": { "type": "string" },
+          "rewritten_href": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

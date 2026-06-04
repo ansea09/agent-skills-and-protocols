@@ -35,6 +35,10 @@ document-ingestion service.
   `DOC_TO_MD_INPUT_ROOTS`, and `DOC_TO_MD_OUTPUT_ROOTS`.
 - The PDF audit and OCR workflows use same-output locks to reject concurrent
   writes to one bundle or OCR PDF.
+- The EPUB bundle workflow rejects zip-slip paths, ZIP symlink entries,
+  encrypted members, and declared EPUB encryption metadata; it enforces archive
+  size, file-count, and unpacked-size limits; it does not fetch remote assets or
+  execute JavaScript.
 - Audit/OCR reports can redact local absolute paths for external transfer.
 
 These guardrails reduce common local mistakes. They do not isolate process

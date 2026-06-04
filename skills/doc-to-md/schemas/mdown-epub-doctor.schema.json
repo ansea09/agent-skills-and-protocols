@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "required": ["schema_version", "tool", "status", "exit_code", "paths", "checks"],
+  "properties": {
+    "schema_version": { "type": "integer" },
+    "tool": { "const": "mdown-epub" },
+    "status": { "enum": ["ok", "warn", "fail"] },
+    "exit_code": { "type": "integer" },
+    "paths": {
+      "type": "object",
+      "required": ["requirements"],
+      "properties": {
+        "requirements": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["level", "message"],
+        "properties": {
+          "level": { "enum": ["ok", "info", "warn", "fail"] },
+          "message": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

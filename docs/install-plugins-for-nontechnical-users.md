@@ -140,6 +140,7 @@ https://github.com/ansea09/agent-skills-and-protocols
      bash "<DOC_TO_MD_PLUGIN_PATH>/skills/doc-to-md/scripts/install.sh" --all --hash-locked
    - запусти проверки:
      mdown-doctor --json
+     mdown-epub --doctor --json
      mdown-book --doctor --json
      mdown-ocrpdf --doctor --json
 
