@@ -166,6 +166,49 @@ def write_zip(path: Path, text: str) -> None:
         zf.writestr("inside.txt", f"{text}\n")
 
 
+def write_epub(path: Path, text: str) -> None:
+    with ZipFile(path, "w", ZIP_DEFLATED) as zf:
+        zf.writestr("mimetype", "application/epub+zip")
+        zf.writestr(
+            "META-INF/container.xml",
+            """<?xml version="1.0"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+  <rootfiles>
+    <rootfile full-path="OPS/content.opf" media-type="application/oebps-package+xml"/>
+  </rootfiles>
+</container>
+""",
+        )
+        zf.writestr(
+            "OPS/content.opf",
+            f"""<?xml version="1.0" encoding="UTF-8"?>
+<package version="3.0" xmlns="http://www.idpf.org/2007/opf" unique-identifier="bookid">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:title>{text}</dc:title>
+    <dc:creator>Doc To Md Regression</dc:creator>
+    <dc:language>en</dc:language>
+    <dc:identifier id="bookid">epub-smoke</dc:identifier>
+  </metadata>
+  <manifest>
+    <item id="chapter1" href="chapter1.xhtml" media-type="application/xhtml+xml"/>
+  </manifest>
+  <spine>
+    <itemref idref="chapter1"/>
+  </spine>
+</package>
+""",
+        )
+        zf.writestr(
+            "OPS/chapter1.xhtml",
+            f"""<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><title>{text}</title></head>
+  <body><h1>{text}</h1><p>{text} body.</p></body>
+</html>
+""",
+        )
+
+
 def fixtures() -> dict[str, tuple[str, callable]]:
     return {
         "sample.html": ("html.md", lambda path: path.write_text("<h1>HTML Smoke</h1>\n<p>Snapshot body.</p>\n", encoding="utf-8")),
@@ -174,6 +217,7 @@ def fixtures() -> dict[str, tuple[str, callable]]:
         "sample.xls": ("xls.md", lambda path: write_xls(path, "XLS Smoke")),
         "sample.xlsx": ("xlsx.md", lambda path: write_xlsx(path, "XLSX Smoke")),
         "sample.pptx": ("pptx.md", lambda path: write_pptx(path, "PPTX Smoke")),
+        "sample.epub": ("epub.md", lambda path: write_epub(path, "EPUB Smoke")),
         "sample.csv": ("csv.md", lambda path: path.write_text("name,value\nCSV Smoke,1\n", encoding="utf-8")),
         "sample.json": (
             "json.md",

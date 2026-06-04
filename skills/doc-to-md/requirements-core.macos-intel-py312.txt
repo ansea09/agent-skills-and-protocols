@@ -3,7 +3,7 @@
 #   python3 -m venv "$HOME/.codex/tools/markitdown-core-venv"
 #   "$HOME/.codex/tools/markitdown-core-venv/bin/python" -m pip install -r "$HOME/.codex/skills/doc-to-md/requirements-core.macos-intel-py312.txt"
 #
-# Scope: local PDF/DOCX/PPTX/XLS/XLSX plus base text/HTML/CSV/JSON/XML/ZIP support.
+# Scope: local PDF/DOCX/PPTX/XLS/XLSX/EPUB plus base text/HTML/CSV/JSON/XML/ZIP support.
 # Excluded by design: Azure, YouTube, audio transcription, plugins/OCR LLM clients.
 # Refreshed by scripts/refresh-locks.py; review conversion output before publishing.
 # Intel-specific note: onnxruntime 1.26.0 does not publish a compatible macOS

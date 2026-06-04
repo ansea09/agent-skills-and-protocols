@@ -14,6 +14,7 @@ Use this profile when the input is a trusted local file and ordinary text extrac
 Typical inputs:
 
 - DOCX, PPTX, XLS, XLSX;
+- simple EPUB files where reading-order text extraction is sufficient;
 - HTML, CSV, JSON, XML, text-like files;
 - ZIP archives containing supported local files;
 - born-digital PDFs without scanned-page, image-heavy, or link-traceability concerns.

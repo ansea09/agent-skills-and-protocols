@@ -95,7 +95,7 @@ mdown source.pdf > source.md
 ## Workflow Profiles
 
 Use the `Standard Local Document Profile` for ordinary trusted local files where
-text extraction is expected to be enough.
+text extraction is expected to be enough, including simple EPUB files.
 
 Use the `Textbook Audit + OCR Profile` for textbook-like PDFs, scanned PDFs,
 formula-heavy PDFs, diagram-heavy PDFs, link-heavy PDFs, or any PDF where silent
