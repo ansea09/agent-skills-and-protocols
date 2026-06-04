@@ -23,6 +23,9 @@ scripts/validate-doc-to-md-release.sh
 The source gate uses staged requirements, staged wrappers, and either a
 temporary runtime or a reusable `DOC_TO_MD_CI_RUNTIME` cache root. It does not
 require the public skill to be installed under `${CODEX_HOME:-$HOME/.codex}`.
+Before comparing staged/plugin copies, it removes generated Python cache files
+such as `__pycache__` and `.pyc` so local test imports do not create false
+source drift.
 For public publication evidence, require online dependency SCA:
 
 ```bash

@@ -68,6 +68,10 @@ This profile improves discoverability and traceability. It does not run OCR,
 vision, remote fetches, JavaScript, DRM removal, or publication-quality layout
 reconstruction.
 
+This is a core runtime workflow because it uses the core pinned Python
+environment. It remains a separate command and output contract, not the default
+`mdown` path and not a separate hash-profile component.
+
 ## Textbook Audit + OCR Profile
 
 Use this profile when the user is converting trusted local textbook-like PDFs or any PDF where silent quality loss would be costly.

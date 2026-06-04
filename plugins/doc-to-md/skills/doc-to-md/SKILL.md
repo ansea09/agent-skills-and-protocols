@@ -1,6 +1,6 @@
 ---
 name: doc-to-md
-description: Public core for converting trusted local documents and data files to Markdown using the installed Microsoft MarkItDown wrapper, with reusable workflow profiles for standard local documents and textbook-like PDF audit/OCR. Use when Codex is asked to convert, extract, ingest, normalize, or preview content from local PDF, Word, Excel, PowerPoint, EPUB, HTML, CSV, JSON, XML, ZIP, or similar files as Markdown; when the user mentions MarkItDown; when converting textbook-like PDFs with images or links; when OCR may be needed; or when a clean Markdown intermediate is useful before analysis.
+description: Public core for converting trusted local documents and data files to Markdown using the installed Microsoft MarkItDown wrapper, with reusable workflow profiles for standard local documents, EPUB LLM-analysis bundles, and textbook-like PDF audit/OCR. Use when Codex is asked to convert, extract, ingest, normalize, or preview content from local PDF, Word, Excel, PowerPoint, EPUB, HTML, CSV, JSON, XML, ZIP, or similar files as Markdown; when the user mentions MarkItDown; when converting EPUB textbooks for LLM analysis; when converting textbook-like PDFs with images or links; when OCR may be needed; or when a clean Markdown intermediate is useful before analysis.
 compatibility:
   primary_runtime: "Codex on macOS arm64"
   supported_runtimes:
@@ -76,13 +76,13 @@ This skill is the portable public core. Keep only publishable commands, wrappers
 
 Personal local preferences belong outside this skill, for example in a private repository policy file. The public core must not depend on private-only files, paths, fixtures, or commands.
 
-Current support contract: Codex on macOS arm64 is supported for core, book, and OCR workflows with the `macos-arm64-py313` hash profile. Codex on Intel macOS is supported for core and book workflows with Python 3.12 and the `macos-intel-py312` hash profile; OCR hash-locked support is not published for Intel macOS. Python minor versions are not interchangeable for `--hash-locked`: unlisted profiles such as `macos-arm64-py312`, `macos-arm64-py314`, or `macos-intel-py313` are candidate/unverified until validated and listed in `references/python-profiles.md`. WSL is a candidate; Claude Code on macOS is experimental unless the installed wrappers know the skill source path and runtime paths through `DOC_TO_MD_SKILL_DIR`, `DOC_TO_MD_BIN_DIR`, and `DOC_TO_MD_TOOLS_DIR`; native Windows PowerShell/CMD is unsupported. Read `references/support-matrix.md` before installing outside these maintained Codex/macOS paths.
+Current support contract: Codex on macOS arm64 is supported for core workflows, including `mdown` and `mdown-epub`, plus book and OCR workflows with the `macos-arm64-py313` hash profile. Codex on Intel macOS is supported for core workflows, including `mdown` and `mdown-epub`, plus book workflows with Python 3.12 and the `macos-intel-py312` hash profile; OCR hash-locked support is not published for Intel macOS. Python minor versions are not interchangeable for `--hash-locked`: unlisted profiles such as `macos-arm64-py312`, `macos-arm64-py314`, or `macos-intel-py313` are candidate/unverified until validated and listed in `references/python-profiles.md`. WSL is a candidate; Claude Code on macOS is experimental unless the installed wrappers know the skill source path and runtime paths through `DOC_TO_MD_SKILL_DIR`, `DOC_TO_MD_BIN_DIR`, and `DOC_TO_MD_TOOLS_DIR`; native Windows PowerShell/CMD is unsupported. Read `references/support-matrix.md` before installing outside these maintained Codex/macOS paths.
 
 Use the local wrapper `markitdown-local`, which runs the pinned core MarkItDown venv at `${DOC_TO_MD_TOOLS_DIR:-${CODEX_HOME:-$HOME/.codex}/tools}/markitdown-core-venv`. The short command `mdown` is a symlink to the same wrapper. Prefer local-file conversion with `-o/--output` so the wrapper can protect the previous output from normal process failures, then perform focused verification.
 
-Core scope is intentionally narrow: local PDF, DOCX, PPTX, XLS, XLSX, simple EPUB, HTML, CSV, JSON, XML, text-like files, and ZIP extraction. Audio, YouTube, Azure, OCR plugins, and LLM-backed image description are advanced modes and are not part of the default runtime.
+Core runtime scope is intentionally narrow: local PDF, DOCX, PPTX, XLS, XLSX, simple EPUB, HTML, CSV, JSON, XML, text-like files, ZIP extraction, and the separate `mdown-epub` EPUB LLM-analysis bundle workflow. Audio, YouTube, Azure, OCR plugins, and LLM-backed image description are advanced modes and are not part of the default runtime.
 
-For trusted local EPUB textbooks where chapter navigation, images, footnotes, internal links, MathML/SVG warnings, and LLM-readable asset routing matter, use the separate EPUB LLM textbook bundle wrapper `mdown-epub`. It runs in the pinned core runtime and creates a runtime-neutral bundle for Codex, Claude Code, and other local agent environments. This is not publication-quality EPUB layout reconstruction or visual understanding.
+For trusted local EPUB textbooks where chapter navigation, images, footnotes, internal links, MathML/SVG warnings, and LLM-readable asset routing matter, use the separate EPUB LLM textbook bundle wrapper `mdown-epub`. It is a core runtime capability, not a new hash-profile component, and it stays separate from the default `mdown` conversion path. It creates a runtime-neutral bundle for Codex, Claude Code, and other local agent environments. This is not publication-quality EPUB layout reconstruction or visual understanding.
 
 For textbook-like local PDFs where page traceability, embedded raster images, link records, and quality warnings matter, use the separate PDF audit bundle wrapper `mdown-book`. It runs from `${DOC_TO_MD_TOOLS_DIR:-${CODEX_HOME:-$HOME/.codex}/tools}/doc-to-md-book-venv`, calls the pinned core wrapper first, and keeps PyMuPDF out of the core runtime. This is not inline placement or high-fidelity PDF reconstruction.
 
@@ -290,7 +290,7 @@ bash "$DOC_TO_MD_SKILL_DIR/scripts/install.sh"
 ```
 
 For public release on maintained hash profiles, use hash-locked installs.
-macOS arm64 / Python 3.13 supports core, EPUB bundle, book, and OCR:
+macOS arm64 / Python 3.13 supports core workflows, including `mdown-epub`, plus book and OCR:
 
 ```bash
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --hash-locked
@@ -305,7 +305,7 @@ doctors:
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --all --hash-locked && mdown-doctor --json && mdown-epub --doctor --json && mdown-book --doctor --json && mdown-ocrpdf --doctor --json
 ```
 
-Intel macOS / Python 3.12 supports core, EPUB bundle, and book:
+Intel macOS / Python 3.12 supports core workflows, including `mdown-epub`, plus book:
 
 ```bash
 PYTHON=python3.12 DOC_TO_MD_HASH_PROFILE=macos-intel-py312 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --hash-locked

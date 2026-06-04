@@ -282,6 +282,11 @@ macos-arm64-py313: core, book, OCR
 macos-intel-py312: core, book
 ```
 
+The `core` profile includes both the standard `mdown` conversion path and the
+separate `mdown-epub` EPUB LLM-analysis bundle workflow. EPUB bundle support is
+therefore not listed as a separate hash-profile component unless it later gains
+its own runtime or lockfile.
+
 The installer supports:
 
 ```bash
@@ -314,9 +319,10 @@ part of the public skill, plugin artifact, or private local policy.
 
 Current support contract:
 
-- Codex on macOS arm64: supported for core, book, and OCR.
-- Codex on Intel macOS: supported for core and book on Python 3.12 with the
-  `macos-intel-py312` profile.
+- Codex on macOS arm64: supported for core workflows, including `mdown` and
+  `mdown-epub`, plus book and OCR.
+- Codex on Intel macOS: supported for core workflows, including `mdown` and
+  `mdown-epub`, plus book on Python 3.12 with the `macos-intel-py312` profile.
 - Claude Code on macOS: experimental unless installer-generated shims record
   `DOC_TO_MD_SKILL_DIR`, `DOC_TO_MD_BIN_DIR`, and `DOC_TO_MD_TOOLS_DIR`.
 - WSL on Windows: candidate.
@@ -660,6 +666,16 @@ default.
 Rejected. A single runtime would make simple document conversion depend on
 PyMuPDF, OCRmyPDF, Tesseract-related concerns, and optional licensing decisions.
 Separate runtimes keep the default path smaller and clearer.
+
+### Put EPUB LLM bundle in a separate runtime
+
+Rejected for the current implementation. `mdown-epub` uses the core Python
+environment and adds a separate command/output contract rather than heavy OCR,
+vision, layout reconstruction, or cloud dependencies. Keeping it in the core
+runtime avoids a fake profile boundary while preserving a separate workflow from
+the default `mdown` path. If EPUB analysis later adds OCR, vision, semantic math
+recognition, or a different parser engine, it should move to an explicit
+experimental runtime with its own release gate.
 
 ### Make OCR-first or Marker/MinerU the default textbook workflow
 

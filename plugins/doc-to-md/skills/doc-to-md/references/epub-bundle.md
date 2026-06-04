@@ -4,6 +4,11 @@ Use `mdown-epub` for trusted local EPUB textbooks when LLM analysis needs more
 than simple reading-order Markdown. The workflow creates a runtime-neutral
 bundle for Codex, Claude Code, and other local agent environments.
 
+`mdown-epub` is a core runtime capability: it uses the pinned core Python
+environment and core requirements. It remains a separate command and bundle
+contract, not the default simple `mdown` conversion path and not a separate
+hash-profile component.
+
 Simple EPUB conversion remains in the standard core route:
 
 ```bash

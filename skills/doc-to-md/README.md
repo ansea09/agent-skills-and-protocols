@@ -1,15 +1,17 @@
 # doc-to-md
 
 Public-core Codex skill for converting trusted local documents and data files
-to Markdown with Microsoft MarkItDown, plus optional PDF audit and OCR
-preprocessing workflows. Reusable workflow profiles live in this public core;
-personal defaults and machine-specific choices belong in private local policy
-files.
+to Markdown with Microsoft MarkItDown, plus a core-runtime EPUB LLM bundle
+workflow and optional PDF audit/OCR preprocessing workflows. Reusable workflow
+profiles live in this public core; personal defaults and machine-specific
+choices belong in private local policy files.
 
 ## Install
 
-Supported default paths: Codex on macOS arm64 for core, book, and OCR;
-Codex on Intel macOS for core and book on Python 3.12. WSL is a candidate.
+Supported default paths: Codex on macOS arm64 for core workflows, book, and
+OCR; Codex on Intel macOS for core workflows and book on Python 3.12. The core
+runtime includes both `mdown` and the separate `mdown-epub` bundle command. WSL
+is a candidate.
 Claude Code on macOS is experimental unless the skill source and runtime paths
 are configured through the installer-generated shims.
 Native Windows PowerShell/CMD is unsupported.
@@ -39,7 +41,7 @@ Hash-locked public release install for macOS arm64 / Python 3.13:
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --hash-locked
 ```
 
-One-command happy path for supported macOS arm64 with core, EPUB bundle, book,
+One-command happy path for supported macOS arm64 with core workflows, book,
 OCR, and JSON doctors:
 
 ```bash

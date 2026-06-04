@@ -162,6 +162,8 @@ def main() -> int:
             return 1
 
         content = (bundle / "content.md").read_text(encoding="utf-8")
+        llm_readme = (bundle / "LLM_README.md").read_text(encoding="utf-8")
+        report = (bundle / "conversion-report.md").read_text(encoding="utf-8")
         assets_index = (bundle / "assets-index.md").read_text(encoding="utf-8")
         audit = (bundle / "audit.md").read_text(encoding="utf-8")
         manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
@@ -171,6 +173,9 @@ def main() -> int:
             ("chapter split", len(list((bundle / "chapters").glob("*.md"))) == 2),
             ("asset extraction", len(list((bundle / "assets").iterdir())) >= 4),
             ("asset index hint", "Inspect when" in assets_index),
+            ("content asset cue", "inspect `assets-index.md` and `audit.md`" in content),
+            ("llm asset cue", "explicitly check the asset and audit files" in llm_readme),
+            ("human report warnings", "## Warnings" in report and "## Manual Inspection" in report),
             ("footnote", "[^fn1]" in content),
             ("complex table audit", "complex table" in audit.lower()),
             ("manifest tool", manifest.get("tool") == "mdown-epub"),

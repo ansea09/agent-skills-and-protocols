@@ -45,6 +45,10 @@ Python minor version as evidence for another minor version.
 | `macos-intel-py314` | Candidate / unverified | none claimed | Do not claim until the dependency graph is reviewed for that ABI. |
 | `linux-x86_64-py312` / `linux-x86_64-py313` | Candidate / unverified | none claimed | WSL/Linux needs separate profile generation and validation. |
 
+The `core` component includes the standard `mdown` conversion path and the
+separate `mdown-epub` EPUB LLM-analysis bundle command. Do not list EPUB bundle
+as a separate profile component unless it gains its own runtime or lockfile.
+
 ## Installer Policy
 
 `--hash-locked` must fail closed when the matching profile hash file is absent.

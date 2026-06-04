@@ -22,10 +22,11 @@ installation.
 - Treat shell redirection (`mdown input > output.md`) as unsupported for file
   writes because it is not atomic and can truncate an existing destination.
 - Publish and review the support matrix. Current contract: Codex/macOS arm64 is
-  supported for core, EPUB bundle, book, and OCR; Codex/Intel macOS is supported
-  for core, EPUB bundle, and book on Python 3.12; Claude Code/macOS is
-  experimental unless installer shims record `DOC_TO_MD_SKILL_DIR` and runtime
-  paths are configured, WSL is a candidate, and native Windows PowerShell/CMD is
+  supported for core workflows, including `mdown` and `mdown-epub`, plus book
+  and OCR; Codex/Intel macOS is supported for core workflows, including
+  `mdown-epub`, plus book on Python 3.12; Claude Code/macOS is experimental
+  unless installer shims record `DOC_TO_MD_SKILL_DIR` and runtime paths are
+  configured, WSL is a candidate, and native Windows PowerShell/CMD is
   unsupported.
 - Publish and review `references/python-profiles.md`. Do not claim a Python
   minor version as supported because a different minor version passed. New
@@ -117,7 +118,8 @@ For stricter public redistribution, use platform-specific hash-locked
 requirements or a lockfile produced by the package manager used by the project
 (`uv.lock`, `pip-tools` hashes, or an equivalent mechanism). This skill
 currently publishes `macos-arm64-py313` hash files for core, book, and OCR, and
-`macos-intel-py312` hash files for core and book. Use
+`macos-intel-py312` hash files for core and book. The `core` profile includes
+`mdown-epub`; EPUB bundle support is not a separate hash-profile component. Use
 `scripts/install.sh --hash-locked` only when a matching profile exists.
 
 Support claims are profile-specific. A normal pinned install on an unlisted

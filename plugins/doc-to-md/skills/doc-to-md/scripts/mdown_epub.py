@@ -932,6 +932,7 @@ class EpubConverter:
             "",
             "LLM reading entrypoint: start with this file for continuous text.",
             f"For navigation and asset inspection rules, read `{LLM_README}`.",
+            "Before answering questions about diagrams, figures, formula images, MathML, SVG, media, or table layout, inspect `assets-index.md` and `audit.md`.",
             "",
             "## Bundle Map",
             "",
@@ -957,6 +958,8 @@ class EpubConverter:
             f"3. When a question depends on a figure, diagram, table layout, formula image, MathML, SVG, or media object, inspect `{ASSETS_INDEX}` and `{AUDIT_MARKDOWN}` before answering.",
             f"4. Use `{LINKS_FILE}` for internal and external link records.",
             f"5. Use `{MANIFEST_FILE}` for machine-readable provenance and counts.",
+            "",
+            "Before answering visual, formula, media, or table-layout-sensitive questions, explicitly check the asset and audit files. This bundle surfaces those artifacts; it does not make the continuous Markdown self-sufficient for them.",
             "",
             "## Important Limits",
             "",
@@ -1086,12 +1089,46 @@ class EpubConverter:
         lines.extend(
             [
                 "",
+                "## Start Here",
+                "",
+                f"- For LLM analysis, open `{LLM_README}` first, then `{PRIMARY_MARKDOWN}`.",
+                f"- For human review, check this report, then `{AUDIT_MARKDOWN}` if warnings or unsupported items are listed.",
+                f"- For figure, diagram, formula, MathML, SVG, media, or table-layout questions, inspect `{ASSETS_INDEX}` before trusting the continuous Markdown alone.",
+                "",
                 "## Summary",
                 "",
                 f"- Chapters: {manifest['chapter_count']}",
                 f"- Assets: {manifest['asset_count']}",
                 f"- Links: {manifest['link_count']}",
                 f"- Warnings: {manifest['warning_count']}",
+                f"- Unsupported/manual-inspection items: {len(self.unsupported)}",
+                "",
+                "## Warnings",
+                "",
+            ]
+        )
+        if self.warnings:
+            lines.extend(f"- {warning}" for warning in self.warnings[:10])
+            if len(self.warnings) > 10:
+                lines.append(f"- ... {len(self.warnings) - 10} more warnings in `{AUDIT_MARKDOWN}`")
+        else:
+            lines.append("- None.")
+        lines.extend(
+            [
+                "",
+                "## Manual Inspection",
+                "",
+            ]
+        )
+        if self.unsupported:
+            for item in self.unsupported[:10]:
+                lines.append(f"- {item.get('kind', 'unknown')}: {item.get('message', '')} `{item.get('source_path', '')}`")
+            if len(self.unsupported) > 10:
+                lines.append(f"- ... {len(self.unsupported) - 10} more items in `{AUDIT_MARKDOWN}`")
+        else:
+            lines.append("- None.")
+        lines.extend(
+            [
                 "",
                 "## Quality Boundary",
                 "",

@@ -95,6 +95,19 @@ check_dir() {
   fi
 }
 
+clean_python_cache() {
+  label="$1"
+  path="$2"
+  if [ ! -d "$path" ]; then
+    return 0
+  fi
+  if find "$path" -name __pycache__ -type d -print | grep -q . || find "$path" -name "*.pyc" -type f -print | grep -q .; then
+    echo "WARN: removing generated Python cache under $label doc-to-md skill copy"
+    find "$path" -name __pycache__ -type d -prune -exec rm -rf {} +
+    find "$path" -name "*.pyc" -type f -exec rm -f {} +
+  fi
+}
+
 check_diff() {
   label="$1"
   left="$2"
@@ -185,6 +198,12 @@ check_dir "staged" "$staged_skill"
 check_dir "plugin" "$plugin_skill"
 if [ "$mode" = "promotion" ]; then
   check_dir "installed" "$installed_skill"
+fi
+
+clean_python_cache staged "$staged_skill"
+clean_python_cache plugin "$plugin_skill"
+if [ "$mode" = "promotion" ]; then
+  clean_python_cache installed "$installed_skill"
 fi
 
 if [ "$failed" -eq 0 ]; then
