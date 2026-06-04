@@ -115,6 +115,7 @@ After installing runtime dependencies locally:
 
 ```bash
 mdown-doctor
+mdown-epub --doctor
 mdown-book --doctor
 mdown-ocrpdf --doctor
 ```

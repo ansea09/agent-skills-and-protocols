@@ -232,6 +232,7 @@ install_wrapper() {
 install_wrapper markitdown-local
 install_wrapper mdown-doctor
 install_wrapper mdown-book
+install_wrapper mdown-epub
 install_wrapper mdown-ocrpdf
 install_wrapper mdown-refresh-locks
 install_wrapper mdown-markitdown-monitor

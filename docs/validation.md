@@ -104,8 +104,8 @@ Claude Code profile validation checks:
 - promotion mode additionally checks that staged `skills/doc-to-md` matches the
   installed operational copy at `${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md`,
   unless `DOC_TO_MD_INSTALLED_SKILL_DIR` points elsewhere;
-- `mdown-doctor --json`, `mdown-book --doctor --json`, and
-  `mdown-ocrpdf --doctor --json` validate against
+- `mdown-doctor --json`, `mdown-epub --doctor --json`,
+  `mdown-book --doctor --json`, and `mdown-ocrpdf --doctor --json` validate against
   `skills/doc-to-md/schemas/*.schema.json`;
 - the dependency license/runtime audit runs for core, book, and OCR profiles;
 - `DOC_TO_MD_SCA_MODE=required` additionally fails closed if online package
@@ -115,8 +115,12 @@ Claude Code profile validation checks:
 - the synthetic regression corpus matches expected Markdown snapshots before a
   MarkItDown upgrade is published;
 - the generated audit bundle regression verifies PDF page/image/link evidence;
-- promotion mode additionally checks installed `mdown-book --doctor --json` and
-  `mdown-ocrpdf --doctor --json` as releasable runtime evidence.
+- the generated EPUB bundle regression verifies LLM entrypoints, chapter split,
+  asset routing, links, footnotes, complex table audit, SVG, MathML, and nested
+  asset paths;
+- promotion mode additionally checks installed `mdown-epub --doctor --json`,
+  `mdown-book --doctor --json`, and `mdown-ocrpdf --doctor --json` as
+  releasable runtime evidence.
 
 Manual review checklist:
 

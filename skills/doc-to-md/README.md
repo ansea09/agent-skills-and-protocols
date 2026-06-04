@@ -39,11 +39,11 @@ Hash-locked public release install for macOS arm64 / Python 3.13:
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --hash-locked
 ```
 
-One-command happy path for supported macOS arm64 with core, book, OCR, and JSON
-doctors:
+One-command happy path for supported macOS arm64 with core, EPUB bundle, book,
+OCR, and JSON doctors:
 
 ```bash
-bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --all --hash-locked && mdown-doctor --json && mdown-book --doctor --json && mdown-ocrpdf --doctor --json
+bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --all --hash-locked && mdown-doctor --json && mdown-epub --doctor --json && mdown-book --doctor --json && mdown-ocrpdf --doctor --json
 ```
 
 Hash-locked public release install for Intel macOS / Python 3.12:
@@ -97,6 +97,11 @@ mdown source.pdf > source.md
 Use the `Standard Local Document Profile` for ordinary trusted local files where
 text extraction is expected to be enough, including simple EPUB files.
 
+Use the `EPUB LLM Textbook Bundle Profile` for trusted local EPUB textbooks
+where LLM analysis needs chapter files, image/asset routing, internal links,
+footnotes, MathML/SVG warnings, and audit evidence across Codex, Claude Code, or
+another local agent runtime.
+
 Use the `Textbook Audit + OCR Profile` for textbook-like PDFs, scanned PDFs,
 formula-heavy PDFs, diagram-heavy PDFs, link-heavy PDFs, or any PDF where silent
 quality loss would be costly. That profile starts with an audit bundle when
@@ -117,6 +122,25 @@ mdown-book textbook.pdf -o textbook-audit-bundle
 This creates `content.md`, `audit.md`, `assets/`, `manifest.json`, and
 `conversion-report.md`. It does not perform inline image placement or
 high-fidelity PDF reconstruction.
+
+## EPUB LLM Textbook Bundle
+
+```bash
+mdown-epub textbook.epub -o textbook-epub-bundle
+```
+
+Start agent analysis from `textbook-epub-bundle/LLM_README.md`, then read
+`content.md`. Use `assets-index.md` and `audit.md` before answering questions
+that depend on figures, diagrams, formula images, MathML, SVG, media, or table
+layout. This workflow uses the core runtime and keeps links relative so the
+bundle can move across Codex, Claude Code, and other local LLM runtimes.
+
+Run:
+
+```bash
+mdown-epub --doctor
+mdown-epub --doctor --json
+```
 
 For external transfer, export a sanitized copy of report files:
 
@@ -226,6 +250,7 @@ mdown-refresh-locks --core-pdf --core-filetype --ocr --apply
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --rebuild --all
 mdown-doctor --online
 mdown-doctor --json
+mdown-epub --doctor --json
 mdown-book --doctor --json
 mdown-ocrpdf --doctor --json
 mdown-ocrpdf --doctor --online

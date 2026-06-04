@@ -45,6 +45,8 @@ Canonical detail sources:
   caveats, or are unsupported.
 - `references/audit-bundle.md` - audit bundle output contract and quality
   interpretation.
+- `references/epub-bundle.md` - LLM-ready EPUB textbook bundle contract for
+  Codex, Claude Code, and other local agent runtimes.
 - `references/ocr-paths.md` - OCRmyPDF/Tesseract path, doctor checks, and OCR
   limits.
 - `references/support-matrix.md` - supported runtimes, portability, and platform
@@ -80,6 +82,8 @@ Use the local wrapper `markitdown-local`, which runs the pinned core MarkItDown 
 
 Core scope is intentionally narrow: local PDF, DOCX, PPTX, XLS, XLSX, simple EPUB, HTML, CSV, JSON, XML, text-like files, and ZIP extraction. Audio, YouTube, Azure, OCR plugins, and LLM-backed image description are advanced modes and are not part of the default runtime.
 
+For trusted local EPUB textbooks where chapter navigation, images, footnotes, internal links, MathML/SVG warnings, and LLM-readable asset routing matter, use the separate EPUB LLM textbook bundle wrapper `mdown-epub`. It runs in the pinned core runtime and creates a runtime-neutral bundle for Codex, Claude Code, and other local agent environments. This is not publication-quality EPUB layout reconstruction or visual understanding.
+
 For textbook-like local PDFs where page traceability, embedded raster images, link records, and quality warnings matter, use the separate PDF audit bundle wrapper `mdown-book`. It runs from `${DOC_TO_MD_TOOLS_DIR:-${CODEX_HOME:-$HOME/.codex}/tools}/doc-to-md-book-venv`, calls the pinned core wrapper first, and keeps PyMuPDF out of the core runtime. This is not inline placement or high-fidelity PDF reconstruction.
 
 For scanned PDFs, use the optional OCR preprocessor `mdown-ocrpdf` first. It runs from `${DOC_TO_MD_TOOLS_DIR:-${CODEX_HOME:-$HOME/.codex}/tools}/doc-to-md-ocr-venv`, keeps OCRmyPDF out of the core runtime, and writes a searchable OCR PDF before the audit bundle step.
@@ -92,6 +96,7 @@ Choose the route before running commands. If the case is ambiguous, read
 | Situation | Default action | Canonical detail |
 | --- | --- | --- |
 | Trusted local DOCX, PPTX, XLS/XLSX, simple EPUB, HTML, CSV, JSON, XML, text-like file, ZIP, or born-digital PDF | `mdown input-file -o output-file.md` | `references/workflow-profiles.md` |
+| Trusted local EPUB textbook where LLM analysis needs chapters, assets, links, footnotes, and audit evidence | `mdown-epub source.epub -o source-epub-bundle` | `references/epub-bundle.md` |
 | Textbook-like PDF, image-heavy PDF, link-sensitive PDF, formula/table-heavy PDF, or uncertain PDF quality | `mdown-book source.pdf -o source-audit-bundle` | `references/audit-bundle.md` |
 | Scanned or low-text PDF after audit evidence, or explicit trusted OCR request | `mdown-ocrpdf scanned.pdf -o scanned-ocr.pdf`, then rerun `mdown-book` | `references/ocr-paths.md` |
 | Audit/OCR evidence prepared for external transfer | Export sanitized reports or bundles before sharing | `references/publishing.md` |
@@ -119,6 +124,22 @@ Use the installed wrapper path if PATH is unavailable:
 The supported output path is `-o/--output`. The core wrapper writes through a temporary file only when it controls the output path through `-o/--output`; this protects the previous output from normal process failures but is not a crash/power-loss or multi-writer guarantee. Shell redirection such as `mdown input > output.md` is not a supported write path for this skill because the shell opens and truncates the destination before the wrapper runs. Stdout mode is only for inspection or explicit piping where truncation risk is acceptable. The default core guardrails are `MARKITDOWN_TIMEOUT_SECONDS=600` and `MARKITDOWN_MAX_INPUT_MB=512`; these are timeout and input-size limits only, not memory, temporary-storage, page-count, or ZIP-expansion limits. Raise or disable them only for trusted large conversions.
 
 The core selftest covers HTML, PDF, DOCX, XLS, XLSX, PPTX, EPUB, CSV, JSON, XML, ZIP, protected `-o` failure behavior, and stdout warnings. It is a smoke test for the runtime profile, not a quality benchmark for every possible document.
+
+## EPUB LLM Textbook Bundle
+
+Use this for trusted local EPUB textbooks when the output will be used by an LLM agent and silent loss of images, footnotes, links, tables, MathML, SVG, or chapter structure would be costly.
+
+```bash
+mdown-epub source.epub -o source-epub-bundle
+```
+
+Expected top-level outputs are `LLM_README.md`, `content.md`, `llm-index.md`,
+`toc.md`, `chapters/`, `assets/`, `assets-index.md`, `audit.md`,
+`manifest.json`, `links.json`, and `conversion-report.md`. The bundle is
+runtime-neutral: start from `LLM_README.md`, then read `content.md`, and inspect
+`assets-index.md`/`audit.md` before answering visual, formula, media, or table
+layout-sensitive questions. Run `mdown-epub --doctor` before relying on this
+workflow. Read `references/epub-bundle.md` for the canonical output contract.
 
 ## PDF Audit Bundle
 
@@ -209,6 +230,8 @@ mdown-doctor --json
 mdown-doctor --output output-file.md
 mdown-book --doctor
 mdown-book --doctor --json
+mdown-epub --doctor
+mdown-epub --doctor --json
 mdown-ocrpdf --doctor
 mdown-ocrpdf --doctor --json
 mdown-ocrpdf --doctor --online
@@ -222,10 +245,12 @@ mdown-dependency-audit --help
 mdown-markitdown-monitor --record-decision approved
 mdown-markitdown-monitor --record-decision declined
 python3 scripts/regression_corpus.py
+python3 scripts/epub_bundle_regression.py
 python3 scripts/audit_bundle_regression.py
 markitdown-local --version
 markitdown-local --help
 mdown source.pdf -o source.md
+mdown-epub source.epub -o source-epub-bundle
 mdown-book source.pdf -o source-audit-bundle
 mdown-book --export-sanitized source-audit-bundle -o source-audit-bundle-public
 mdown-ocrpdf scanned.pdf -o scanned-ocr.pdf
@@ -265,7 +290,7 @@ bash "$DOC_TO_MD_SKILL_DIR/scripts/install.sh"
 ```
 
 For public release on maintained hash profiles, use hash-locked installs.
-macOS arm64 / Python 3.13 supports core, book, and OCR:
+macOS arm64 / Python 3.13 supports core, EPUB bundle, book, and OCR:
 
 ```bash
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --hash-locked
@@ -277,10 +302,10 @@ Supported macOS arm64 happy path with all maintained workflows and JSON
 doctors:
 
 ```bash
-bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --all --hash-locked && mdown-doctor --json && mdown-book --doctor --json && mdown-ocrpdf --doctor --json
+bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --all --hash-locked && mdown-doctor --json && mdown-epub --doctor --json && mdown-book --doctor --json && mdown-ocrpdf --doctor --json
 ```
 
-Intel macOS / Python 3.12 supports core and book:
+Intel macOS / Python 3.12 supports core, EPUB bundle, and book:
 
 ```bash
 PYTHON=python3.12 DOC_TO_MD_HASH_PROFILE=macos-intel-py312 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --hash-locked

@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "required": ["schema_version", "tool", "profile", "outputs", "chapters", "assets", "warnings"],
+  "properties": {
+    "schema_version": { "type": "integer" },
+    "tool": { "const": "mdown-epub" },
+    "profile": { "const": "llm-textbook" },
+    "outputs": {
+      "type": "object",
+      "required": ["llm_readme", "content", "toc", "chapters_dir", "assets_dir", "assets_index", "audit", "manifest", "links", "report"],
+      "properties": {
+        "llm_readme": { "type": "string" },
+        "llm_index": { "type": "string" },
+        "content": { "type": "string" },
+        "toc": { "type": "string" },
+        "chapters_dir": { "type": "string" },
+        "assets_dir": { "type": "string" },
+        "assets_index": { "type": "string" },
+        "audit": { "type": "string" },
+        "manifest": { "type": "string" },
+        "links": { "type": "string" },
+        "report": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "chapters": { "type": "array" },
+    "assets": { "type": "array" },
+    "warnings": { "type": "array" }
+  },
+  "additionalProperties": true
+}

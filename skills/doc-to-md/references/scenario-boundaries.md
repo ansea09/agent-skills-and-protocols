@@ -10,6 +10,7 @@ cleanly.
 | Scenario | Why it fits | Expected result | Route |
 | --- | --- | --- | --- |
 | Trusted local DOCX, PPTX, XLS, XLSX, simple EPUB, HTML, CSV, JSON, XML, text-like files, and ZIP archives containing supported local files | These are in the narrow core scope and use the pinned MarkItDown runtime. | Markdown suitable for reading, search, ingestion, or follow-up analysis. | `mdown input -o output.md`, then cheap verification with `wc`, `du`, and `sed`. |
+| Trusted local EPUB textbooks where LLM analysis needs chapters, assets, links, footnotes, and audit evidence | The EPUB bundle route exposes structure and non-textual assets instead of relying on simple Markdown extraction. | Runtime-neutral bundle with `LLM_README.md`, `content.md`, chapter files, asset index, links, manifest, and audit. | `mdown-epub source.epub -o source-epub-bundle`. |
 | Trusted born-digital PDFs with mostly selectable text | Text extraction is the main need and the PDF is not primarily scanned or image-only. | Markdown text extraction, with quality dependent on the original PDF structure. | `mdown input.pdf -o output.md`; use `mdown-book` when page/image/link evidence matters. |
 | Textbook-like born-digital PDFs where audit evidence matters more than layout reproduction | The book workflow is an audit bundle, not a layout reconstruction engine. | `content.md`, `audit.md`, `assets/`, `manifest.json`, and `conversion-report.md`. | `mdown-book source.pdf -o source-audit-bundle`. |
 | Trusted scanned PDFs when OCR is explicitly needed and language data is installed | OCR is handled as a separate local preprocessing step. | A derived searchable OCR PDF plus a normal audit bundle after rerunning the book workflow. | `mdown-ocrpdf scanned.pdf -o scanned-ocr.pdf`, then `mdown-book scanned-ocr.pdf -o scanned-audit-bundle`. |
@@ -21,7 +22,7 @@ cleanly.
 | Scenario | Caveat | Required expectation |
 | --- | --- | --- |
 | Large trusted local documents | Timeout and input-size limits are guardrails only. They do not cap memory, temporary storage, page count, or ZIP expansion. | Raise limits only for trusted sources and expect manual verification. |
-| EPUB with complex CSS layout, image-heavy chapters, footnotes, sidebars, MathML, SVG, or media assets | The core route converts EPUB spine XHTML to Markdown; it is not an EPUB asset/audit bundle or publication-quality layout reconstruction. | Treat simple EPUB support as reading-order text extraction. Use manual review for assets, internal links, footnotes, and complex structures. |
+| EPUB with complex CSS layout, image-heavy chapters, footnotes, sidebars, MathML, SVG, or media assets | The simple core route converts EPUB spine XHTML to Markdown; the EPUB bundle route surfaces assets and warnings but still does not reconstruct publication layout or semantically analyze visuals. | Use `mdown-epub` for LLM analysis bundles; use manual review for visual, formula, media, and complex layout claims. |
 | Mixed-language OCR | Tesseract language packs are external system data and are not rebuilt from the Python lockfile. | Choose a source-specific language string and run `mdown-ocrpdf --doctor` first. |
 | Formula-heavy, table-heavy, or diagram-heavy textbooks | The audit bundle can expose quality risk, but it does not reconstruct formulas, tables, captions, vector diagrams, or image placement with high fidelity. | Treat output as a reviewable extraction bundle, not a publication-quality textbook conversion. |
 | PDFs where links or image placement must appear inline in running Markdown | The current workflow records link and image evidence separately. | Use `manifest.json` and `audit.md`; do not promise inline placement. |
@@ -39,6 +40,7 @@ cleanly.
 | Native Windows PowerShell/CMD | Unsupported until separate Windows launchers, path handling, and install paths exist. |
 | Hosted, shared, or server-side ingestion of untrusted documents | Wrapper root checks are not a sandbox. Use OS or container sandboxing before accepting untrusted input. |
 | High-fidelity PDF layout reconstruction | The current design extracts text and audit evidence; it does not reproduce visual layout. |
+| High-fidelity EPUB publication reconstruction | The EPUB bundle is optimized for LLM-readable analysis, not exact CSS/layout reproduction. |
 | Automatic inline placement of extracted images, links, captions, formulas, or diagrams | The book workflow stores evidence separately in `audit.md`, `assets/`, and `manifest.json`. |
 | Image-to-text or image description without a configured LLM/image workflow | The core wrapper has no LLM client configured, and image-only output may be empty. |
 | Audio transcription, YouTube transcription, Azure conversion, or MarkItDown plugins by default | These are intentionally outside the core dependency set. |

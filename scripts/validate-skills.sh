@@ -170,6 +170,7 @@ for skill_dir in "$skills_dir"/*; do
       references/diagnostics.md \
       references/scenario-boundaries.md \
       references/audit-bundle.md \
+      references/epub-bundle.md \
       references/ocr-paths.md \
       references/support-matrix.md \
       references/python-profiles.md \

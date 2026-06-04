@@ -35,6 +35,39 @@ sed -n '1,80p' output-file.md
 
 Run `mdown-doctor --output output-file.md` when the output is empty, tiny, malformed, or otherwise questionable.
 
+## EPUB LLM Textbook Bundle Profile
+
+Use this profile when the input is a trusted local EPUB textbook and the output
+will be used for LLM analysis rather than simple reading.
+
+Typical triggers:
+
+- image-heavy or diagram-heavy EPUB textbooks;
+- important footnotes or endnotes;
+- important internal links and table of contents;
+- MathML, SVG, media, or formula images;
+- complex tables;
+- need for a portable bundle that works across Codex, Claude Code, and other
+  local agent runtimes.
+
+Command shape:
+
+```bash
+mdown-epub source.epub -o source-epub-bundle
+```
+
+Default reading route:
+
+- start with `source-epub-bundle/LLM_README.md`;
+- read `source-epub-bundle/content.md`;
+- use `source-epub-bundle/toc.md` and `chapters/` for focused context;
+- use `assets-index.md` and `audit.md` before answering visual, formula,
+  MathML, SVG, media, or table-layout-sensitive questions.
+
+This profile improves discoverability and traceability. It does not run OCR,
+vision, remote fetches, JavaScript, DRM removal, or publication-quality layout
+reconstruction.
+
 ## Textbook Audit + OCR Profile
 
 Use this profile when the user is converting trusted local textbook-like PDFs or any PDF where silent quality loss would be costly.
@@ -106,3 +139,13 @@ For textbook/audit/OCR conversions, report:
 - link count;
 - major warnings from `conversion-report.md`;
 - any missing OCR language packs or doctor failures.
+
+For EPUB LLM textbook bundles, report:
+
+- bundle path;
+- `LLM_README.md` and `content.md` entrypoints;
+- extracted asset count;
+- link count;
+- warnings from `audit.md` or `conversion-report.md`;
+- whether visual/manual inspection is needed for images, MathML, SVG, media, or
+  complex tables.

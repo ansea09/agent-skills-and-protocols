@@ -243,6 +243,18 @@ run_core_book() {
     "$@"
 }
 
+run_core_epub() {
+  env \
+    MARKITDOWN_VENV="$core_venv" \
+    MARKITDOWN_BIN="$core_venv/bin/markitdown" \
+    MARKITDOWN_PYTHON="$core_python" \
+    MARKITDOWN_REQUIREMENTS="$staged_skill/requirements-core.txt" \
+    MARKITDOWN_WRAPPER="$staged_skill/scripts/markitdown-local" \
+    DOC_TO_MD_EPUB_REQUIREMENTS="$staged_skill/requirements-core.txt" \
+    DOC_TO_MD_EPUB_SCRIPT="$staged_skill/scripts/mdown_epub.py" \
+    "$@"
+}
+
 run_ocr() {
   env \
     DOC_TO_MD_OCR_VENV="$ocr_venv" \
@@ -308,6 +320,7 @@ if [ "$failed" -eq 0 ]; then
   fi
 
   run_core "$staged_skill/scripts/regression_corpus.py" || failed=1
+  run_core_epub "$staged_skill/scripts/epub_bundle_regression.py" || failed=1
   run_core_book "$staged_skill/scripts/audit_bundle_regression.py" || failed=1
 
   validate_doctor_json \
@@ -323,6 +336,13 @@ if [ "$failed" -eq 0 ]; then
     "source book" \
     no-fail \
     run_core_book "$staged_skill/scripts/mdown-book" --doctor --json
+
+  validate_doctor_json \
+    "$staged_skill/schemas/mdown-epub-doctor.schema.json" \
+    mdown-epub \
+    "source EPUB" \
+    no-fail \
+    run_core_epub "$staged_skill/scripts/mdown-epub" --doctor --json
 
   validate_doctor_json \
     "$staged_skill/schemas/mdown-ocrpdf-doctor.schema.json" \
@@ -348,6 +368,15 @@ if [ "$mode" = "promotion" ]; then
     validate_doctor_json "$staged_skill/schemas/mdown-book-doctor.schema.json" mdown-book "installed book" no-fail "$HOME/.local/bin/mdown-book" --doctor --json
   else
     echo "ERROR: mdown-book not found for promotion gate" >&2
+    failed=1
+  fi
+
+  if command -v mdown-epub >/dev/null 2>&1; then
+    validate_doctor_json "$staged_skill/schemas/mdown-epub-doctor.schema.json" mdown-epub "installed EPUB" no-fail mdown-epub --doctor --json
+  elif [ -x "$HOME/.local/bin/mdown-epub" ]; then
+    validate_doctor_json "$staged_skill/schemas/mdown-epub-doctor.schema.json" mdown-epub "installed EPUB" no-fail "$HOME/.local/bin/mdown-epub" --doctor --json
+  else
+    echo "ERROR: mdown-epub not found for promotion gate" >&2
     failed=1
   fi
 

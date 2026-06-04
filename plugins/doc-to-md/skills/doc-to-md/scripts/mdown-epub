@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+DEFAULT_SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd -P)"
+DOC_TO_MD_SKILL_DIR="${DOC_TO_MD_SKILL_DIR:-$DEFAULT_SKILL_DIR}"
+DOC_TO_MD_BIN_DIR="${DOC_TO_MD_BIN_DIR:-$HOME/.local/bin}"
+CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
+DOC_TO_MD_TOOLS_DIR="${DOC_TO_MD_TOOLS_DIR:-$CODEX_HOME_DIR/tools}"
+CORE_VENV="${MARKITDOWN_VENV:-$DOC_TO_MD_TOOLS_DIR/markitdown-core-venv}"
+CORE_PYTHON="${MARKITDOWN_PYTHON:-$CORE_VENV/bin/python}"
+EPUB_SCRIPT="${DOC_TO_MD_EPUB_SCRIPT:-$DOC_TO_MD_SKILL_DIR/scripts/mdown_epub.py}"
+runtime_requirements="$CORE_VENV/.doc-to-md-requirements"
+if [[ -z "${DOC_TO_MD_EPUB_REQUIREMENTS:-}" && -f "$runtime_requirements" ]]; then
+  DOC_TO_MD_EPUB_REQUIREMENTS="$(<"$runtime_requirements")"
+fi
+DOC_TO_MD_EPUB_REQUIREMENTS="${DOC_TO_MD_EPUB_REQUIREMENTS:-$DOC_TO_MD_SKILL_DIR/requirements-core.txt}"
+export DOC_TO_MD_EPUB_REQUIREMENTS
+
+if [[ ! -x "$CORE_PYTHON" ]]; then
+  printf 'mdown-epub: core workflow Python not found at %s\n' "$CORE_PYTHON" >&2
+  printf 'Rebuild with: %q/scripts/install.sh\n' "$DOC_TO_MD_SKILL_DIR" >&2
+  exit 127
+fi
+
+exec "$CORE_PYTHON" "$EPUB_SCRIPT" "$@"

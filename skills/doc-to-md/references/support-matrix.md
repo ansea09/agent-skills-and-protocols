@@ -14,10 +14,10 @@ Python minor-version support is governed by
 
 | Environment | Status | Contract |
 | --- | --- | --- |
-| Codex on macOS, arm64 | Supported | Maintained for core, book, and OCR workflows. Install the public skill, run `scripts/install.sh`, add `~/.local/bin` to `PATH`, then run the doctors. Optional `--hash-locked` installs use the `macos-arm64-py313` hash profile. |
-| Codex on macOS, Intel | Supported | Maintained for core and book workflows on Python 3.12 with the `macos-intel-py312` hash profile. OCR hash-locked support is not published for Intel macOS under the current OCRmyPDF v17 dependency graph. |
-| Claude Code on macOS | Experimental | Claude Code discovers skills from Claude skill locations such as `~/.claude/skills` or `.claude/skills`. Run the bundled installer from that source directory so installed command shims record `DOC_TO_MD_SKILL_DIR`; configure `DOC_TO_MD_BIN_DIR` and `DOC_TO_MD_TOOLS_DIR` when the defaults are not appropriate. Keep this experimental until a Claude Code release gate is run. |
-| WSL on Windows | Candidate | Use the Linux/WSL shell environment and rebuild runtimes inside WSL. Do not reuse macOS venvs, wrappers, cache, or Tesseract binaries. A separate WSL hash profile is required for hash-locked public release. |
+| Codex on macOS, arm64 | Supported | Maintained for core, EPUB bundle, book, and OCR workflows. Install the public skill, run `scripts/install.sh`, add `~/.local/bin` to `PATH`, then run the doctors. Optional `--hash-locked` installs use the `macos-arm64-py313` hash profile. |
+| Codex on macOS, Intel | Supported | Maintained for core, EPUB bundle, and book workflows on Python 3.12 with the `macos-intel-py312` hash profile. OCR hash-locked support is not published for Intel macOS under the current OCRmyPDF v17 dependency graph. |
+| Claude Code on macOS | Experimental | Claude Code discovers skills from Claude skill locations such as `~/.claude/skills` or `.claude/skills`. Run the bundled installer from that source directory so installed command shims record `DOC_TO_MD_SKILL_DIR`; configure `DOC_TO_MD_BIN_DIR` and `DOC_TO_MD_TOOLS_DIR` when the defaults are not appropriate. The EPUB bundle output is runtime-neutral, but command installation remains experimental until a Claude Code release gate is run. |
+| WSL on Windows | Candidate | Use the Linux/WSL shell environment and rebuild runtimes inside WSL. Do not reuse macOS venvs, wrappers, cache, or Tesseract binaries. EPUB bundle output is runtime-neutral, but a separate WSL hash profile is required for hash-locked public release. |
 | Native Windows PowerShell/CMD | Unsupported | The current implementation uses Bash, POSIX paths, `install`, symlinks, `mktemp`, Perl, `~/.local/bin`, and venv `bin/` paths. Native Windows support needs separate PowerShell launchers, Windows path-root handling, and a Windows runtime install path. |
 
 ## Required Local Tools
@@ -40,16 +40,16 @@ file as a universal lock for Intel macOS, Linux, WSL, or Windows.
 Current generated profiles:
 
 ```text
-macos-arm64-py313: core, book, OCR
-macos-intel-py312: core, book
+macos-arm64-py313: core, EPUB bundle, book, OCR
+macos-intel-py312: core, EPUB bundle, book
 ```
 
 Profile support levels:
 
 | Profile | Level | Components | Public claim |
 | --- | --- | --- | --- |
-| `macos-arm64-py313` | Supported hash-locked profile | core, book, OCR | Supported with `--hash-locked`. |
-| `macos-intel-py312` | Supported hash-locked profile | core, book | Supported with `--hash-locked` except OCR. |
+| `macos-arm64-py313` | Supported hash-locked profile | core, EPUB bundle, book, OCR | Supported with `--hash-locked`. |
+| `macos-intel-py312` | Supported hash-locked profile | core, EPUB bundle, book | Supported with `--hash-locked` except OCR. |
 | `macos-arm64-py312` | Candidate / unverified | none claimed | Use normal pinned install only as a candidate path until hashes and checks exist. |
 | `macos-arm64-py314` | Candidate / unverified | none claimed | Do not claim until compiled wheels and checks are reviewed. |
 | `macos-intel-py313` | Candidate / unverified | none claimed | Known blocker in the checked core graph: `onnxruntime==1.26.0` lacks a compatible Intel macOS wheel. |
@@ -64,11 +64,11 @@ bash scripts/install.sh --book --hash-locked
 bash scripts/install.sh --ocr --hash-locked
 ```
 
-One-command supported macOS arm64 happy path for core, book, OCR, and JSON
+One-command supported macOS arm64 happy path for core, EPUB bundle, book, OCR, and JSON
 doctors:
 
 ```bash
-bash scripts/install.sh --all --hash-locked && mdown-doctor --json && mdown-book --doctor --json && mdown-ocrpdf --doctor --json
+bash scripts/install.sh --all --hash-locked && mdown-doctor --json && mdown-epub --doctor --json && mdown-book --doctor --json && mdown-ocrpdf --doctor --json
 ```
 
 Use the Intel profile from an Intel Python 3.12 runtime:
