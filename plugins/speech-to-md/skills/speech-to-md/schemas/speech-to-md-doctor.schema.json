@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "required": ["schema", "checked_at", "status", "checks", "runtime"],
+  "properties": {
+    "schema": { "const": "speech-to-md.doctor.v1" },
+    "checked_at": { "type": "string" },
+    "status": { "enum": ["ok", "warn", "fail"] },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "status", "detail"],
+        "properties": {
+          "name": { "type": "string" },
+          "status": { "enum": ["ok", "warn", "fail"] },
+          "detail": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "runtime": { "type": "object" }
+  },
+  "additionalProperties": false
+}

@@ -206,6 +206,46 @@ for skill_dir in "$skills_dir"/*; do
       fi
     done
   fi
+
+  if [ "$dir_name" = "speech-to-md" ]; then
+    if ! grep -q "## Document Roles" "$skill_md"; then
+      echo "ERROR: speech-to-md/SKILL.md must declare document roles" >&2
+      failed=1
+    fi
+
+    for reference in \
+      references/audio-bundle.md \
+      references/runtime.md
+    do
+      if [ ! -f "$skill_dir/$reference" ]; then
+        echo "ERROR: speech-to-md is missing canonical reference: $reference" >&2
+        failed=1
+      elif ! grep -q "$reference" "$skill_md"; then
+        echo "ERROR: speech-to-md/SKILL.md does not link canonical reference: $reference" >&2
+        failed=1
+      fi
+    done
+
+    for schema_file in \
+      schemas/speech-to-md-doctor.schema.json \
+      schemas/speech-to-md-manifest.schema.json \
+      schemas/speech-to-md-segments.schema.json
+    do
+      if [ ! -f "$skill_dir/$schema_file" ]; then
+        echo "ERROR: speech-to-md is missing JSON schema: $schema_file" >&2
+        failed=1
+      fi
+    done
+
+    if [ -f "$skill_dir/scripts/regression_corpus.py" ]; then
+      if ! python3 "$skill_dir/scripts/regression_corpus.py"; then
+        failed=1
+      fi
+    else
+      echo "ERROR: speech-to-md is missing regression corpus script" >&2
+      failed=1
+    fi
+  fi
 done
 
 if [ -z "$only_skill" ] && [ -f "$manifest" ]; then

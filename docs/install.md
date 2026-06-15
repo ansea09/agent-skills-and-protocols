@@ -44,6 +44,7 @@ README when one exists. Current staged skill READMEs:
 ```text
 skills/fpf-work-guide/README.md
 skills/doc-to-md/README.md
+skills/speech-to-md/README.md
 ```
 
 ### Migration From `fpf-latest`
@@ -83,6 +84,37 @@ For `doc-to-md --hash-locked`, use only a published profile for the target OS,
 architecture, and Python minor version. Current public profiles are documented
 in `skills/doc-to-md/references/python-profiles.md`; unlisted Python minors are
 candidate/unverified.
+
+For `speech-to-md`, install the skill source first, then install the command
+shim. The public skill does not install ASR models, `whisper.cpp` binaries, or
+`ffmpeg`:
+
+```bash
+cp -R skills/speech-to-md "$CODEX_SKILLS_TARGET/"
+bash "$CODEX_SKILLS_TARGET/speech-to-md/scripts/install.sh"
+speech-to-md --doctor
+```
+
+Transcript import works without ASR:
+
+```bash
+speech-to-md --transcript transcript.txt --source-audio recording.mp3 -o recording-audio-bundle
+```
+
+Local ASR requires a user-installed `whisper-cli` and model path:
+
+```bash
+export SPEECH_TO_MD_WHISPER_CPP_MODEL="/absolute/path/to/ggml-model.bin"
+speech-to-md recording.mp3 -o recording-audio-bundle
+```
+
+MP3 may work directly through `whisper.cpp`; M4A/AAC/MP4 and other containers
+normally use local `ffmpeg` normalization to mono 16 kHz WAV first:
+
+```bash
+export SPEECH_TO_MD_FFMPEG_BIN="/absolute/path/to/ffmpeg"
+speech-to-md recording.m4a -o recording-audio-bundle --audio-normalization auto
+```
 
 Install all staged skills:
 
@@ -228,6 +260,7 @@ The plugin artifacts live at:
 ```text
 plugins/fpf-work-guide
 plugins/doc-to-md
+plugins/speech-to-md
 ```
 
 Each plugin bundles its public skill only. Plugins do not include personal launchers, LaunchAgents, session-start hooks, workspace jobs, cache, logs, local state files, private overlays, private local policy files, runtime venvs, OCR binaries, or generated outputs.
@@ -292,4 +325,13 @@ export FPF_ENV_STATE_DIR="$FPF_UPDATE_STATE_DIR"
 
 `doc-to-md` expects trusted local files by default. Its public skill source may include reusable workflow profiles such as `Textbook Audit + OCR Profile`, but personal defaults belong in a private local policy file and are not installed as a second public skill. Its user-facing install, workflow, OCR, diagnostics, release notes, and publication guidance lives in `skills/doc-to-md/README.md`.
 
-This public repository currently stages `fpf-work-guide` and `doc-to-md`. Other local or private skills should stay outside the public staged `skills/` tree unless they are deliberately promoted later.
+`speech-to-md` expects trusted local speech audio or trusted existing
+transcripts by default. Its public skill source may include command shims,
+bundle builders, and runtime diagnostics, but ASR model files, `whisper.cpp`
+binaries, `ffmpeg`, cloud credentials, private recordings, generated transcript
+bundles, and personal defaults are local runtime or output artifacts. Its
+user-facing install and runtime guidance lives in `skills/speech-to-md/README.md`.
+
+This public repository currently stages `fpf-work-guide`, `doc-to-md`, and
+`speech-to-md`. Other local or private skills should stay outside the public
+staged `skills/` tree unless they are deliberately promoted later.

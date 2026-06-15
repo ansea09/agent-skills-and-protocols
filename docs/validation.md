@@ -143,6 +143,16 @@ Manual review checklist:
 - `doc-to-md` plugin copy is synchronized with `skills/doc-to-md/`, including reference files such as `workflow-profiles.md` and `local-policy-migration.md`.
 - `doc-to-md` installed, staged, and plugin copies have no release drift.
 - `doc-to-md` MarkItDown upgrades run `skills/doc-to-md/scripts/regression_corpus.py` and compare snapshot diffs before publishing.
+- `speech-to-md` has a staged `README.md` covering command shim install, transcript import, local ASR boundary, and model/runtime separation.
+- `speech-to-md` plugin copy is synchronized with `skills/speech-to-md/`.
+- `speech-to-md` public artifacts do not include ASR model files, `whisper.cpp` binaries, cloud credentials, private recordings, generated transcript bundles, or personal defaults.
+- `speech-to-md --doctor --json` runs from the staged script and reports missing local ASR dependencies as warnings when transcript import is still available.
+- `speech-to-md` validates doctor, manifest, and segments JSON against
+  `skills/speech-to-md/schemas/*.schema.json`.
+- `speech-to-md` runs `skills/speech-to-md/scripts/regression_corpus.py` for
+  transcript import and atomic `--force`; when local `whisper-cli`, model,
+  `ffmpeg`, and the sample WAV are available, the same regression also covers
+  WAV, MP3 direct input, and M4A normalization.
 - `doc-to-md` MarkItDown upgrades follow `skills/doc-to-md/references/markitdown-upgrade.md`; `magika 1.x` is not promoted alone until upstream MarkItDown metadata allows it.
 - `doc-to-md` public review includes `skills/doc-to-md/references/threat-model.md`; trusted-local guardrails are not represented as sandboxing.
 - `doc-to-md` does not add a high-fidelity textbook parser to core; higher-quality textbook parsing stays in a separate experimental workflow until it has its own runtime, support matrix, and release gate.

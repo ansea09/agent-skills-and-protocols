@@ -1,0 +1,82 @@
+# Speech To Md
+
+`speech-to-md` turns trusted local speech recordings, or existing transcripts,
+into Markdown bundles for LLM analysis.
+
+The public skill does not bundle ASR models, cloud credentials, or generated
+outputs. It provides the routing contract, bundle format, doctor checks, and a
+local wrapper that can use `whisper.cpp` when `whisper-cli` and a model file are
+installed by the user.
+
+## Quick Start
+
+Install the command shim from an installed skill directory:
+
+```bash
+bash "${CODEX_HOME:-$HOME/.codex}/skills/speech-to-md/scripts/install.sh"
+```
+
+Check runtime readiness:
+
+```bash
+speech-to-md --doctor
+```
+
+Package an existing transcript:
+
+```bash
+speech-to-md --transcript transcript.txt --source-audio recording.mp3 -o recording-audio-bundle
+```
+
+Transcribe with local `whisper.cpp` after installing `whisper-cli` and a model:
+
+```bash
+speech-to-md recording.mp3 -o recording-audio-bundle --model /path/to/ggml-model.bin
+```
+
+`--audio-normalization auto` is the default. It passes WAV/MP3/FLAC directly to
+`whisper.cpp` and uses local `ffmpeg` to normalize other containers, such as
+M4A/AAC/MP4, to mono 16 kHz WAV before ASR. Use
+`--audio-normalization always` to force normalization, or `never` to disable it.
+
+If the model is stored under
+`${CODEX_HOME:-$HOME/.codex}/tools/whisper.cpp/models`, the wrapper can find
+common model filenames automatically. Pass `--model` to override that choice.
+
+If the local Metal/GPU backend fails, retry with CPU fallback:
+
+```bash
+speech-to-md recording.wav -o recording-audio-bundle --model /path/to/ggml-model.bin --no-gpu
+```
+
+## Output
+
+The bundle contains:
+
+```text
+LLM_README.md
+content.md
+segments.md
+segments.json
+manifest.json
+audit.md
+conversion-report.md
+timestamps.vtt
+```
+
+`timestamps.vtt` appears only when the ASR engine emits it.
+
+## Boundaries
+
+- Trusted local audio only by default.
+- No bundled model files or runtime environments.
+- MP3/M4A support depends on the local ASR engine plus optional local `ffmpeg`
+  normalization.
+- `manifest.json` records runtime fingerprints and audio-normalization metadata;
+  temporary normalized WAV files are not retained in the bundle.
+- No cloud transcription unless the user explicitly opts in later.
+- No diarization or speaker identity in the first local workflow.
+- Native Windows support is not claimed.
+
+Read `references/runtime.md` and `references/audio-bundle.md` before extending
+the runtime or output contract.

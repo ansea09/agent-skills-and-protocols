@@ -18,6 +18,7 @@ English version: [`README.md`](README.md)
 | --- | --- | --- |
 | Чтобы Codex проверял актуальный FPF-контекст и применял FPF-backed protocols перед содержательной работой | `fpf-work-guide` | [`skills/fpf-work-guide/README.md`](skills/fpf-work-guide/README.md) |
 | Чтобы конвертировать локальные документы в Markdown | `doc-to-md` | [`skills/doc-to-md/README.md`](skills/doc-to-md/README.md) |
+| Чтобы транскрибировать локальные speech audio в Markdown bundles | `speech-to-md` | [`skills/speech-to-md/README.md`](skills/speech-to-md/README.md) |
 | Чтобы установить skill через упаковку Codex plugin | Codex plugin package | [`plugins/`](plugins/) |
 | Чтобы использовать поддерживаемый публичный skill в Claude Code | Claude Code source-only profile | [`claude-code/`](claude-code/) |
 
@@ -27,6 +28,7 @@ English version: [`README.md`](README.md)
 | --- | --- |
 | [`fpf-work-guide`](skills/fpf-work-guide/) | Проверяет или обновляет локальный FPF-контекст и применяет FPF-backed protocols перед содержательной работой Codex. |
 | [`doc-to-md`](skills/doc-to-md/) | Конвертирует trusted local files в Markdown через MarkItDown, с optional PDF audit bundles и optional OCR preprocessing. |
+| [`speech-to-md`](skills/speech-to-md/) | Конвертирует trusted local speech recordings или готовые transcripts в Markdown transcript bundles для LLM analysis. |
 
 Полный список: [`skills-index.md`](skills-index.md).
 
@@ -44,6 +46,7 @@ English version: [`README.md`](README.md)
 
 - [`plugins/fpf-work-guide`](plugins/fpf-work-guide/)
 - [`plugins/doc-to-md`](plugins/doc-to-md/)
+- [`plugins/speech-to-md`](plugins/speech-to-md/)
 
 Если plugin marketplace discovery недоступен, установите skill вручную.
 
@@ -76,6 +79,18 @@ cp -R skills/doc-to-md "$CODEX_SKILLS_TARGET/"
 bash "$CODEX_SKILLS_TARGET/doc-to-md/scripts/install.sh"
 ```
 
+Установить `speech-to-md` и command shim:
+
+```bash
+cp -R skills/speech-to-md "$CODEX_SKILLS_TARGET/"
+bash "$CODEX_SKILLS_TARGET/speech-to-md/scripts/install.sh"
+speech-to-md --doctor
+```
+
+Для локального ASR нужны установленные пользователем `whisper-cli` и model.
+Для MP3/M4A и нормализации audio containers также нужен локальный `ffmpeg`;
+public skill не включает эти runtime binaries и модели.
+
 Для legacy Codex setups, которые всё ещё читают skills из `${CODEX_HOME:-$HOME/.codex}/skills`, а также для WSL и нестандартных путей используйте [`docs/install.md`](docs/install.md).
 
 ## Установка в Claude Code
@@ -92,10 +107,10 @@ Claude Code не использует Codex plugins. Для Claude Code испо
 
 | Слой | Примеры | Публикуется здесь? |
 | --- | --- | --- |
-| Public skill source | `skills/fpf-work-guide`, `skills/doc-to-md` | Да |
-| Codex plugin package | `plugins/fpf-work-guide`, `plugins/doc-to-md` | Да |
+| Public skill source | `skills/fpf-work-guide`, `skills/doc-to-md`, `skills/speech-to-md` | Да |
+| Codex plugin package | `plugins/fpf-work-guide`, `plugins/doc-to-md`, `plugins/speech-to-md` | Да |
 | Claude Code profile | `claude-code/fpf-work-guide` | Да |
-| Runtime dependencies | Python virtual environments, installed command shims, OCR tools | Нет |
+| Runtime dependencies | Python virtual environments, installed command shims, OCR tools, ASR models, external ASR binaries | Нет |
 | Local state and cache | `.fpf-update`, FPF caches, logs | Нет |
 | Generated outputs | Markdown files, OCR PDFs, audit bundles | Нет |
 | Private local policy | Personal defaults, private overlays, local launchers | Нет |

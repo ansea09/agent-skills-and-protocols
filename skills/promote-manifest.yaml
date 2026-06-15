@@ -10,6 +10,9 @@ skills:
   - name: doc-to-md
     mode: curated
     reason: "Public copy includes reviewed publication docs, optional workflow boundaries, plugin packaging, and local-policy separation; do not overwrite mechanically without manual diff review."
+  - name: speech-to-md
+    mode: curated
+    reason: "Public copy includes source-only ASR workflow boundaries, bundle contract, plugin packaging, and local-runtime separation; do not overwrite mechanically without manual diff review."
 
 exclude_artifacts:
   - ".DS_Store"

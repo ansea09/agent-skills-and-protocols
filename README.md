@@ -18,6 +18,7 @@ Use it when you want to:
 | --- | --- | --- |
 | Make Codex use current FPF context and FPF-backed protocols before substantive work | `fpf-work-guide` | [`skills/fpf-work-guide/README.md`](skills/fpf-work-guide/README.md) |
 | Convert trusted local documents to Markdown | `doc-to-md` | [`skills/doc-to-md/README.md`](skills/doc-to-md/README.md) |
+| Transcribe trusted local speech audio into Markdown bundles | `speech-to-md` | [`skills/speech-to-md/README.md`](skills/speech-to-md/README.md) |
 | Install through Codex plugin packaging | Codex plugin package | [`plugins/`](plugins/) |
 | Use a supported public skill from Claude Code | Claude Code source-only profile | [`claude-code/`](claude-code/) |
 
@@ -27,6 +28,7 @@ Available public skills:
 | --- | --- |
 | [`fpf-work-guide`](skills/fpf-work-guide/) | Validates or refreshes local FPF context and applies FPF-backed protocols before substantive Codex work. |
 | [`doc-to-md`](skills/doc-to-md/) | Converts trusted local files to Markdown with MarkItDown, optional PDF audit bundles, and optional OCR preprocessing. |
+| [`speech-to-md`](skills/speech-to-md/) | Converts trusted local speech recordings or existing transcripts into Markdown transcript bundles for LLM analysis. |
 
 Full inventory: [`skills-index.md`](skills-index.md).
 
@@ -44,6 +46,7 @@ Available plugin packages:
 
 - [`plugins/fpf-work-guide`](plugins/fpf-work-guide/)
 - [`plugins/doc-to-md`](plugins/doc-to-md/)
+- [`plugins/speech-to-md`](plugins/speech-to-md/)
 
 If plugin marketplace discovery is not available, install the skill manually.
 
@@ -72,6 +75,18 @@ cp -R skills/doc-to-md "$CODEX_SKILLS_TARGET/"
 bash "$CODEX_SKILLS_TARGET/doc-to-md/scripts/install.sh"
 ```
 
+Install `speech-to-md` and its command shim:
+
+```bash
+cp -R skills/speech-to-md "$CODEX_SKILLS_TARGET/"
+bash "$CODEX_SKILLS_TARGET/speech-to-md/scripts/install.sh"
+speech-to-md --doctor
+```
+
+Local ASR needs user-installed `whisper-cli` and a model. MP3/M4A and other
+container normalization paths also need local `ffmpeg`; the public skill does
+not bundle those runtime binaries or models.
+
 For legacy Codex setups that still load skills from `${CODEX_HOME:-$HOME/.codex}/skills`, or for WSL and non-default paths, read [`docs/install.md`](docs/install.md).
 
 ## Install In Claude Code
@@ -88,10 +103,10 @@ This repository separates source, packaging, runtime dependencies, and generated
 
 | Layer | Examples | Published here? |
 | --- | --- | --- |
-| Public skill source | `skills/fpf-work-guide`, `skills/doc-to-md` | Yes |
-| Codex plugin package | `plugins/fpf-work-guide`, `plugins/doc-to-md` | Yes |
+| Public skill source | `skills/fpf-work-guide`, `skills/doc-to-md`, `skills/speech-to-md` | Yes |
+| Codex plugin package | `plugins/fpf-work-guide`, `plugins/doc-to-md`, `plugins/speech-to-md` | Yes |
 | Claude Code profile | `claude-code/fpf-work-guide` | Yes |
-| Runtime dependencies | Python virtual environments, installed command shims, OCR tools | No |
+| Runtime dependencies | Python virtual environments, installed command shims, OCR tools, ASR models, external ASR binaries | No |
 | Local state and cache | `.fpf-update`, FPF caches, logs | No |
 | Generated outputs | Markdown files, OCR PDFs, audit bundles | No |
 | Private local policy | Personal defaults, private overlays, local launchers | No |
