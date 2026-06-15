@@ -80,7 +80,7 @@ Current support contract: Codex on macOS arm64 is supported for core workflows, 
 
 Use the local wrapper `markitdown-local`, which runs the pinned core MarkItDown venv at `${DOC_TO_MD_TOOLS_DIR:-${CODEX_HOME:-$HOME/.codex}/tools}/markitdown-core-venv`. The short command `mdown` is a symlink to the same wrapper. Prefer local-file conversion with `-o/--output` so the wrapper can protect the previous output from normal process failures, then perform focused verification.
 
-Core runtime scope is intentionally narrow: local PDF, DOCX, PPTX, XLS, XLSX, simple EPUB, HTML, CSV, JSON, XML, text-like files, ZIP extraction, and the separate `mdown-epub` EPUB LLM-analysis bundle workflow. Audio, YouTube, Azure, OCR plugins, and LLM-backed image description are advanced modes and are not part of the default runtime.
+Core runtime scope is intentionally narrow: local PDF, DOCX, PPTX, XLS, XLSX, simple EPUB, HTML, CSV, JSON, XML, text-like files, ZIP extraction, and the separate `mdown-epub` EPUB LLM-analysis bundle workflow. Audio, YouTube, Azure, OCR plugins, and LLM-backed image description are not part of the default runtime. Route trusted local speech recordings to the separate `speech-to-md` skill instead of adding ASR dependencies to `doc-to-md`.
 
 For trusted local EPUB textbooks where chapter navigation, images, footnotes, internal links, MathML/SVG warnings, and LLM-readable asset routing matter, use the separate EPUB LLM textbook bundle wrapper `mdown-epub`. It is a core runtime capability, not a new hash-profile component, and it stays separate from the default `mdown` conversion path. It creates a runtime-neutral bundle for Codex, Claude Code, and other local agent environments. This is not publication-quality EPUB layout reconstruction or visual understanding.
 
@@ -99,6 +99,7 @@ Choose the route before running commands. If the case is ambiguous, read
 | Trusted local EPUB textbook where LLM analysis needs chapters, assets, links, footnotes, and audit evidence | `mdown-epub source.epub -o source-epub-bundle` | `references/epub-bundle.md` |
 | Textbook-like PDF, image-heavy PDF, link-sensitive PDF, formula/table-heavy PDF, or uncertain PDF quality | `mdown-book source.pdf -o source-audit-bundle` | `references/audit-bundle.md` |
 | Scanned or low-text PDF after audit evidence, or explicit trusted OCR request | `mdown-ocrpdf scanned.pdf -o scanned-ocr.pdf`, then rerun `mdown-book` | `references/ocr-paths.md` |
+| Trusted local speech audio, lecture recording, interview, meeting, podcast, or voice note | Use the separate `speech-to-md` skill | `speech-to-md` public skill |
 | Audit/OCR evidence prepared for external transfer | Export sanitized reports or bundles before sharing | `references/publishing.md` |
 
 ## Workflow
@@ -199,7 +200,7 @@ or dependency requirements.
 - The PDF audit bundle does not run OCR by default and does not perform inline image/link placement. Low-text pages, scanned pages, formula-heavy pages, and image-only diagrams require explicit OCR or manual review.
 - The OCR preprocessor follows OCRmyPDF v17 requirements: `tesseract >= 4.1.1` is required; PDF rasterization needs Python `pypdfium2` or `Ghostscript >= 9.54`; `qpdf` CLI is not a hard requirement because OCRmyPDF uses `pikepdf`. Run `mdown-ocrpdf --doctor` for the exact local gap.
 - `mdown-doctor`, `mdown-book --doctor`, and `mdown-ocrpdf --doctor` check installed versions against their pinned requirements. The OCR lockfile pins Python packages; external Tesseract is checked by doctor but is not rebuilt from that lockfile.
-- Audio, YouTube transcription, Azure conversion, and OCR plugins are excluded from the default core venv. Do not assume they work until deliberately installed and checked.
+- Audio, YouTube transcription, Azure conversion, and OCR plugins are excluded from the default core venv. For trusted local speech audio, use the separate `speech-to-md` skill; do not assume MarkItDown audio transcription works from this `doc-to-md` runtime.
 - Keep generated Markdown separate from source files unless the user asks to overwrite or place files elsewhere.
 - Sanitize audit bundles and OCR reports before transferring generated evidence outside the local trusted environment.
 

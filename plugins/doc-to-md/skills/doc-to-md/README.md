@@ -94,6 +94,11 @@ Do not use shell redirection for overwrite-safe file writes:
 mdown source.pdf > source.md
 ```
 
+Speech audio is not part of this skill's core runtime. For trusted local
+lectures, interviews, meetings, podcasts, or voice notes, use the separate
+`speech-to-md` skill, which owns ASR, timestamps, transcript bundles, and audit
+notes.
+
 ## Workflow Profiles
 
 Use the `Standard Local Document Profile` for ordinary trusted local files where
