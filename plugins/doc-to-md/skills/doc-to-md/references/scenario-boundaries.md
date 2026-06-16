@@ -31,7 +31,8 @@ cleanly.
 | WSL on Windows | Candidate path only. macOS venvs, wrappers, OCR binaries, and caches must not be reused. | Rebuild everything inside WSL and publish a WSL hash profile before claiming hash-locked support. |
 | Claude Code on macOS | Experimental unless the installed command shims know the skill source and runtime paths. | Run `scripts/install.sh` from the Claude-installed skill source so shims record `DOC_TO_MD_SKILL_DIR`; set `DOC_TO_MD_BIN_DIR` and `DOC_TO_MD_TOOLS_DIR` when defaults are not appropriate. |
 | Remote URL conversion | Blocked by default because MarkItDown may perform I/O with process privileges. | Use `--allow-remote` only for an explicit trusted remote conversion. |
-| Advanced plugin, cloud, Azure, YouTube, audio, or LLM-backed image paths | Excluded from the public core runtime. | Install and enable these deliberately outside the default core; do not imply they work by default. |
+| Advanced plugin, cloud, Azure, YouTube, or LLM-backed image paths | Excluded from the public core runtime. | Install and enable these deliberately outside the default core; do not imply they work by default. |
+| Trusted local speech audio | Speech transcription is a separate ASR workflow, not document extraction. | Use the separate `speech-to-md` skill and its audio transcript bundle contract. |
 
 ## Not Supported Or Do Not Promise
 
@@ -43,7 +44,7 @@ cleanly.
 | High-fidelity EPUB publication reconstruction | The EPUB bundle is optimized for LLM-readable analysis, not exact CSS/layout reproduction. |
 | Automatic inline placement of extracted images, links, captions, formulas, or diagrams | The book workflow stores evidence separately in `audit.md`, `assets/`, and `manifest.json`. |
 | Image-to-text or image description without a configured LLM/image workflow | The core wrapper has no LLM client configured, and image-only output may be empty. |
-| Audio transcription, YouTube transcription, Azure conversion, or MarkItDown plugins by default | These are intentionally outside the core dependency set. |
+| Audio transcription inside `doc-to-md`, YouTube transcription, Azure conversion, or MarkItDown plugins by default | These are intentionally outside the core dependency set. Route trusted local speech recordings to `speech-to-md`. |
 | Copying venvs, caches, generated outputs, OCR PDFs, or machine-specific binaries between machines | Rebuild runtimes on the target machine and migrate only source skill files and approved local policy metadata. |
 | Untrusted ZIP/PDF processing, decompression bombs, renderer exploits, or multi-tenant processing | Not solved by this skill. Use a separate sandboxed ingestion architecture. |
 

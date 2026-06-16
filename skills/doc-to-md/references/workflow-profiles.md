@@ -19,6 +19,11 @@ Typical inputs:
 - ZIP archives containing supported local files;
 - born-digital PDFs without scanned-page, image-heavy, or link-traceability concerns.
 
+Not this profile:
+
+- speech recordings, interviews, meetings, podcasts, voice notes, or other
+  audio that requires ASR. Use the separate `speech-to-md` skill.
+
 Command shape:
 
 ```bash
