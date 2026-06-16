@@ -16,6 +16,12 @@ The first local engine contract is `whisper.cpp`:
 - output consumed by this skill: JSON text segments, plain text transcript, and
   optional VTT timestamps
 
+The CLI dispatches ASR through an explicit engine adapter boundary. The current
+public adapter registry contains only `whisper-cpp`. Additional local ASR
+engines should be added as adapters only when they can preserve the same bundle
+contract. See `extension-boundaries.md` before adding a second engine,
+diarization, chunking, or cloud workflows.
+
 Set the model path with:
 
 ```bash
@@ -114,7 +120,8 @@ These are intentionally not part of the first public runtime:
 - remote URL fetching.
 
 Add each as an explicit workflow with its own doctor checks, privacy warning,
-and output evidence.
+release gate, and output evidence. Cloud transcription must not become a
+default local-core engine; it changes the privacy and credential boundary.
 
 ## Doctor Status
 

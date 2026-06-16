@@ -55,7 +55,11 @@ def validate_doctor(work_dir: Path) -> dict:
     proc = run([sys.executable, str(WRAPPER), "--doctor", "--json"])
     doctor_path.write_text(proc.stdout, encoding="utf-8")
     run([sys.executable, str(VALIDATOR), str(SCHEMA_DIR / "speech-to-md-doctor.schema.json"), str(doctor_path)])
-    return load_json(doctor_path)
+    doctor = load_json(doctor_path)
+    checks = {item.get("name"): item.get("detail") for item in doctor.get("checks", [])}
+    if "engine" not in checks or "whisper-cpp" not in checks["engine"]:
+        raise AssertionError("doctor did not report selected ASR engine")
+    return doctor
 
 
 def check_transcript_import(work_dir: Path) -> None:
@@ -149,6 +153,12 @@ def run_asr_bundle(source: Path, bundle: Path, extra_args: list[str] | None = No
         command.extend(extra_args)
     run(command)
     manifest = validate_bundle(bundle)
+    engine = manifest.get("engine", {})
+    if engine.get("adapter") != "whisper-cpp":
+        raise AssertionError("ASR manifest did not record whisper-cpp adapter")
+    capabilities = engine.get("capabilities", {})
+    if capabilities.get("diarization") is not False or capabilities.get("cloud") is not False:
+        raise AssertionError("ASR manifest capabilities do not preserve local-core boundary")
     content = (bundle / "content.md").read_text(encoding="utf-8").lower()
     if "country" not in content:
         raise AssertionError(f"unexpected ASR content for {source}: {content[:200]}")

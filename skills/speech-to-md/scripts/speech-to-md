@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 import hashlib
 import json
 import os
@@ -20,6 +21,58 @@ SCHEMA = "speech-to-md.bundle.v1"
 SEGMENTS_SCHEMA = "speech-to-md.segments.v1"
 WHISPER_CPP_DIRECT_EXTENSIONS = {".wav", ".wave", ".mp3", ".flac"}
 AUDIO_NORMALIZATION_MODES = {"auto", "always", "never"}
+
+
+@dataclass(frozen=True)
+class EngineAdapter:
+    key: str
+    display_name: str
+    kind: str
+    supports_diarization: bool = False
+    supports_chunking: bool = False
+    supports_cloud: bool = False
+
+
+@dataclass(frozen=True)
+class EngineRun:
+    content: str
+    segments: list[dict[str, Any]]
+    engine: dict[str, Any]
+    warnings: list[str]
+    vtt_path: Path | None = None
+
+
+ENGINE_ADAPTERS: dict[str, EngineAdapter] = {
+    "whisper-cpp": EngineAdapter(
+        key="whisper-cpp",
+        display_name="whisper.cpp",
+        kind="local-asr",
+        supports_diarization=False,
+        supports_chunking=False,
+        supports_cloud=False,
+    ),
+}
+
+
+def engine_choices() -> list[str]:
+    return sorted(ENGINE_ADAPTERS)
+
+
+def require_engine_adapter(name: str | None) -> EngineAdapter:
+    key = name or "whisper-cpp"
+    try:
+        return ENGINE_ADAPTERS[key]
+    except KeyError as exc:
+        raise SystemExit(f"ERROR: unsupported ASR engine: {key}") from exc
+
+
+def engine_capabilities(adapter: EngineAdapter) -> dict[str, Any]:
+    return {
+        "kind": adapter.kind,
+        "diarization": adapter.supports_diarization,
+        "chunking": adapter.supports_chunking,
+        "cloud": adapter.supports_cloud,
+    }
 
 
 def utc_now() -> str:
@@ -283,12 +336,14 @@ def parse_transcript_payload(path: Path) -> tuple[str, list[dict[str, Any]], str
 
 
 def doctor_payload(args: argparse.Namespace) -> dict[str, Any]:
+    adapter = require_engine_adapter(getattr(args, "engine", None))
     whisper_bin = args.whisper_bin or os.environ.get("SPEECH_TO_MD_WHISPER_CPP_BIN") or which("whisper-cli")
     model = args.model or os.environ.get("SPEECH_TO_MD_WHISPER_CPP_MODEL") or default_model_path()
     model_path = Path(model).expanduser() if model else None
     checks: list[dict[str, Any]] = []
     checks.append({"name": "python", "status": "ok", "detail": sys.version.split()[0]})
     checks.append({"name": "platform", "status": "ok", "detail": f"{platform.system()} {platform.machine()}"})
+    checks.append({"name": "engine", "status": "ok", "detail": f"{adapter.key} ({adapter.kind})"})
     if whisper_bin:
         checks.append({"name": "whisper-cli", "status": "ok", "detail": whisper_bin})
     else:
@@ -401,7 +456,7 @@ def normalize_audio_for_whisper(source: Path, work_dir: Path, args: argparse.Nam
     return output, info
 
 
-def run_whisper_cpp(args: argparse.Namespace, work_dir: Path) -> tuple[str, list[dict[str, Any]], dict[str, Any], list[str]]:
+def run_whisper_cpp(args: argparse.Namespace, work_dir: Path) -> EngineRun:
     source = args.source
     if source is None:
         raise SystemExit("ERROR: source audio file is required unless --transcript is used")
@@ -448,6 +503,9 @@ def run_whisper_cpp(args: argparse.Namespace, work_dir: Path) -> tuple[str, list
     proc = subprocess.run(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=args.timeout)
     engine = {
         "name": "whisper.cpp",
+        "adapter": "whisper-cpp",
+        "contract": "speech-to-md.asr-engine.v1",
+        "capabilities": engine_capabilities(require_engine_adapter("whisper-cpp")),
         "command": manifest_command,
         "returncode": proc.returncode,
         "output_tail": "\n".join((proc.stdout or "").splitlines()[-80:]),
@@ -478,7 +536,14 @@ def run_whisper_cpp(args: argparse.Namespace, work_dir: Path) -> tuple[str, list
         raise RuntimeError("whisper.cpp completed but produced no JSON or TXT transcript.")
     if vtt_path.is_file():
         engine["vtt_path"] = str(vtt_path)
-    return content, segments, engine, warnings
+    return EngineRun(content=content, segments=segments, engine=engine, warnings=warnings, vtt_path=vtt_path if vtt_path.is_file() else None)
+
+
+def run_asr_engine(args: argparse.Namespace, work_dir: Path) -> EngineRun:
+    adapter = require_engine_adapter(args.engine)
+    if adapter.key == "whisper-cpp":
+        return run_whisper_cpp(args, work_dir)
+    raise SystemExit(f"ERROR: unsupported ASR engine: {adapter.key}")
 
 
 def write_bundle(
@@ -648,10 +713,12 @@ def build_bundle(args: argparse.Namespace) -> int:
         else:
             args.source = args.source.expanduser().resolve() if args.source else None
             source_audio = args.source
-            content, segments, engine, engine_warnings = run_whisper_cpp(args, work_dir)
-            warnings.extend(engine_warnings)
-            if "vtt_path" in engine:
-                vtt_path = Path(str(engine["vtt_path"]))
+            engine_run = run_asr_engine(args, work_dir)
+            content = engine_run.content
+            segments = engine_run.segments
+            engine = engine_run.engine
+            warnings.extend(engine_run.warnings)
+            vtt_path = engine_run.vtt_path
         if not normalize_text(content).strip():
             warnings.append("transcript content is empty.")
         if not segments:
@@ -681,7 +748,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("-o", "--output", type=Path, help="Output bundle directory.")
     parser.add_argument("--transcript", type=Path, help="Package an existing transcript text or JSON file instead of running ASR.")
     parser.add_argument("--source-audio", type=Path, help="Source audio path to record when using --transcript.")
-    parser.add_argument("--engine", choices=["whisper-cpp"], default="whisper-cpp")
+    parser.add_argument("--engine", choices=engine_choices(), default="whisper-cpp")
     parser.add_argument("--model", help="whisper.cpp model path; defaults to SPEECH_TO_MD_WHISPER_CPP_MODEL.")
     parser.add_argument("--whisper-bin", help="Path to whisper-cli; defaults to SPEECH_TO_MD_WHISPER_CPP_BIN or PATH.")
     parser.add_argument("--ffmpeg-bin", help="Path to ffmpeg; defaults to SPEECH_TO_MD_FFMPEG_BIN or PATH.")

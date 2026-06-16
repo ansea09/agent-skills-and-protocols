@@ -13,6 +13,8 @@ runtime rules in references:
 - `references/audio-bundle.md` - canonical transcript bundle contract.
 - `references/runtime.md` - local ASR engine, model, install, and support
   boundaries.
+- `references/extension-boundaries.md` - refactoring thresholds for additional
+  ASR engines, diarization, long-recording chunking, and cloud workflows.
 
 ## Operating Contract
 
@@ -26,10 +28,10 @@ virtual environments, cloud credentials, or generated transcripts. Use a local
 ASR engine deliberately. The first supported source-level engine contract is
 `whisper.cpp` through a `whisper-cli` executable and a user-provided model file.
 
-Cloud transcription, diarization, translation, speaker identification, and
-meeting-minutes generation are explicit advanced modes. Do not imply they work
-unless the needed engine, credentials, and workflow have been installed and
-checked.
+Cloud transcription, diarization, translation, speaker identification,
+long-recording chunking, and meeting-minutes generation are explicit advanced
+modes. Do not imply they work unless the needed engine, credentials, workflow,
+and output evidence contract have been installed and checked.
 
 ## Route Selection
 

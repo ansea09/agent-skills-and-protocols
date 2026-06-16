@@ -8,6 +8,33 @@ outputs. It provides the routing contract, bundle format, doctor checks, and a
 local wrapper that can use `whisper.cpp` when `whisper-cli` and a model file are
 installed by the user.
 
+The runtime has an explicit ASR engine adapter boundary. The current supported
+adapter is still only `whisper-cpp`; the boundary exists so future local engines
+can be added without changing the bundle contract.
+
+## Current Update
+
+This update prepares `speech-to-md` for the next growth step without changing
+the day-to-day command. It keeps the current local `whisper.cpp` workflow, but
+adds a clear internal boundary between the transcript bundle format and the ASR
+engine that produces transcript text.
+
+This is useful for:
+
+- users who want stable Markdown transcript bundles today;
+- maintainers who may later add another local ASR engine;
+- reviewers who need to see whether diarization, chunking, or cloud
+  transcription are actually supported;
+- LLM agents that should inspect `manifest.json` and `audit.md` before making
+  speaker-sensitive or quote-sensitive claims.
+
+The update matters most when the skill is used in contexts such as lectures,
+interviews, meetings, podcasts, field notes, or long voice recordings where the
+transcript may later need stronger evidence: timestamps, engine metadata,
+runtime fingerprints, speaker labels, or chunking records. It does not claim
+new transcription quality by itself; it makes future quality-related features
+safer to add and easier to audit.
+
 ## Quick Start
 
 Install the command shim from an installed skill directory:
@@ -76,7 +103,11 @@ timestamps.vtt
   temporary normalized WAV files are not retained in the bundle.
 - No cloud transcription unless the user explicitly opts in later.
 - No diarization or speaker identity in the first local workflow.
+- A second ASR engine, diarization, deterministic long-recording chunking, or
+  cloud transcription must follow `references/extension-boundaries.md` before
+  being advertised as supported.
 - Native Windows support is not claimed.
 
-Read `references/runtime.md` and `references/audio-bundle.md` before extending
-the runtime or output contract.
+Read `references/runtime.md`, `references/audio-bundle.md`, and
+`references/extension-boundaries.md` before extending the runtime or output
+contract.

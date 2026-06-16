@@ -55,6 +55,22 @@ and warnings when quoteability or trust matters.
 
 Fields may be `null` when the selected engine did not provide them.
 
+## Engine Metadata
+
+`manifest.json` records the selected engine under `engine`. For ASR adapters,
+the engine object should include:
+
+- `name`: human-readable engine name;
+- `adapter`: stable adapter key, such as `whisper-cpp`;
+- `contract`: engine-result contract identifier;
+- `capabilities`: explicit booleans for diarization, chunking, and cloud
+  behavior when known;
+- `runtime`: executable/model/preprocessor fingerprints when available.
+
+Do not infer support for diarization, chunking, cloud transcription, or speaker
+identity from the engine name alone. Use `capabilities`, `audit.md`, and the
+presence of dedicated evidence files.
+
 ## Quality Interpretation
 
 The transcript is ASR output. It is not authoritative evidence of what was said
