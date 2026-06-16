@@ -101,7 +101,7 @@ def default_model_path() -> str | None:
         ]
     )
     for model_dir in model_dirs:
-        for name in ("ggml-tiny.en.bin", "ggml-base.en.bin", "ggml-small.en.bin", "ggml-tiny.bin", "ggml-base.bin"):
+        for name in ("ggml-medium-q8_0.bin", "ggml-medium.bin", "ggml-small-q8_0.bin", "ggml-small.bin"):
             candidate = model_dir / name
             if candidate.is_file():
                 return str(candidate)

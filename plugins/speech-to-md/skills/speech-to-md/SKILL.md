@@ -161,8 +161,11 @@ export SPEECH_TO_MD_WHISPER_CPP_MODEL="/absolute/path/to/ggml-model.bin"
 ```
 
 The wrapper also auto-discovers common local model paths under
-`${CODEX_HOME:-$HOME/.codex}/tools/whisper.cpp/models`. Use `--model` when
-several models exist or when a specific quality/speed tradeoff matters.
+`${CODEX_HOME:-$HOME/.codex}/tools/whisper.cpp/models`, but only for
+`medium`/`small` quality-floor models. Lower-quality `tiny` and `base` models
+must be selected explicitly with `--model` when a speed-first test is intended.
+Use `--model` when several models exist or when a specific quality/speed
+tradeoff matters.
 
 For MP3/M4A and audio normalization paths, install a local `ffmpeg` binary on
 PATH or set:

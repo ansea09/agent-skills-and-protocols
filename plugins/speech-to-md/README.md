@@ -53,6 +53,12 @@ export SPEECH_TO_MD_WHISPER_CPP_MODEL="/absolute/path/to/ggml-model.bin"
 speech-to-md recording.mp3 -o recording-audio-bundle
 ```
 
+When the model path is not set explicitly, the wrapper only auto-discovers
+`medium`/`small` model filenames. It intentionally skips `tiny` and `base`
+models because they are speed-first choices and can be too error-prone for
+ordinary transcripts. Pass `--model` or set `SPEECH_TO_MD_WHISPER_CPP_MODEL`
+when a lower-quality model is deliberately desired.
+
 M4A/AAC/MP4 and other container normalization paths require local `ffmpeg`:
 
 ```bash
