@@ -27,8 +27,8 @@ REPO_ROOT = find_repo_root(SCRIPT_DIR)
 VALIDATOR = REPO_ROOT / "scripts" / "validate-json-schema.py"
 
 
-def run(command: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
-    proc = subprocess.run(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+def run(command: list[str], *, check: bool = True, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
+    proc = subprocess.run(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
     if check and proc.returncode != 0:
         raise RuntimeError(f"command failed ({proc.returncode}): {' '.join(command)}\n{proc.stdout}")
     return proc
@@ -60,6 +60,25 @@ def validate_doctor(work_dir: Path) -> dict:
     if "engine" not in checks or "whisper-cpp" not in checks["engine"]:
         raise AssertionError("doctor did not report selected ASR engine")
     return doctor
+
+
+def check_model_auto_discovery_quality_floor(work_dir: Path) -> None:
+    model_dir = work_dir / "models"
+    model_dir.mkdir()
+    (model_dir / "ggml-tiny.bin").write_bytes(b"tiny model should not be auto-discovered\n")
+    (model_dir / "ggml-base.bin").write_bytes(b"base model should not be auto-discovered\n")
+    env = {**os.environ, "SPEECH_TO_MD_MODELS_DIR": str(model_dir)}
+    doctor = json.loads(run([sys.executable, str(WRAPPER), "--doctor", "--json"], env=env).stdout)
+    model_check = next(item for item in doctor["checks"] if item["name"] == "whisper-model")
+    if model_check["status"] != "warn":
+        raise AssertionError("tiny/base models should not satisfy automatic model discovery")
+
+    small_model = model_dir / "ggml-small.bin"
+    small_model.write_bytes(b"small model is allowed for automatic discovery\n")
+    doctor = json.loads(run([sys.executable, str(WRAPPER), "--doctor", "--json"], env=env).stdout)
+    model_check = next(item for item in doctor["checks"] if item["name"] == "whisper-model")
+    if model_check["status"] != "ok" or model_check["detail"] != str(small_model):
+        raise AssertionError("small model should satisfy automatic model discovery")
 
 
 def check_transcript_import(work_dir: Path) -> None:
@@ -202,6 +221,7 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="speech-to-md-regression.") as temp:
         work_dir = Path(temp)
         doctor = validate_doctor(work_dir)
+        check_model_auto_discovery_quality_floor(work_dir)
         check_transcript_import(work_dir)
         check_force_is_success_atomic(work_dir)
         check_asr_regressions(work_dir, doctor)

@@ -40,6 +40,11 @@ The wrapper also auto-discovers common model filenames under:
 ${CODEX_HOME:-$HOME/.codex}/tools/whisper.cpp/models
 ```
 
+Auto-discovery intentionally uses a quality floor. It considers
+`ggml-medium-q8_0.bin`, `ggml-medium.bin`, `ggml-small-q8_0.bin`, and
+`ggml-small.bin`; it does not select `tiny` or `base` models automatically.
+Pass `--model` for an explicit speed-first test with a lower-quality model.
+
 Set `SPEECH_TO_MD_MODELS_DIR` when models live somewhere else.
 
 The wrapper checks for `whisper-cli` and the model file. It does not install or

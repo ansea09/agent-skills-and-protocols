@@ -68,7 +68,13 @@ M4A/AAC/MP4, to mono 16 kHz WAV before ASR. Use
 
 If the model is stored under
 `${CODEX_HOME:-$HOME/.codex}/tools/whisper.cpp/models`, the wrapper can find
-common model filenames automatically. Pass `--model` to override that choice.
+common `medium`/`small` model filenames automatically. It intentionally skips
+`tiny` and `base` models unless they are passed explicitly with `--model`.
+
+This quality floor keeps routine transcripts from silently using very small
+models that are fast but often too error-prone for reading, quoting, or
+summarizing. Use `tiny` or `base` only as an explicit speed-first choice, for
+example when testing that the local runtime is wired correctly.
 
 If the local Metal/GPU backend fails, retry with CPU fallback:
 
