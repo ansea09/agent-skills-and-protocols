@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "required": ["schema", "created_at", "source_audio", "transcript_import", "transcript_import_kind", "engine", "warnings", "files"],
+  "properties": {
+    "schema": { "const": "speech-to-md.bundle.v1" },
+    "created_at": { "type": "string" },
+    "source_audio": { "type": "object" },
+    "transcript_import": { "type": ["string", "null"] },
+    "transcript_import_kind": { "type": ["string", "null"] },
+    "engine": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "audio_input": { "type": "object" },
+        "audio_preprocess": { "type": "object" },
+        "runtime": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "files": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

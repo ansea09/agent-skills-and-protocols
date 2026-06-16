@@ -1,0 +1,4 @@
+interface:
+  display_name: "Speech To Md"
+  short_description: "Transcribe trusted local speech audio into Markdown bundles."
+  default_prompt: "Use Speech To Md to transcribe this local audio file into a Markdown bundle."

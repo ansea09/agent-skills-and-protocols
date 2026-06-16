@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "required": ["schema", "segments"],
+  "properties": {
+    "schema": { "const": "speech-to-md.segments.v1" },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["index", "start", "end", "start_label", "end_label", "speaker", "text"],
+        "properties": {
+          "index": { "type": "integer" },
+          "start": { "type": ["number", "null"] },
+          "end": { "type": ["number", "null"] },
+          "start_label": { "type": ["string", "null"] },
+          "end_label": { "type": ["string", "null"] },
+          "speaker": { "type": ["string", "null"] },
+          "text": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

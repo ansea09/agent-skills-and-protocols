@@ -108,3 +108,19 @@ profile, not a fork of the skill and not a Codex plugin.
 - Generated output layer: Markdown files, OCR PDFs, audit bundles, conversion reports, extracted assets, and comparison artifacts.
 
 `doc-to-md` uses one public skill, not a required public/private pair of skills. Reusable workflow profiles such as `Standard Local Document Profile` and `Textbook Audit + OCR Profile` belong in the public skill. Personal preferences, such as preferring `eng+rus` for the author's English/Russian OCR materials, belong in private local policy and must not become universal public defaults.
+
+### speech-to-md
+
+- Public staged copy: `skills/speech-to-md/`.
+- User-facing skill README: `skills/speech-to-md/README.md`.
+- Plugin distribution artifact: `plugins/speech-to-md/`.
+- Installed operational copy: `${CODEX_HOME:-$HOME/.codex}/skills/speech-to-md/`, `$HOME/.agents/skills/speech-to-md/`, `$REPO_ROOT/.agents/skills/speech-to-md/`, or another agent-specific runtime location.
+- Runtime dependency layer: installer-generated `~/.local/bin` command shim, optional user-installed `whisper-cli`, optional user-provided ASR model files, and optional audio tooling such as `ffmpeg`.
+- Generated output layer: transcript bundles, `content.md`, `segments.json`, `audit.md`, `conversion-report.md`, and timed text files.
+
+`speech-to-md` is source-only in this repository. It must not publish ASR model
+files, Homebrew packages, cloud credentials, private recordings, private
+transcripts, generated transcript bundles, or personal audio-processing
+defaults. The public skill owns routing, bundle construction, doctor checks, and
+explicit runtime boundaries; ASR engines and models remain local runtime
+dependencies.

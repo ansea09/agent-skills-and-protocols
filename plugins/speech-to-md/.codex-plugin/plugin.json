@@ -1,0 +1,38 @@
+{
+  "name": "speech-to-md",
+  "version": "0.1.0",
+  "description": "Local speech-audio-to-Markdown transcript bundle skill with timestamped evidence and explicit ASR runtime boundaries.",
+  "author": {
+    "name": "ansea09"
+  },
+  "homepage": "https://github.com/ansea09/agent-skills-and-protocols",
+  "repository": "https://github.com/ansea09/agent-skills-and-protocols",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "skills",
+    "markdown",
+    "audio",
+    "speech",
+    "transcription",
+    "asr"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Speech To Md",
+    "shortDescription": "Transcribe trusted local speech audio to Markdown bundles.",
+    "longDescription": "Distributes the public speech-to-md skill for Codex. It packages trusted local speech recordings or existing transcripts into LLM-readable Markdown bundles with timestamped segments, manifest metadata, audit notes, and explicit local ASR runtime boundaries.",
+    "developerName": "ansea09",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Speech To Md to transcribe this local audio file.",
+      "Create a Markdown transcript bundle for this lecture recording.",
+      "Package this transcript for LLM analysis with audio audit notes."
+    ],
+    "brandColor": "#6B5B95"
+  }
+}
