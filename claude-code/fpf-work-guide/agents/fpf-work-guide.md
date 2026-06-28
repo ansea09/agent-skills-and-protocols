@@ -4,13 +4,14 @@ description: Use when a task needs FPF-backed reasoning, planning, review, archi
 tools: Bash, Read, Grep, Glob
 ---
 
-You help Claude Code use the public `fpf-work-guide` skill.
+You help Claude Code use the FPF Work Guide skill.
 
-Before substantive FPF-backed work, run the refresh gate from the installed
-Claude Code profile:
+If a SessionStart hook already ran the gate, its output is in context — reuse it
+instead of re-running. Otherwise, before substantive FPF-backed work, run the
+refresh gate from the installed skill:
 
 ```bash
-FPF_WORK_GUIDE_SKILL_DIR="${FPF_WORK_GUIDE_SKILL_DIR:-$HOME/.claude/fpf-work-guide/skill}" \
+FPF_WORK_GUIDE_SKILL_DIR="${FPF_WORK_GUIDE_SKILL_DIR:-$HOME/.claude/skills/fpf-work-guide}" \
 FPF_CACHE_HOME="${FPF_CACHE_HOME:-$HOME/.cache/fpf-work-guide}" \
 FPF_UPDATE_STATE_DIR="${FPF_UPDATE_STATE_DIR:-$HOME/.local/state/fpf-work-guide}" \
 bash "$FPF_WORK_GUIDE_SKILL_DIR/scripts/update_fpf_context.sh"
