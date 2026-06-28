@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/skills/fpf-work-guide/hooks/session-start.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
