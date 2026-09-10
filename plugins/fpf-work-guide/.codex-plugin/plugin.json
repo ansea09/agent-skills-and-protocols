@@ -1,6 +1,6 @@
 {
   "name": "fpf-work-guide",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "FPF-backed reasoning skill with refresh gate, chunk-first lookup, cache fallback, and protocol routing.",
   "author": {
     "name": "ansea09"

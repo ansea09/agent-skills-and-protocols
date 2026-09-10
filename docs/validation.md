@@ -4,6 +4,11 @@ Run this before installing or sharing staged skills or plugins from this reposit
 
 ## Protocol Revision 2.0
 
+DPF discovery and optional Suite acquisition have separate acceptance checks;
+see the [0.2.1 evidence and replay procedure](release-evidence/fpf-dpf-discovery-0.2.1.md).
+A passing format check does not prove implicit selection, and selection does
+not prove that the host authorized or completed a download.
+
 For an FPF protocol/skill batch, also run:
 
 ```bash

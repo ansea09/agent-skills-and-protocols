@@ -3,9 +3,12 @@
 This file is for users and maintainers. It is not part of the runtime protocol
 that an agent must read before every task.
 
-## 0.2.0 - Protocol Revision 2.0 (Prepared, Not A Publication Record)
+## 0.2.1 - DPF Discovery And Optional Engineering Suite
 
-### Local Follow-Up: Optional Engineering Suite (Not Yet Published)
+- Added explicit DPF creation, update and review triggers to the description.
+- One independent local creation probe selected the skill and invoked the
+  helper, but source acquisition was blocked by the sandbox. This is not a
+  successful download or public-install end-to-end validation.
 
 - Added an optional `engineering_suite_loader` setting and per-task temporary
   source contract. Download only for Suite-dependent work; release source files
@@ -14,6 +17,13 @@ that an agent must read before every task.
   separate and are never rewritten merely because an upstream source changes.
 - Same-commit Core is an explicit additional reference when a Suite dependency
   cannot be satisfied from the ordinary Core cache, not silent chunk refresh.
+
+No runtime refresh script or network permission policy changes in this batch.
+ADR 0005 and the repository's 0.2.1 release evidence describe the decisions,
+replay checks and known acquisition gap. Publication identity is the merging PR;
+this version heading does not claim a GitHub release or tag exists.
+
+## 0.2.0 - Protocol Revision 2.0
 
 ### Protocol Revision Changes
 

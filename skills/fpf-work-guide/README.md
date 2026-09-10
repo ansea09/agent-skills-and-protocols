@@ -51,6 +51,16 @@ does not bundle that helper or a scheduler. Each task releases only its own
 temporary sources after retaining user outputs and provenance elsewhere.
 The ordinary FPF Core refresh and protocol source selection remain independent.
 
+Requests to create, update or review a DPF are explicit discovery triggers in
+the skill description. For example: "Help me create a DPF for managing team
+work." Selection is agent-driven, not a hook on opening a chat. Explicitly
+invoking `$fpf-work-guide` removes ambiguity about which skill you want.
+
+Without a configured helper or supplied Suite sources, the agent must report
+the missing input for Suite-dependent work. A sandbox download block is not a
+successful retrieval. A draft based on other sources must say so; neither
+installation nor skill selection guarantees a Suite download.
+
 ### Platform Requirements
 
 The frontmatter `compatibility` is a short string per Agent Skills format;

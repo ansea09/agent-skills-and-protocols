@@ -1,6 +1,13 @@
-# ADR 0005: Optional Engineering DPF Suite Source
+# ADR 0005: Optional Engineering DPF Suite Source And DPF Discovery
 
-Status: accepted locally, 2026-09-10; not a publication record.
+Status: accepted, 2026-09-11. Publication identity is recorded by the merging PR.
+
+## Context
+
+DPF authoring, updating and review should be discoverable without requiring
+users to remember a skill invocation. Suite sources need not occupy permanent
+local storage or be downloaded for ordinary FPF answers. Source acquisition,
+skill selection and successful DPF authoring are separate operations.
 
 ## Decision
 
@@ -14,6 +21,15 @@ external helper, if configured by the user, obtains source material outside
 the sandbox on demand. No Suite background refresh or six-hour timer is needed.
 Its implementation, permissions and installation are separate responsibilities.
 
+Include DPF creation, update and review explicitly in the skill description.
+After selection, the agent follows the Suite reference only for work that needs
+it. Opening a chat alone does not trigger a download. This is instruction-based
+routing, not a deterministic application hook or guaranteed implicit selection.
+
+The public package does not provide an out-of-the-box Suite downloader. Users
+must configure a trusted local helper or supply sources for Suite-dependent
+work. No local machine settings or personal helper paths are published.
+
 ## Consistency And Failure
 
 Resolve one commit snapshot per task. Retain source editions and provenance.
@@ -23,6 +39,12 @@ Reuse the acquired snapshot within the task and disclose its cached status.
 If initial acquisition fails, report the missing source; no permanent fallback
 is assumed. Retain another task's source only with its own explicit lifecycle.
 Missing Suite blocks only the work that needs it. Do not execute fetched source.
+
+An `external-download-required` result is an acquisition block, not a successful
+refresh. The agent must disclose it and cannot claim to have read Suite. A
+draft using other available sources must identify that different basis. The
+contract does not authorize bypassing sandbox restrictions or guarantee an
+agent will successfully request and execute an outside-sandbox operation.
 
 Include same-commit Core as an additional reference for Suite dependencies that
 are absent or different in the ordinary Core cache. Disclose differing versions
@@ -44,3 +66,15 @@ No automatic DPF update follows from source availability: promotion/publication
 requires impact review, source checks and authorization.
 
 See [engineering-suite.md](../../skills/fpf-work-guide/references/engineering-suite.md).
+
+## Validation And Reopen Conditions
+
+The [discovery probe](../release-evidence/fpf-dpf-discovery-0.2.1.md) observed
+implicit selection, Suite-reference reading and helper invocation in one new
+local task. Acquisition was blocked; Suite-based authoring was not demonstrated.
+This is not a causal before/after test or evidence for every DPF request.
+
+Revisit routing if creation/update/review requests miss the skill. Revisit
+integration if a supported deployment is expected to download without manual
+setup, or if source layout, helper output or host permissions change. Test the
+affected boundary rather than weakening permission checks to obtain a pass.

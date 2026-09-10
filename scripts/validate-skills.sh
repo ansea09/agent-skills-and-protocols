@@ -123,6 +123,7 @@ for skill_dir in "$skills_dir"/*; do
       references/diagnostics.md \
       references/protocol-trust.md \
       references/local-settings.md \
+      references/engineering-suite.md \
       references/source-selection.md
     do
       if [ ! -f "$skill_dir/$reference" ]; then
