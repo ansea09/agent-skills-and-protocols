@@ -1,0 +1,20 @@
+# Optional, non-public observation. Do not create a public issue automatically.
+schema_version: 1
+case_family: SC-01
+observed_at: ""
+source:
+  locator: ""
+  version: ""
+  supported_condition_or_permitted_excerpt: ""
+answer:
+  locator: ""
+  claim_or_permitted_excerpt: ""
+unsupported_transfer: ""
+detection_stage: "" # before_delivery | after_delivery
+observation_status: "" # suspected | confirmed | rejected
+correction: ""
+review:
+  outcome: "" # needs_revision | corrected_for_case | not_an_error | unresolved
+  evidence: ""
+  limits: ""
+# Correction of this observation does not close the case family.

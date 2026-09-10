@@ -161,6 +161,23 @@ When a substantive task is admitted:
 
 ## Queries And Read Models
 
+Protocol revision 2.0 adds agent-side selection after a usable refresh result.
+The agent reads optional authorized local settings; otherwise it uses the
+gate-selected protocol cache. It validates revision/entrypoints, selects one
+depth profile, applies relevant routes and checks the answer before delivery.
+This does not change app-start or refresh events. An incompatible protocol
+source blocks dependent protocol work even when cache mechanics passed.
+
+When a material source-condition transfer is suspected during answer checking,
+the agent compares the claim with source-local conditions in both directions.
+It corrects the claim or preserves its uncertainty. If monitoring has an
+authorized non-public destination, it appends a minimal observation; otherwise
+it reports that a needed observation could not be persisted. A detected case,
+its correction, and a later review are different records. There is no scheduled
+monitor or guaranteed observation of every error.
+
+The detailed contract is in [ADR 0003](adr/0003-fpf-response-protocols-v2.md).
+
 | Read model | Used by | Data shown |
 | --- | --- | --- |
 | Refresh gate output | Agent runtime and user diagnostics | `FPF_REFRESH_DECISION`, reason, TTL, durable state path, previous-attempt source path, cache status, chunk mode, commits. |

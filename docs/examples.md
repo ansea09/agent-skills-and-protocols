@@ -20,10 +20,10 @@ Answer shape:
 
 Checklist status summary:
 
-- FPF and protocol refreshed: done or cached with warning.
+- FPF gate executed: done; result may be a valid current cached copy, not a refresh.
 - Scope stated: done.
-- Active system/role/work identified internally: done.
-- Evidence needed: not_applicable, FPF spec only.
+- Formal actor/role inventory: not_applicable if it does not affect this explanation.
+- Evidence checked: done, using the relevant specification body and its version.
 - Consistency and temporal adequacy checked: done.
 - Simple-medium checklist complete.
 
@@ -39,13 +39,18 @@ Classification:
 - Protocol: complex.
 - Reason: file creation, tool behavior, external GitHub source, cache fallback, future agent behavior.
 
-Phase summary:
+Six-stage summary:
 
-- 10 Intake and Scope: define skill boundaries, fallback behavior, installation path, and user-facing limitations.
-- 20 Actors, Roles, Work: Codex edits files; shell runs scripts; GitHub mirror supplies source; future agents consume the skill.
-- 30 Sources and Evidence: FPF spec path and commit; skill-creator instructions; script test output.
-- 40 Reasoning and Answer: implement skill files, test script, explain how to invoke.
-- 50 Final Audit: report commit, cache status, validation limits, and residual risk.
+- C1 Define the request: distinguish substantive tasks from social/control turns.
+- C2 Establish basis: scope, permissions, existing implementation and sources.
+- C3 Select applicable routes: performers/work, source trust and change risks.
+- C4 Implement authorized changes; a script describes operations, not an acting system.
+- C5 Run tests; separate completed checks from pass/fail/unknown outcomes.
+- C6 Deliver with versions, validation limits, residual risk and continuation.
+
+Complex support documents explain these stages; they are not five additional
+mandatory passes. For a material source-condition mapping, use the worked
+[source-fidelity example](../protocols/04-source-fidelity.md).
 
 Checklist status summary:
 

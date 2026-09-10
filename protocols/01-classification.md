@@ -1,36 +1,35 @@
 # Task Classification
 
-Classify every normalized task before answering or acting.
+Protocol revision: 2.0. Classify the admitted task, not message length.
+Use the shared rules in [03-pattern-use.md](03-pattern-use.md).
 
-## Simple-Medium Task
+## Simple-Medium
 
-Use `simple-medium` when all of these are true:
+Choose `simple-medium` for a bounded question or low-risk local action when
+available evidence suffices and no material conflict remains. Reading one
+current authoritative source does not by itself require the complex profile.
+External facts still need the applicable freshness and source checks.
 
-- The task has one clear objective.
-- The answer can be scoped in one bounded context.
-- There is no high-stakes legal, medical, financial, security, safety, employment, or public-policy consequence.
-- Current external facts are not essential, or they can be verified quickly from authoritative sources.
-- The task does not require multiple viewpoints to avoid a misleading answer.
-- Code changes, if any, are small, local, reversible, and testable in the current workspace.
-- The user does not ask for external publication, automation, agent delegation, or long-running monitoring.
+## Complex
 
-## Complex Task
+Choose `complex` when the result needs any of these:
 
-Use `complex` if any of these are true:
+- Resolving conflicting evidence, material ambiguity, or competing decision criteria.
+- Architecture, protocol design, automation design, significant multi-component
+  changes, or consequential external action.
+- Medical, legal, financial, security, safety, or other high-impact decisions.
+- Multiple viewpoints whose different questions can change the conclusion.
+- A substantive unknown requiring comparison rather than one bounded check.
 
-- High-stakes domain: legal, medical, financial, safety, security, infrastructure, employment, public policy, or irreversible user impact.
-- Multi-source or current research is needed.
-- The task has multiple stakeholders, viewpoints, systems, contexts, or conflicting goals.
-- The key terms are ambiguous or overloaded and must be repaired before reasoning.
-- The user asks for architecture, strategy, governance, protocol design, evaluation, or a decision framework.
-- The task involves code changes across modules, data migrations, external APIs, CI, deployment, or GitHub publication.
-- The task involves creating or modifying automations, agents, recurring work, or external resources.
-- A wrong answer could cause significant money, time, privacy, legal, reputation, or safety harm.
+A difference is material if it can change the main conclusion, admissible use,
+acceptance criterion, action, or significant consequence.
 
-## Escalation Rule
+## Routing And Reuse
 
-When uncertain, choose `complex` if the extra checklist cost is justified by risk, ambiguity, external evidence, or blast radius. Otherwise choose `simple-medium` and state the bounded scope.
+A brief response can require complex checking. Style never waives a safeguard.
+An immaterial unknown can be bounded without escalating the entire task.
+Independent tasks can have different profiles; do not split a consequential
+task merely to evade its requirements.
 
-## De-Escalation Rule
-
-A task may be de-escalated from `complex` to `simple-medium` only when the risky or ambiguous part is explicitly out of scope and the final answer states that boundary.
+Escalate when a material condition appears; retain valid work rather than
+restarting. Do not downgrade to hide an unperformed required check.

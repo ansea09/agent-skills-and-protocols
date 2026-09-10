@@ -41,6 +41,23 @@ the current cached copy and must disclose cached/fresh status.
 
 ## Portable Invocation
 
+### Platform Requirements
+
+The frontmatter `compatibility` is a short string per Agent Skills format;
+this documentation retains the detailed operating contract:
+
+| Environment | Requirement / support boundary |
+| --- | --- |
+| Codex on macOS | Primary runtime; Bash and standard Unix utilities (`awk`, `date`, `dirname`, `mkdir`, `mv`, `rmdir`, `stat`, `uname`). |
+| Linux / WSL | Bash entrypoints; run the portable doctor on the target host. |
+| Git Bash | Best effort, not native Windows release evidence. |
+| Windows | PowerShell 5.1 or 7+ implementation and CMD delegation; release support requires the relevant tested lane. |
+| Claude Code / another agent | Install the whole skill and invoke its gate explicitly or through the documented native profile. |
+| Other shells | No support claim without Bash or PowerShell compatibility. |
+| Refresh | Git and GitHub access; valid existing caches support offline fallback. |
+
+Default home/workspace paths are conveniences, not mandatory install locations.
+
 `$HOME/.codex`, `$HOME/.agents`, and `$PWD/.fpf-update` are defaults, not a
 portable installation contract. For Claude Code, WSL, Git Bash, shared
 workspaces, symlinked workspaces, read-only checkouts, or non-default runtime
@@ -126,18 +143,33 @@ reference text. Before using it, apply `references/protocol-trust.md`.
 
 For substantive tasks:
 
-1. Read the registry from `FPF_PROTOCOLS_REGISTRY_PATH`.
+1. Apply `references/local-settings.md`; by default read the gate-selected
+   `FPF_PROTOCOLS_REGISTRY_PATH`. Require protocol revision 2.0.
 2. Read `protocols/00-definitions.md` when message/request/question/task
    distinctions matter.
 3. Read `protocols/01-classification.md`.
 4. Read `protocols/02-routing-table.md`.
-5. Select exactly one baseline protocol: `simple-medium` or `complex`.
-6. Execute every selected checklist item without silent skips.
-7. Mark each item as `done`, `not_applicable: reason`, or `blocked: reason`.
+5. Read shared rules in `protocols/03-pattern-use.md` and relevant FPF bodies.
+6. Select one baseline per independent task: `simple-medium` or `complex`.
+   Both have six stages; complex adds depth rather than extra mandatory passes.
+7. Execute required checks and distinguish execution status from check outcome.
 
-Use `simple-medium` for bounded low-risk tasks. Use `complex` for high-stakes,
-source-sensitive, multi-view, external-action, architecture, automation,
-large-code-change, or ambiguous ontology tasks.
+Use simple-medium for bounded low-risk work with sufficient evidence; escalate
+for material uncertainty, risk, source conflict, viewpoints or significant
+change. One current source alone does not force complex. Default output is a
+compact basis; detailed audit records are conditional.
+
+`protocols/04-source-fidelity.md` governs material paraphrase and condition
+mapping. It checks unsupported transfers in both directions. SC-01 remains an
+open monitored risk, not a solved error class. Optional observations go only to
+a user-authorized non-public log; this is not a background monitor or detector.
+
+For local testing before publication, see
+[local settings](references/local-settings.md). A local protocol source is
+read-only and explicitly reported; it never replaces the updater's cache path.
+Publish skill, plugin, Claude routing and protocol revision 2.0 as one compatible
+batch. An older protocol cache must be refreshed or an authorized compatible
+local source selected before this routing contract can run; never mix versions.
 
 ## FPF Source Use
 

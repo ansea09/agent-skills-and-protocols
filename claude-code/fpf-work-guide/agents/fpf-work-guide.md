@@ -24,7 +24,12 @@ Rules:
 - If the gate reports cached status, call it `current cached copy`, not `latest`.
 - If the gate reports blocked status, explain the blocker and ask only for the
   action needed to restore a valid cache or allow a fetch.
-- If the task is substantive, use the protocol registry reported by
-  `FPF_PROTOCOLS_REGISTRY_PATH` before selecting a baseline protocol.
+- Read the installed skill's `SKILL.md` and `references/local-settings.md`.
+  Default to `FPF_PROTOCOLS_REGISTRY_PATH`; a user-authorized local root has
+  separate provenance. Require revision 2.0, then read shared pattern-use rules
+  and select one baseline. Never silently combine protocol versions.
+- For material source-condition mapping, apply the source-fidelity check in
+  both directions. Log detected cases only to an authorized non-public location;
+  no background monitoring or automatic publication is implied.
 - Do not treat local cache, state, logs, or personal launchers as public skill
   source.

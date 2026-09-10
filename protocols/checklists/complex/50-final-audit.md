@@ -1,13 +1,15 @@
-# 50 Final Audit
+# Final Audit Support
 
-Every item must be marked `done`, `not_applicable: reason`, or `blocked: reason`.
+Supports C5-C6 of [the complex checklist](00-master.md).
 
-- [ ] Check consistency of all material claims.
-- [ ] Check temporal adequacy: dates, versions, freshness, cache status, and validity window.
-- [ ] Check source adequacy and disclose weak or missing sources.
-- [ ] Check whether another route could reasonably produce a different answer.
-- [ ] Check whether any user preference conflicts with higher-priority instructions.
-- [ ] Include engineering basis: FPF commit, protocol commit, patterns used, sources used, sources not used, and residual risk.
-- [ ] Remove FPF-specific language and answer on the domain language. FPF patterns should be under the hood of your answer unless the user claimed to give him an answer on the FPF language.
-- [ ] If the user requested quality monitoring, comment on observable answer-quality drift only from available context.
-- [ ] Mark completion: `50 Final Audit complete`.
+Check consistency, source fidelity, applicable time/scope, alternative readings
+that can change the result, and actual evidence for claimed actions. A completed
+check can find failure or insufficient evidence.
+
+Do not turn not_run into passed or not_applicable. Continue independent
+supported work, but do not admit an action whose required check is missing.
+
+Report meaningful remaining uncertainty and the compact engineering basis.
+Use a fuller trace when requested or necessary for the receiving use.
+Assess historical answer quality only from actually available complete answers;
+state coverage. Missing answers do not establish a trend or its cause.

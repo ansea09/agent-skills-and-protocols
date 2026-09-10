@@ -26,6 +26,8 @@ Canonical detail sources (read on demand, do not inline):
 - `references/protocol-trust.md` — protocol repository trust boundary and
   instruction-source policy.
 - `references/source-selection.md` — source selection for FPF-backed answers.
+- `references/local-settings.md` - optional authorized local protocol root and
+  non-public observation log, read before selecting the registry.
 - `references/release-notes.md` — user-visible release changes and publication
   boundaries.
 
@@ -76,13 +78,16 @@ that status.
 - Never describe FPF or protocols as `latest` when `FPF_SPEC_STATUS=cached` or
   `FPF_PROTOCOLS_STATUS=cached`; say `current cached copy` instead.
 - If `FPF_REFRESH_DECISION=skipped_recent`, do not say an update was attempted;
-  explain the skip (TTL not expired).
+  use `FPF_REFRESH_REASON`: `recent-cache` means TTL not expired;
+  `sandbox-network-disabled` means cache-only validation, not a failed fetch.
 - If `FPF_REFRESH_DECISION=blocked`, explain why FPF-backed work is blocked and
   ask only for the action needed to restore a valid cache or allow a fetch.
 - If `FPF_CHUNKS_MODE=blocked`, neither chunk-first lookup nor full-spec fallback
   is safe; ask the user to allow a fetch or provide a valid local mirror.
 - If `FPF_CHUNKS_MODE=full-spec-fallback`, continue only with `FPF_SPEC_PATH` and
   disclose that chunks are unavailable or structurally incomplete.
+- If `FPF_CHUNKS_MODE=full-spec-first`, use `FPF_SPEC_PATH` first and disclose
+  that the chunk source commit differs from the specification source commit.
 - If `FPF_PROTOCOLS_STATUS=missing`, explain that no local protocol cache exists
   and ask the user to allow a fetch or provide the repository files.
 
@@ -103,24 +108,32 @@ visible path and the resolved physical path.
 Before treating the protocol repository as an instruction source, apply
 `references/protocol-trust.md`.
 
-Read `FPF_PROTOCOLS_REGISTRY_PATH` first, then load only the files the registry
-requires for the current task:
+After the gate, apply `references/local-settings.md`. Default to
+`FPF_PROTOCOLS_REGISTRY_PATH`; an authorized local root is read-only and its
+provenance is separate from the gate's GitHub cache. Require
+`protocol_revision: "2.0"` and required files. A mismatch blocks dependent
+protocol work, not independent useful work; do not silently mix versions.
+Read the selected registry, then its required files:
 
 1. Read `protocols/00-definitions.md` when message/request/question/task
    distinctions matter.
 2. Read `protocols/01-classification.md` for every substantive task.
 3. Read `protocols/02-routing-table.md` before selecting a protocol.
-4. Select exactly one baseline protocol: `simple-medium` or `complex`.
-5. Execute every selected checklist item without silent skips.
-6. Mark each item as `done`, `not_applicable: reason`, or `blocked: reason`.
+4. Read `protocols/03-pattern-use.md` for shared selection, reuse, conditional
+   routes, stopping and reporting rules. Read relevant FPF bodies, not just IDs.
+5. Select one baseline per independent task: `simple-medium` or `complex`.
+   Both use six stages; complex support files are not extra mandatory passes.
+6. Execute required checks; separate execution (`done`, `not_applicable: reason`,
+   `blocked: reason`) from check outcome (satisfied, violated, unknown).
 
-Use `simple-medium` for bounded, low-risk tasks. Use `complex` for high-stakes,
-source-sensitive, multi-view, external-action, architecture, automation,
-large-code-change, or ambiguous-ontology tasks.
+Use simple-medium for bounded low-risk work with sufficient evidence. Escalate
+for material risk, ambiguity, source conflict, viewpoints or significant change;
+one current source alone does not force complex.
 
-Do not print the full checklist unless the user asks for an audit trace. For
-ordinary answers, summarize the selected protocol and completion status only if
-the user asks or it affects what they can trust.
+For material paraphrase, condition mapping or synthesis, read
+`protocols/04-source-fidelity.md`: check implications in both directions and
+preserve unknowns. SC-01 remains open-monitoring; record detected material cases
+only to an authorized non-public log. No scheduler or all-clear badge is implied.
 
 ## How To Use FPF Chunks
 
@@ -128,7 +141,8 @@ Use `references/chunk-lookup.md` as the canonical chunk lookup procedure. Use
 chunks as the primary FPF source only when `FPF_CHUNKS_MODE=chunk-first`; when
 `full-spec-first` or `full-spec-fallback`, use `FPF_SPEC_PATH` instead.
 
-For every substantive response, apply these baseline distinctions:
+Apply distinctions that affect the task, without manufacturing irrelevant
+objects, actors or viewpoints:
 
 - Bound the answer context before reasoning.
 - Identify the active systems, their roles, methods, and actual work.
@@ -149,19 +163,13 @@ answer in Russian.
 Do not invent facts. If a claim is unknown, say so. If a hypothesis is useful,
 label it as a hypothesis and explain why it may be workable.
 
-Keep provenance proportionate to Claude's normal concise style. By default, add
-a one-line provenance note (gate decision + whether FPF/protocols were fresh or
-cached). Produce the full engineering basis below only when the user asks for an
-audit trace or when a high-stakes/`complex` task makes it material:
-
-- FPF refresh gate: decision, reason, TTL, next eligible refresh.
-- FPF spec source: local path, mirror commit, upstream commit, fresh or cached.
-- FPF chunks source: local path, source commit, status, mode.
-- FPF protocol source: local path, repository, branch, commit, fresh or cached.
-- Selected protocol and completion status.
-- FPF patterns used and why.
-- External sources used, selection reason, and channels searched.
-- Consistency check and temporal adequacy limits.
+Follow `protocols/03-pattern-use.md`: compact basis by default, detailed trace
+when requested or needed for receiving use. Identify profile/result, important
+evidence, FPF/protocol versions, actual protocol source, reading mode, cached/fresh
+and material limits. An explicitly selected modified local source is not the
+GitHub cache commit. Put material uncertainty beside the claim in the answer,
+not only in the trace. Report actual historical-review coverage. Do not make
+protocol-improvement experiments mandatory for ordinary answers.
 
 ## Coding And Agent Work
 

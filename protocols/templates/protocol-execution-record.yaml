@@ -1,7 +1,12 @@
-schema_version: 1
+schema_version: 2
+protocol_revision: "2.0"
 task_id: ""
 selected_protocol: ""
 selection_reason: ""
+protocol_source:
+  kind: "" # trusted_cache | explicit_local
+  path: ""
+  version_or_fingerprint: ""
 fpf_spec:
   commit: ""
   status: ""
@@ -15,6 +20,14 @@ checklist_items:
     text: ""
     status: "" # done | not_applicable | blocked
     reason: ""
+    check_outcome: "" # satisfied | violated | unknown | domain-specific
+    evidence: ""
+routes_used: []
+source_fidelity:
+  applicable: false
+  condition_support_notes: []
+  observation_ref: "" # optional authorized non-public log; no secrets
+  watch_status: open-monitoring
 evidence:
   sources_used: []
   sources_rejected: []

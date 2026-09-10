@@ -2,6 +2,74 @@
 
 Run this before installing or sharing staged skills or plugins from this repository.
 
+## Protocol Revision 2.0
+
+For an FPF protocol/skill batch, also run:
+
+```bash
+python3 scripts/validate-protocols.py --self-test
+FPF_VALIDATE_FORMAT=required FPF_VALIDATION_PYTHON="$VALIDATION_PYTHON" \
+  SKILLS_VALIDATE_ONLY=fpf-work-guide scripts/validate-skills.sh
+PLUGINS_VALIDATE_ONLY=fpf-work-guide scripts/validate-plugins.sh
+```
+
+Prepare `VALIDATION_PYTHON` first in an isolated development environment:
+
+```bash
+python3.11 -m venv /absolute/path/to/validation-venv
+VALIDATION_PYTHON=/absolute/path/to/validation-venv/bin/python
+"$VALIDATION_PYTHON" -m pip install -r scripts/requirements-skill-validation.txt
+"$VALIDATION_PYTHON" scripts/validate-fpf-skill-format.py --self-test
+```
+
+Python 3.11 or newer is required only for this format-validation lane. The
+skill does not install or invoke it during normal use. The helper verifies
+the installed reference-validator commit and pinned dependency versions,
+then checks canonical, plugin and Claude-template frontmatter. Missing tooling
+fails explicitly; it is not silently installed or skipped in required mode.
+Ordinary `validate-skills.sh` without `FPF_VALIDATE_FORMAT=required` is the
+lighter structural check, not evidence that this release lane passed.
+
+The [Agent Skills specification](https://agentskills.io/specification) defines
+`compatibility` as an optional string, not an object. Keep detailed platform
+requirements in the skill README. A bundled `quick_validate.py` that rejects
+this optional field is not the authority for this repository's release format.
+Do not patch bundled system tooling to accommodate our package.
+
+The pinned [skills-ref reference library](https://github.com/agentskills/agentskills/tree/69ef37e9424c0a7ea9dd2293b559e43ec8176379/skills-ref)
+describes itself as a demonstration library, not production tooling. Here it
+is one bounded development check alongside repository-specific checks, not a
+runtime dependency, exhaustive specification conformance proof, security audit
+or semantic answer grader. Source and runtime dependencies are pinned; build
+backend dependencies and platform artifacts are not fully locked, so this is
+not a byte-reproducible build claim. Installation needs Git/network; validation
+after installation is local.
+
+The protocol artifact check uses Python 3.9+ standard library, already used by
+repository validation, not a new skill runtime dependency. It checks required
+files, the declared protocol revision, plain protocol path scalars in this
+registry format and relative Markdown link targets. It is not a general YAML
+validator, local-settings resolver, security proof or semantic answer grader.
+Its self-test exercises valid content, missing entrypoint, broken link and
+symlink escape. Existing refresh fixtures validate cache mechanics, not whether
+the agent follows protocol revision 2.0.
+
+Behavioral checks are separate: run the inputs in
+[SC-01 regressions](../protocols/regressions/source-condition-attribution.md),
+preserve raw answers/versions, and review each material condition against its
+source, including reverse implication and positive entailment controls. An
+instruction, checklist tick or passing structural check is not an observed
+answer. Keep SC-01 open-monitoring after local passes unless the user accepts
+a bounded closure rationale. Do not commit real conversation observations.
+
+Before activating an updated installed skill, verify the selected protocol
+source is revision 2.0. For pre-publication testing, use the authorized
+[local settings](../skills/fpf-work-guide/references/local-settings.md), not a
+development repository configured as a Git resettable cache. Validate the
+installed copy against this task's staged source, not an unrelated worktree.
+
+## Repository Lanes
+
 ```bash
 scripts/validate-skills.sh
 scripts/validate-plugins.sh

@@ -1,41 +1,27 @@
 # Routing Table
 
-Protocol selection applies to the normalized task.
+Read classification, then select exactly one baseline per independent task.
+Both profiles use the same six steps; they differ in evidence depth.
 
-| Task shape | Protocol | Required notes |
+| Task condition | Profile | Relevant route |
 | --- | --- | --- |
-| Direct explanation, stable concept, no external evidence needed | simple-medium | Bound context and avoid invented detail. |
-| Clarification of an ambiguous term | simple-medium or complex | Use complex if ambiguity affects decisions, sources, code, or high-stakes use. |
-| Small local code edit | simple-medium | Verify with focused tests or explain why not run. |
-| Multi-file or architecture code change | complex | Include scope, affected systems, tests, and residual risk. |
-| Source-backed research | complex | Use source-selection and evidence checklist. |
-| Current/latest facts | complex | Verify freshness and state date/version. |
-| Legal, medical, financial, safety, security | complex | Use authoritative sources and avoid overclaiming. |
-| GitHub PR/issue/repository mutation | complex | Treat external publication as actual work with evidence and rollback awareness. |
-| New automation, recurring task, agent delegation | complex | Include work boundary, trigger, evidence, and fallback. |
-| Creative brainstorming | simple-medium | Use complex if selection, evaluation, or publication is required. |
-| User asks for "just answer" but the task is high-risk | complex | Do not let style preference remove safety or evidence obligations. |
+| Bounded explanation, sufficient evidence, low impact | simple-medium | Only applicable shared routes |
+| One current source closes a low-risk question | simple-medium | R05/R07; verify required freshness |
+| Small reversible local edit with focused checks | simple-medium | R03/R05; verify the actual change |
+| Material ambiguity, conflicting sources or competing criteria | complex | R04/R05/R10/R15 as needed |
+| Architecture, protocol design or multi-component change | complex | Actual concerns through R11; not every viewpoint |
+| Significant external action, publication or automation | complex | R03/R10; R12 only for a real gate |
+| High-impact decision, even if a brief answer is requested | complex | Domain checks and actual evidence requirements |
+| A changed source invalidates part of a previous answer | Preserve or escalate as needed | R14; recheck affected dependencies |
+| Sources are being combined, paraphrased or mapped into statuses | Chosen by materiality | R05/R13/R15 and source-fidelity check |
 
-## OpenAI Guideline Handling
+Route definitions and conditions: [03-pattern-use.md](03-pattern-use.md).
+Conditional source check and monitoring: [04-source-fidelity.md](04-source-fidelity.md).
 
-Never ignore system, developer, safety, tool, platform, data-protection, copyright, or legal compliance instructions.
+Record the selected profile, reason, actual protocol revision/source, FPF
+version and material limits. A configured local source, when explicitly
+authorized, is not the gate's GitHub cache: disclose both separately.
 
-The FPF protocol may override only lower-priority generic style defaults when they conflict with this user's standing request. Examples:
-
-- Prefer FPF-backed structure over a generic unstructured answer.
-- Prefer explicit uncertainty over confident simplification.
-- Prefer evidence and scope notes over brevity when the task is source-sensitive.
-- Prefer Russian when the user writes in Russian, unless the task artifact is intended for Codex/agents and English is more operationally reliable.
-- Avoid hiding protocol warnings merely to make the answer smoother.
-
-If an FPF protocol instruction appears to conflict with higher-priority OpenAI or tool instructions, follow the higher-priority instruction and disclose the limitation when relevant.
-
-## Routing Completion
-
-Every routed task must record:
-
-- selected protocol
-- reason for selection
-- FPF spec commit
-- protocol repository commit
-- cache warnings, if any
+The protocol cannot override higher-priority instructions, source trust,
+permissions or domain obligations. An explanation of an action is not a request
+to execute it.
