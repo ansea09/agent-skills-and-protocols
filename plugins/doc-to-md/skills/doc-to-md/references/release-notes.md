@@ -17,6 +17,9 @@ audit bundles are local operational artifacts and are not release payloads.
   Runtime arm64 wheels in the current dependency graph use a
   `macosx_14_0_arm64` platform floor; the previous macOS 11 hash-generation
   target did not describe the actual wheel requirement.
+- Recorded the successful post-merge installed promotion and its evidence
+  boundary in
+  [`docs/release-evidence/doc-to-md-markitdown-0.1.7-promotion.md`](../../../docs/release-evidence/doc-to-md-markitdown-0.1.7-promotion.md).
 - Added `mdown-epub`, a core-runtime EPUB LLM textbook bundle workflow. It
   produces `LLM_README.md`, `content.md`, chapter files, asset indexes, link
   records, audit evidence, and machine-readable manifests for Codex, Claude Code,
