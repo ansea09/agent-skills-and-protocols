@@ -1,26 +1,7 @@
 ---
 name: fpf-work-guide
 description: Maintain and use the current First Principles Framework (FPF) context from ansea09/fpf-spec-mirror and agent skills/protocols from ansea09/agent-skills-and-protocols. Run the FPF context refresh gate before substantive reasoning, coding, review, research, planning, document drafting, agent work, or source-backed answers; the gate refreshes only on session start, forced refresh, missing cache, or TTL expiry. Use when the user asks to answer with FPF or FPF Work Guide, when a task needs FPF patterns or FPF-backed protocols, or when working in this user's Codex environment where current FPF-backed reasoning is required.
-compatibility:
-  primary_runtime: "Codex on macOS; Windows PowerShell/CMD implementation included, release-verified only when the Windows or pwsh validation lane passes"
-  secondary_runtime: "Claude Code or other agents when this skill directory is installed and invoked explicitly"
-  supported_shells:
-    - "macOS Bash"
-    - "Linux Bash"
-    - "WSL Bash"
-    - "Git Bash best effort"
-    - "Windows PowerShell 5.1 or PowerShell 7+ implementation; release-verified only when the PowerShell validation lane passes"
-    - "Windows CMD wrappers delegate to PowerShell; release-verified only when CMD smoke validation passes"
-  unsupported_shells:
-    - "unlisted shells without Bash or PowerShell compatibility"
-  required_commands:
-    - "bash for Unix-like shell path"
-    - "PowerShell for native Windows path"
-    - "git for fresh GitHub refresh"
-    - "standard Unix utilities for Bash path: awk, date, dirname, mkdir, mv, rmdir, stat, uname"
-  network_requirement: "GitHub network access is required only when a refresh is due, forced, or no valid cache exists."
-  cache_fallback: "Supported when FPF and protocol caches already exist; disclose cached/fresh status."
-  path_policy: "$HOME/.codex, $HOME/.agents, and $PWD/.fpf-update are defaults only; portable installs should set explicit skill, cache, and state paths."
+compatibility: "Codex/macOS-first. Requires Bash and standard Unix utilities, or the bundled PowerShell entrypoints on Windows. Git and GitHub access are needed for refresh; valid cache fallback is supported. Windows release support requires its validation lane. See README.md for platform and path details."
 ---
 
 # FPF Work Guide

@@ -158,6 +158,11 @@ for skill_dir in "$skills_dir"/*; do
     if ! python3 "$repo_root/scripts/validate-protocols.py"; then
       failed=1
     fi
+    if [ "${FPF_VALIDATE_FORMAT:-optional}" = "required" ]; then
+      if ! "${FPF_VALIDATION_PYTHON:-python3}" "$repo_root/scripts/validate-fpf-skill-format.py"; then
+        failed=1
+      fi
+    fi
     if ! "$repo_root/scripts/validate-fpf-work-guide-cross-platform.sh"; then
       failed=1
     fi

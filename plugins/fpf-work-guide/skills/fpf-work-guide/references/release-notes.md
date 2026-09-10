@@ -21,6 +21,10 @@ that an agent must read before every task.
   library, refresh algorithm, hook, scheduler or automatic logger is added.
 - Structural validation and behavioral evaluation have separate boundaries;
   see the protocol ADR and repository validation instructions.
+- Corrected the former nested `compatibility` object to the specification's
+  string form; detailed requirements remain in README. A pinned reference
+  format validator and negative fixtures are development/release tooling only.
+  The bundled generic validator is not modified. See ADR 0004 for boundaries.
 
 ## 0.1.0 - 2026-05-28
 

@@ -41,6 +41,23 @@ the current cached copy and must disclose cached/fresh status.
 
 ## Portable Invocation
 
+### Platform Requirements
+
+The frontmatter `compatibility` is a short string per Agent Skills format;
+this documentation retains the detailed operating contract:
+
+| Environment | Requirement / support boundary |
+| --- | --- |
+| Codex on macOS | Primary runtime; Bash and standard Unix utilities (`awk`, `date`, `dirname`, `mkdir`, `mv`, `rmdir`, `stat`, `uname`). |
+| Linux / WSL | Bash entrypoints; run the portable doctor on the target host. |
+| Git Bash | Best effort, not native Windows release evidence. |
+| Windows | PowerShell 5.1 or 7+ implementation and CMD delegation; release support requires the relevant tested lane. |
+| Claude Code / another agent | Install the whole skill and invoke its gate explicitly or through the documented native profile. |
+| Other shells | No support claim without Bash or PowerShell compatibility. |
+| Refresh | Git and GitHub access; valid existing caches support offline fallback. |
+
+Default home/workspace paths are conveniences, not mandatory install locations.
+
 `$HOME/.codex`, `$HOME/.agents`, and `$PWD/.fpf-update` are defaults, not a
 portable installation contract. For Claude Code, WSL, Git Bash, shared
 workspaces, symlinked workspaces, read-only checkouts, or non-default runtime
