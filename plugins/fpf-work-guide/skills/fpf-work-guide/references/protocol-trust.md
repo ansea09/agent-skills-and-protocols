@@ -61,6 +61,12 @@ In those cases, disclose the issue and use the safest available fallback.
 
 ## Routing Rule
 
-Read `FPF_PROTOCOLS_REGISTRY_PATH` first. Then load only the files required by the registry for the current task.
+By default read `FPF_PROTOCOLS_REGISTRY_PATH` first. An explicitly authorized
+local protocol root may be selected under `local-settings.md`; record its own
+provenance separately from the gate's cache fields. It is a read-only source
+selection, not a refresh or cache-path override. Require protocol revision 2.0;
+do not silently mix incompatible sources.
+
+Then load only the files required by the selected registry for the current task.
 
 Do not bulk-load the whole protocol repository unless the task is specifically to audit the repository.

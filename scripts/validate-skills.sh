@@ -122,6 +122,7 @@ for skill_dir in "$skills_dir"/*; do
       references/chunk-lookup.md \
       references/diagnostics.md \
       references/protocol-trust.md \
+      references/local-settings.md \
       references/source-selection.md
     do
       if [ ! -f "$skill_dir/$reference" ]; then
@@ -154,6 +155,9 @@ for skill_dir in "$skills_dir"/*; do
       fi
     done
 
+    if ! python3 "$repo_root/scripts/validate-protocols.py"; then
+      failed=1
+    fi
     if ! "$repo_root/scripts/validate-fpf-work-guide-cross-platform.sh"; then
       failed=1
     fi

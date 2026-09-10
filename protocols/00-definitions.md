@@ -10,11 +10,14 @@ Use these distinctions before selecting a protocol.
 | Request | A work-demand extracted from the user message. One message may contain multiple requests. | Route each independent request if they differ materially. |
 | Question | A request whose main expected output is an answer or explanation. | Use answer protocols unless the question also asks for code, research, publication, or external action. |
 | Task | The normalized unit of work Codex will perform after reading the message, constraints, files, tools, and context. | Protocol selection is made on the task. |
-| Subtask | A separable part of a task with its own risk, evidence, or work surface. | Complex tasks may split into subtasks but still use the complex protocol. |
+| Subtask | A separable part of a task with its own risk, evidence, or work surface. | Independent tasks may have different profiles; do not split merely to evade a necessary check. |
 | Substantive task | A task where the answer or action depends on reasoning, code/files, sources, FPF patterns, protocols, architecture, review, planning, or other checkable work beyond a short social or control response. | Run the FPF context refresh gate before performing the work. |
 | Non-substantive interaction | A user turn that only acknowledges, pauses, cancels, thanks, or asks for a trivial response that does not depend on FPF, files, tools, sources, or reasoning state. | Do not run the FPF refresh gate solely for this interaction. |
 | Task admission | The agent-side decision that a normalized request will be handled as a task. | A substantive task starts at admission, not merely when the raw user message is received. |
-| Protocol | The mandatory checklist and SOP selected for a task. | Exactly one baseline protocol is selected: `simple-medium` or `complex`. |
+| Protocol | A description of the response/work method, with a selected checklist and supporting rules. | Exactly one baseline per independent task: `simple-medium` or `complex`; same six steps, different depth. |
+| Material difference | A difference that can change a conclusion, admissible use, criterion, action or significant consequence. | Determines depth and the need to reopen a check. |
+| Check execution | Whether a required checking action was performed. | Distinct from a satisfied, violated or unknown check outcome. |
+| Source-condition attribution | Claiming that a source supports a condition or implication in the answer. | Apply the conditional source-fidelity check; do not import another source's conditions. |
 
 ## Boundary Rule
 
@@ -35,8 +38,12 @@ Do not treat the following as substantive by themselves:
 
 ## Examples
 
-- "Explain X" is usually a simple-medium question unless X is high-stakes, current, source-dependent, or ambiguous enough to require multi-view analysis.
+- "Explain X" is usually simple-medium unless impact, material ambiguity or evidential conflict requires deeper checking; reading one current source does not itself force complex.
 - "Fix this PR and publish it" is a complex task because it includes code changes, verification, GitHub publication, and possible CI risk.
 - "Is this medical treatment safe?" is complex even if short because the domain is high-stakes and source-sensitive.
 - "Stop" is not substantive because it is a control turn.
 - "Use FPF to review this architecture" is substantive because it explicitly requires FPF-backed reasoning.
+
+Task admission is not application startup, waking the laptop or a time-based
+session boundary. Shared selection, reuse and completion rules are defined in
+[03-pattern-use.md](03-pattern-use.md).

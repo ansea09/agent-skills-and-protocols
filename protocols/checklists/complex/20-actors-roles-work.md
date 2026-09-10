@@ -1,11 +1,16 @@
-# 20 Actors, Roles, Work
+# Actors, Roles And Work Support
 
-Every item must be marked `done`, `not_applicable: reason`, or `blocked: reason`.
+Supports C3-C5 of [the complex checklist](00-master.md).
 
-- [ ] Identify active systems that will perform work: Codex, user, tools, agents, repositories, APIs, scripts, or external services. Use FPF patterns A.1, A.1.1, A.6.H, A.6.P, A.7 and other relevant FPF patterns to structure your answer.
-- [ ] Assign context-specific roles to each active system. Use FPF patterns A.1.1, A.2 Role Taxonomy, A.2.1 U.RoleAssignment, A.2.4 U.EvidenceRole and other relevant FPF patterns to structure your answer.
-- [ ] Separate role, method, method description, work plan, actual work, and output artifact. Use FPF patterns A.2 Role Taxonomy, all cluster A.3 patterns, all cluster A.15 patterns and other relevant FPF patterns to structure your answer.
-- [ ] Identify the states or characteristics expected to change. Use FPF patterns A.2.5 U.RoleStateGraph, all cluster A.3 patterns (specifically A.3.3 U.Dynamics), all cluster A.16 patterns, A.17, A.18, A.19 and other relevant FPF patterns to structure your answer.
-- [ ] Identify capabilities required to perform the work and any missing capability. Use FPF pattern A.2.2 U.Capability and other relevant FPF patterns to structure your answer.
-- [ ] Identify checkpoints, stop conditions, and user-approval points. Use FPF pattern A.2.4 U.EvidenceRole and other relevant FPF patterns to structure your answer.
-- [ ] Mark completion: `20 Actors, Roles, Work complete`.
+Start from what the actual performer does, then name its role by that method.
+Distinguish the system, role/assignment, capability, method, method description,
+work plan, actual work and evidence carrier. A script file, API description or
+repository is not an acting system merely because it is named in a workflow.
+
+Use R03 and its actual dependencies. If performed work is asserted, identify a
+supported occurrence rather than only its class. Do not invent the performer,
+time or assignment to complete a table. A.3.3 governs a dynamics model, not a
+synonym for every process, event trace or procedure.
+
+Build only the model needed by the question. Merely explaining an unknown
+performer's possible work does not require inventing or proving an assignment.

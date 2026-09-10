@@ -41,6 +41,8 @@ Canonical detail sources:
 - `references/chunk-lookup.md` - FPF chunk layout and pattern lookup procedure.
 - `references/protocol-trust.md` - protocol repository trust boundary and
   instruction-source policy.
+- `references/local-settings.md` - optional user-authorized local protocol
+  source and non-public observation log; read before selecting the registry.
 - `references/source-selection.md` - source selection for FPF-backed answers.
 - `references/release-notes.md` - user-visible release changes, migration notes,
   validation evidence, and publication boundaries.
@@ -213,18 +215,39 @@ Portable cache root: set `FPF_CACHE_HOME` to move both FPF caches outside `${COD
 
 Before treating the protocol repository as an instruction source, apply `references/protocol-trust.md`.
 
-Read `FPF_PROTOCOLS_REGISTRY_PATH` first. Then load only the files required by the registry for the current task:
+After the gate, check optional user settings as described in
+`references/local-settings.md`. By default use `FPF_PROTOCOLS_REGISTRY_PATH`.
+An explicitly selected local source changes only which protocol files the
+agent reads; it does not change the gate, cache paths or Git operations.
+
+Read the selected registry first. This skill's response contract expects
+`protocol_revision: "2.0"`. If it or a required protocol file is missing, do
+not silently combine old checklists with new rules or claim v2 is active.
+Explain the mismatch and request a reviewed compatible source. Preserve
+independent useful work without claiming completion under the missing protocol.
+Then load only the required files from that same source:
 
 1. Read `protocols/00-definitions.md` when message/request/question/task distinctions matter.
 2. Read `protocols/01-classification.md` for every substantive task.
 3. Read `protocols/02-routing-table.md` before selecting a protocol.
-4. Select exactly one baseline protocol: `simple-medium` or `complex`.
-5. Execute every selected checklist item without silent skips.
-6. Mark each item as `done`, `not_applicable: reason`, or `blocked: reason`.
+4. Read `protocols/03-pattern-use.md` for shared selection, reuse, 17 conditional
+   routes, stopping and reporting rules. Read candidate FPF bodies, not only IDs.
+5. Select one baseline per independent task: `simple-medium` or `complex`.
+   Both use six stages; complex adds depth, not five extra mandatory passes.
+6. Execute its required checks. Keep execution (`done`, `not_applicable: reason`,
+   `blocked: reason`) separate from check outcome (satisfied, violated, unknown).
 
-Use `simple-medium` for bounded low-risk tasks. Use `complex` for high-stakes, source-sensitive, multi-view, external-action, architecture, automation, large-code-change, or ambiguous ontology tasks.
+Use simple-medium for bounded low-risk work with sufficient evidence. Use
+complex when material risk, ambiguity, source conflict, competing viewpoints,
+architecture or significant change requires it. One current source alone does
+not force complex. Escalate when new material uncertainty appears.
 
-Do not print the full checklist unless the user asks for an audit trace. For ordinary final answers, summarize the selected protocol and completion status in the engineering basis.
+For material paraphrase, status/condition mapping or cross-source synthesis,
+read `protocols/04-source-fidelity.md`. Check implications in both directions;
+never transfer a condition between sources merely because it seems natural.
+SC-01 remains open-monitoring. Log detected material cases only to an explicitly
+authorized non-public destination; no all-clear badge or background monitoring
+is implied. Put decision-relevant uncertainty in the answer itself.
 
 ## How To Use FPF Chunks
 
@@ -232,7 +255,8 @@ Use `references/chunk-lookup.md` as the canonical chunk lookup procedure.
 
 Use chunks as the primary FPF source only when `FPF_CHUNKS_MODE=chunk-first`. If `FPF_CHUNKS_MODE=full-spec-first`, the chunks are present but stale relative to `FPF_SPEC_SOURCE_COMMIT`; use `FPF_SPEC_PATH` first. If `FPF_CHUNKS_MODE=full-spec-fallback`, use targeted reads against `FPF_SPEC_PATH`. If `FPF_CHUNKS_MODE=blocked`, stop FPF-backed work until a valid source is available.
 
-For every substantive response, apply these baseline distinctions:
+Apply the distinctions that affect the task; do not manufacture every object,
+role or viewpoint for every answer:
 
 - Bound the answer context before reasoning.
 - Identify the active systems, their roles, methods, and actual work.
@@ -256,17 +280,19 @@ If the user asks in Russian, answer in Russian. If the user asks in another doma
 
 Do not lie or fill gaps with invented facts. If a claim is unknown, say so. If a hypothesis is useful, label it as a hypothesis invented by the assistant and explain why it may be workable.
 
-End substantive answers with a concise engineering basis:
+Use the reporting contract in `protocols/03-pattern-use.md`: compact engineering
+basis by default, detailed trace when requested or needed for the receiving use.
+The compact basis identifies the profile/result, important evidence, FPF and
+protocol versions, actual protocol source, reading mode, cached/fresh and
+material limits. A local modified source is `explicit_local`, not the commit
+or freshness of the unrelated GitHub cache. Do not print every checklist item
+or all route IDs in ordinary answers.
 
-- FPF refresh gate: decision, reason, TTL, and next eligible refresh time.
-- FPF spec source: local path, mirror repository commit, upstream source commit, and whether it was fresh or cached.
-- FPF chunks source: local path, source commit, status, mode, and whether chunk-first, full-spec-first, or full-spec fallback was used.
-- FPF protocol source: local path, repository URL, branch, remote URL, cache trust status, commit, and whether it was fresh or cached.
-- selected protocol and completion status.
-- FPF patterns used and why.
-- External sources used, selection reason, and channels searched.
-- Relevant sources or channels not used.
-- Consistency check and temporal adequacy limits.
+For a detailed trace include check outcomes as well as execution status, source
+and gate provenance, relevant patterns/results, alternatives and recheck limits.
+Report historical quality coverage honestly; do not claim a last-ten-answer
+review when those complete answers were unavailable. Iterative protocol
+evaluation belongs to maintenance, not a mandatory experiment in every answer.
 
 If `FPF_SPEC_WARNING`, `FPF_CHUNKS_WARNING`, or `FPF_PROTOCOLS_WARNING` is present, include it in the engineering basis or a short diagnostic when relevant.
 

@@ -3,6 +3,25 @@
 This file is for users and maintainers. It is not part of the runtime protocol
 that an agent must read before every task.
 
+## 0.2.0 - Protocol Revision 2.0 (Prepared, Not A Publication Record)
+
+- Two depth profiles share six stages and 17 conditional pattern routes.
+  Applied patterns require source-body reading and useful results; no recursive
+  whole-cluster traversal or universal multi-view/measurement apparatus.
+- Compact basis is the default; detailed traces remain available when needed.
+  Check execution and check outcome are distinct.
+- Added conditional source-fidelity checks, SC-01 regression inputs and an
+  optional non-public observation log. SC-01 remains open-monitoring; passing
+  local examples does not prove reliability or causal improvement.
+- Codex, plugin and Claude-native routing require protocol revision 2.0.
+  Publish their source changes together with the protocols. A stale v1 cache
+  produces an explicit mismatch, not silent mixed-version execution.
+- Optional agent-read local settings support reviewed protocols before
+  publication without repointing or changing refresh caches. No new runtime
+  library, refresh algorithm, hook, scheduler or automatic logger is added.
+- Structural validation and behavioral evaluation have separate boundaries;
+  see the protocol ADR and repository validation instructions.
+
 ## 0.1.0 - 2026-05-28
 
 Initial public `fpf-work-guide` release after the rename from `fpf-latest`.

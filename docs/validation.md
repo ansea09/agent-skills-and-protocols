@@ -2,6 +2,41 @@
 
 Run this before installing or sharing staged skills or plugins from this repository.
 
+## Protocol Revision 2.0
+
+For an FPF protocol/skill batch, also run:
+
+```bash
+python3 scripts/validate-protocols.py --self-test
+SKILLS_VALIDATE_ONLY=fpf-work-guide scripts/validate-skills.sh
+PLUGINS_VALIDATE_ONLY=fpf-work-guide scripts/validate-plugins.sh
+```
+
+The protocol artifact check uses Python 3.9+ standard library, already used by
+repository validation, not a new skill runtime dependency. It checks required
+files, the declared protocol revision, plain protocol path scalars in this
+registry format and relative Markdown link targets. It is not a general YAML
+validator, local-settings resolver, security proof or semantic answer grader.
+Its self-test exercises valid content, missing entrypoint, broken link and
+symlink escape. Existing refresh fixtures validate cache mechanics, not whether
+the agent follows protocol revision 2.0.
+
+Behavioral checks are separate: run the inputs in
+[SC-01 regressions](../protocols/regressions/source-condition-attribution.md),
+preserve raw answers/versions, and review each material condition against its
+source, including reverse implication and positive entailment controls. An
+instruction, checklist tick or passing structural check is not an observed
+answer. Keep SC-01 open-monitoring after local passes unless the user accepts
+a bounded closure rationale. Do not commit real conversation observations.
+
+Before activating an updated installed skill, verify the selected protocol
+source is revision 2.0. For pre-publication testing, use the authorized
+[local settings](../skills/fpf-work-guide/references/local-settings.md), not a
+development repository configured as a Git resettable cache. Validate the
+installed copy against this task's staged source, not an unrelated worktree.
+
+## Repository Lanes
+
 ```bash
 scripts/validate-skills.sh
 scripts/validate-plugins.sh

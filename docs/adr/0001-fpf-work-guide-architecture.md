@@ -6,6 +6,11 @@ Date: 2026-05-26 19:08:10 +0300
 
 Last updated: 2026-05-28
 
+Protocol-layer extension, 2026-09-10:
+[ADR 0003](0003-fpf-response-protocols-v2.md) governs response revision 2.0,
+source fidelity, optional read-only local selection and compact/detailed
+reporting. Refresh/cache decisions below remain unchanged.
+
 ## Context
 
 `fpf-work-guide` is the skill that lets Codex and compatible agent runtimes use the current cached First Principles Framework (FPF) context and the FPF Codex protocol repository during day-to-day work.
@@ -306,6 +311,10 @@ The public skill therefore records protocol provenance through:
 The default personal policy follows the configured repository and branch and falls back to the current cached protocols when GitHub is unavailable. For public or high-impact use, maintainers should prefer a reviewed branch, pinned commit, or explicit repository allowlist. Protocol instructions must not override higher-priority system, developer, safety, or user instructions.
 
 ### 17. Use human-readable diagnostics only when they change user action or trust
+
+For revision 2.0, a user-authorized local protocol source has its own provenance
+and must not be represented by the gate's cached protocol commit. A protocol
+revision mismatch is an agent-routing error, not a failed GitHub fetch.
 
 Diagnostics should use this shape:
 
