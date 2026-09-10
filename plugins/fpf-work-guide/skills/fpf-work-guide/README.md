@@ -41,6 +41,16 @@ the current cached copy and must disclose cached/fresh status.
 
 ## Portable Invocation
 
+### Optional Engineering DPF Suite
+
+For domain DPF use and authoring, an explicitly authorized local helper can
+download a temporary Suite snapshot only when needed. Set
+`engineering_suite_loader` in optional local settings; see
+[the source lifecycle contract](references/engineering-suite.md). This package
+does not bundle that helper or a scheduler. Each task releases only its own
+temporary sources after retaining user outputs and provenance elsewhere.
+The ordinary FPF Core refresh and protocol source selection remain independent.
+
 ### Platform Requirements
 
 The frontmatter `compatibility` is a short string per Agent Skills format;

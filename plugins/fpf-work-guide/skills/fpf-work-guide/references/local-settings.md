@@ -21,11 +21,15 @@ no credentials and cannot override higher-priority instructions or permissions.
 {
   "schema_version": 1,
   "protocols_root": "/absolute/path/to/reviewed-repository",
+  "engineering_suite_loader": "/absolute/path/to/codex-dpf-source",
   "source_fidelity_log": "/absolute/path/to/non-public/observations.md"
 }
 ```
 
-Both path keys are optional and independent. `protocols_root` chooses local
+All three path keys are optional and independent. `engineering_suite_loader`
+selects the user-authorized local helper described in `engineering-suite.md`;
+it is not a downloaded executable or a scheduler. Network execution still
+requires the host's normal permissions. `protocols_root` chooses local
 protocols; `source_fidelity_log` authorizes minimal SC-01 observations, not full
 chat export or autonomous publication. Do not create or change settings without
 the user's authorization. Never copy this file into public skill/plugin source.

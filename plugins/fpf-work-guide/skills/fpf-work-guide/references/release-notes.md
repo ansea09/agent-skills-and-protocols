@@ -5,6 +5,18 @@ that an agent must read before every task.
 
 ## 0.2.0 - Protocol Revision 2.0 (Prepared, Not A Publication Record)
 
+### Local Follow-Up: Optional Engineering Suite (Not Yet Published)
+
+- Added an optional `engineering_suite_loader` setting and per-task temporary
+  source contract. Download only for Suite-dependent work; release source files
+  after retaining authored results and provenance outside the temporary directory.
+- No public scheduler or Suite loader is bundled. User-authored DPFs remain
+  separate and are never rewritten merely because an upstream source changes.
+- Same-commit Core is an explicit additional reference when a Suite dependency
+  cannot be satisfied from the ordinary Core cache, not silent chunk refresh.
+
+### Protocol Revision Changes
+
 - Two depth profiles share six stages and 17 conditional pattern routes.
   Applied patterns require source-body reading and useful results; no recursive
   whole-cluster traversal or universal multi-view/measurement apparatus.

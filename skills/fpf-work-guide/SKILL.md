@@ -24,6 +24,8 @@ Canonical detail sources:
   instruction-source policy.
 - `references/local-settings.md` - optional user-authorized local protocol
   source and non-public observation log; read before selecting the registry.
+- `references/engineering-suite.md` - optional on-demand temporary Engineering
+  DPF Suite sources; read when using domain DPFs or developing a user's DPF.
 - `references/source-selection.md` - source selection for FPF-backed answers.
 - `references/release-notes.md` - user-visible release changes, migration notes,
   validation evidence, and publication boundaries.
@@ -231,6 +233,13 @@ authorized non-public destination; no all-clear badge or background monitoring
 is implied. Put decision-relevant uncertainty in the answer itself.
 
 ## How To Use FPF Chunks
+
+For Engineering DPF Suite use or authoring/updating a user's DPF, read
+`references/engineering-suite.md` after local settings. Acquire temporary sources
+only when needed; preserve authored DPFs outside the source directory, then
+release this task's inputs when no longer needed. Suite is reference material,
+not a replacement protocol or permission to rewrite personal DPFs. Never fetch
+it from the sandbox or run downloaded source scripts.
 
 Use `references/chunk-lookup.md` as the canonical chunk lookup procedure.
 
