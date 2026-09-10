@@ -293,7 +293,9 @@ The installer supports:
 bash scripts/install.sh --hash-locked
 ```
 
-Hash files are platform-specific. A macOS arm64 Python 3.13 hash file must not
+Hash files are platform-specific. The maintained macOS arm64 Python 3.13
+profile requires macOS 14 or newer because its ONNX Runtime wheel uses the
+`macosx_14_0_arm64` platform tag. Its hash file must not
 be treated as a universal lock for Intel macOS, Linux, WSL, or native Windows.
 Intel macOS uses a separate Python 3.12 profile because the default core
 dependency graph includes an `onnxruntime` version that does not publish a
@@ -319,8 +321,8 @@ part of the public skill, plugin artifact, or private local policy.
 
 Current support contract:
 
-- Codex on macOS arm64: supported for core workflows, including `mdown` and
-  `mdown-epub`, plus book and OCR.
+- Codex on macOS 14 or newer on arm64: supported for core workflows, including
+  `mdown` and `mdown-epub`, plus book and OCR.
 - Codex on Intel macOS: supported for core workflows, including `mdown` and
   `mdown-epub`, plus book on Python 3.12 with the `macos-intel-py312` profile.
 - Claude Code on macOS: experimental unless installer-generated shims record

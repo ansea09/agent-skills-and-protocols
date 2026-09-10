@@ -21,8 +21,8 @@ installation.
 - Keep `mdown input -o output.md` as the supported write path.
 - Treat shell redirection (`mdown input > output.md`) as unsupported for file
   writes because it is not atomic and can truncate an existing destination.
-- Publish and review the support matrix. Current contract: Codex/macOS arm64 is
-  supported for core workflows, including `mdown` and `mdown-epub`, plus book
+- Publish and review the support matrix. Current contract: Codex/macOS 14+
+  arm64 is supported for core workflows, including `mdown` and `mdown-epub`, plus book
   and OCR; Codex/Intel macOS is supported for core workflows, including
   `mdown-epub`, plus book on Python 3.12; Claude Code/macOS is experimental
   unless installer shims record `DOC_TO_MD_SKILL_DIR` and runtime paths are

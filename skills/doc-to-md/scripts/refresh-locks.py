@@ -22,7 +22,7 @@ BOOK_REQUIREMENTS = SKILL_DIR / "requirements-book.txt"
 
 HASH_PROFILE_DOWNLOAD_TARGETS = {
     "macos-arm64-py313": {
-        "platform": "macosx_11_0_arm64",
+        "platform": "macosx_14_0_arm64",
         "python_version": "3.13",
         "implementation": "cp",
         "abi": "cp313",

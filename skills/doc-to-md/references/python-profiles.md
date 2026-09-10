@@ -37,7 +37,7 @@ Python minor version as evidence for another minor version.
 
 | Profile | Support level | Components | Notes |
 | --- | --- | --- | --- |
-| `macos-arm64-py313` | Supported hash-locked profile | core, book, OCR | Maintained public release profile. |
+| `macos-arm64-py313` | Supported hash-locked profile | core, book, OCR | Maintained public release profile on macOS 14 or newer; ONNX Runtime arm64 wheels set this operating-system floor. |
 | `macos-intel-py312` | Supported hash-locked profile | core, book | OCR hash-locked support is not published for Intel macOS. |
 | `macos-arm64-py312` | Candidate / unverified | none claimed | Add only after resolver, hashes, doctors, selftests, and regressions pass. |
 | `macos-arm64-py314` | Candidate / unverified | none claimed | Newer Python minor releases often wait on compiled wheels. |
