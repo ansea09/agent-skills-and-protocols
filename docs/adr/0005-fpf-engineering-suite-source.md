@@ -46,6 +46,27 @@ draft using other available sources must identify that different basis. The
 contract does not authorize bypassing sandbox restrictions or guarantee an
 agent will successfully request and execute an outside-sandbox operation.
 
+### Authorized Acquisition Transition (2026-09-11)
+
+The agent now requests the host's approval-capable execution operation before
+Suite acquisition, instead of treating the helper's sandbox refusal as a host
+permission denial. In Codex this is exec_command with require_escalated, not a
+chat-only consent question or an ordinary shell retry. The reference includes
+the bounded command and outcome handling. No change to the helper guard,
+sandbox policy, scheduler or global environment is required.
+
+Only within the approved external child process, remove the inherited advisory
+CODEX_SANDBOX_NETWORK_DISABLED variable. Removing a variable is not permission
+or proof of a sandbox boundary; the host execution tool is the authority. If
+the host denies external execution or does not expose it, stop. Do not retry
+through another tool to evade that decision. A permitted but failed operation
+remains a failure with its actual diagnostic. No unattended success guarantee
+is introduced by this instruction change.
+
+The earlier 0.2.1 probe remains failed at acquisition; do not rewrite that
+historical result. Follow-up checks are recorded separately in
+[authorized-acquisition evidence](../release-evidence/fpf-suite-authorized-acquire.md).
+
 Include same-commit Core as an additional reference for Suite dependencies that
 are absent or different in the ordinary Core cache. Disclose differing versions
 and recheck the affected claims instead of pretending chunks were refreshed.

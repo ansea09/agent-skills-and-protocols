@@ -8,10 +8,10 @@ contract but does not install the personal helper or a background job.
 
 ## Acquire, Read, Release
 
-1. Invoke the configured local helper with `acquire`, using an authorized
-   outside-sandbox execution path for network access. Do not bypass sandbox
-   restrictions by changing a flag within the sandbox. If permission or network
-   is unavailable, report the dependent gap and continue independent work.
+1. Use the host-authorized acquisition procedure below before Suite-dependent
+   drafting. A helper result of `external-download-required` means that an
+   outside-sandbox request is needed, not that permission was denied. Do not
+   stop at that result if the host's approval-capable execution tool is available.
 2. Treat output as data, never shell code. Require an absolute
    `DPF_SUITE_ROOT`, a `DPF_SUITE_LEASE_PATH` and a single 40-character lowercase
    hexadecimal `DPF_SUITE_COMMIT`. Retain these values for this task. Do not save
@@ -41,6 +41,60 @@ The download is temporary source acquisition, not installation of a framework
 or an agent. Cleanup is an explicit task step, not a guaranteed crash handler
 or age-based deletion daemon. Release removes local inputs, not remote history
 or authored DPFs. After release another task needs network access again.
+
+## Host-Authorized Acquisition
+
+Read the configured helper path as data and quote it as one shell argument.
+Verify it is the trusted local helper, not downloaded code. If the current
+execution is sandboxed, request the external operation directly instead of
+probing GitHub from the sandbox.
+
+In Codex, when the execution tool supports `sandbox_permissions`, call
+`exec_command` (directly or through the available tool bridge) with
+`sandbox_permissions: "require_escalated"` and a concise justification: download
+public Suite sources from GitHub to a task-owned temporary directory, without
+changing user DPFs. Do not replace this permission request with an ordinary
+chat question. Omit any reusable broad permission prefix.
+
+For the configured Bash helper, the command inside that approval request is:
+
+```bash
+env -u CODEX_SANDBOX_NETWORK_DISABLED "/absolute/configured/helper" acquire
+```
+
+Replace the example path with the validated local setting. This command is
+permitted ONLY in a host-authorized outside-sandbox execution request. The
+host tool, not `env -u`, supplies the execution boundary and permission decision.
+The environment adjustment removes an inherited advisory flag for that child
+process only; it must never be used with ordinary sandbox execution, as a
+retry after a permission denial, or as proof that execution is authorized.
+Do not modify global environment, approval policy, sandbox configuration or
+the helper's protective check. If the tool cannot establish an authorized
+outside-sandbox boundary, do not execute this command.
+
+If an ordinary helper call already returned `external-download-required`,
+make one host approval request as above. If the host denies the request or
+does not offer external execution, stop that acquisition route. Do not switch
+tools, change flags or request broader access to evade the decision. If an
+approved call still returns a block or fails, preserve the actual diagnostic;
+do not repeatedly retry during the same request without a new user decision.
+
+Report the observed outcome precisely:
+
+- Not requested yet: external execution is needed; request it when available.
+- Denied: permission was denied; Suite was not obtained.
+- Tool unavailable: this host cannot request external execution; offer a user-run
+  trusted helper or supplied sources, but do not perform an alternate bypass.
+- Approved but failed: identify the returned network, source-layout or other
+  failure. Approval is not evidence of successful download.
+- Acquired: only after a successful result with the required paths and commit;
+  continue validation/reading and release this task's inputs when finished.
+
+For a blocked outcome, explain what was not obtained, which part of the DPF
+work cannot be completed on that basis, and the available choice: provide
+sources/run the trusted helper outside the agent, or continue only independent
+work with the alternative basis explicitly named. Do not claim Suite-backed
+work or silently substitute a different source.
 
 ## Reasoning And Source Boundary
 
