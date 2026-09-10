@@ -11,7 +11,7 @@
 Важно про платформы:
 
 - `fpf-work-guide`: основной путь поддержки - Codex на macOS. Windows PowerShell/CMD path реализован, но пока считается experimental/unverified до отдельной проверки на Windows. WSL Bash path возможен.
-- `doc-to-md`: основной поддерживаемый путь - Codex на macOS arm64. Windows native не поддерживается. WSL считается candidate/unsupported. macOS на другой архитектуре требует проверки runtime profile.
+- `doc-to-md`: основной поддерживаемый путь - Codex на macOS 14 или новее с arm64. Windows native не поддерживается. WSL считается candidate/unsupported. macOS на другой архитектуре или более старая macOS требуют проверки runtime profile.
 
 ## Что будет делать Codex
 
@@ -41,7 +41,7 @@ https://github.com/ansea09/agent-skills-and-protocols
 
 2. Дополнительный вариант:
    установить doc-to-md тоже, только если мне нужна конвертация PDF/DOCX/XLSX/PPTX/HTML/CSV/JSON/XML/ZIP в Markdown.
-   Важно: doc-to-md сейчас поддерживается только для Codex на macOS arm64. Windows native не поддерживается, WSL считается candidate/unsupported, а macOS на другой архитектуре требует отдельной проверки runtime profile.
+   Важно: doc-to-md сейчас поддерживается только для Codex на macOS 14 или новее с arm64. Windows native не поддерживается, WSL считается candidate/unsupported, а другая архитектура или более старая macOS требуют отдельной проверки runtime profile.
 
 3. Если я явно скажу "оба", "all", "fpf-work-guide и doc-to-md" - устанавливай оба.
 
@@ -54,14 +54,14 @@ https://github.com/ansea09/agent-skills-and-protocols
   - требует Git для fresh refresh.
 
 - doc-to-md:
-  - основной поддерживаемый путь: Codex на macOS arm64;
+  - основной поддерживаемый путь: Codex на macOS 14 или новее с arm64;
   - требует отдельной сборки локального runtime;
   - Windows native сейчас unsupported;
   - WSL candidate/unsupported, не устанавливай runtime без явного подтверждения.
 
 После выбора plugin проверь мою среду:
 
-1. Если это Codex на macOS arm64:
+1. Если это Codex на macOS 14 или новее с arm64:
    - fpf-work-guide можно устанавливать;
    - doc-to-md можно устанавливать только если я его выбрала/выбрал.
 

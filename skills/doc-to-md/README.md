@@ -8,8 +8,9 @@ choices belong in private local policy files.
 
 ## Install
 
-Supported default paths: Codex on macOS arm64 for core workflows, book, and
-OCR; Codex on Intel macOS for core workflows and book on Python 3.12. The core
+Supported default paths: Codex on macOS 14 or newer on arm64 for core
+workflows, book, and OCR; Codex on Intel macOS for core workflows and book on
+Python 3.12. The core
 runtime includes both `mdown` and the separate `mdown-epub` bundle command. WSL
 is a candidate.
 Claude Code on macOS is experimental unless the skill source and runtime paths
@@ -35,14 +36,14 @@ bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --ocr
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --all
 ```
 
-Hash-locked public release install for macOS arm64 / Python 3.13:
+Hash-locked public release install for macOS 14+ arm64 / Python 3.13:
 
 ```bash
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --hash-locked
 ```
 
-One-command happy path for supported macOS arm64 with core workflows, book,
-OCR, and JSON doctors:
+One-command happy path for supported macOS 14+ arm64 with core workflows,
+book, OCR, and JSON doctors:
 
 ```bash
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --all --hash-locked && mdown-doctor --json && mdown-epub --doctor --json && mdown-book --doctor --json && mdown-ocrpdf --doctor --json

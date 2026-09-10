@@ -10,6 +10,13 @@ audit bundles are local operational artifacts and are not release payloads.
 
 ## Unreleased
 
+- Prepared the MarkItDown `0.1.7` core-runtime upgrade with regenerated exact
+  pins and a refreshed `macos-arm64-py313` hash lock. MarkItDown still requires
+  the Magika `0.6.x` line, so Magika `1.x` remains outside this upgrade.
+- Corrected the maintained arm64 profile contract to macOS 14 or newer. ONNX
+  Runtime arm64 wheels in the current dependency graph use a
+  `macosx_14_0_arm64` platform floor; the previous macOS 11 hash-generation
+  target did not describe the actual wheel requirement.
 - Added `mdown-epub`, a core-runtime EPUB LLM textbook bundle workflow. It
   produces `LLM_README.md`, `content.md`, chapter files, asset indexes, link
   records, audit evidence, and machine-readable manifests for Codex, Claude Code,
@@ -45,7 +52,7 @@ audit bundles are local operational artifacts and are not release payloads.
 - Expanded the repository ADR with compact architecture-review evidence:
   architecture characteristics, quanta, fitness functions, risks, and evidence
   gaps.
-- Documented the support matrix: Codex/macOS arm64 is the primary supported
+- Documented the support matrix: Codex/macOS 14+ arm64 is the primary supported
   path; Intel macOS is supported for core/book on Python 3.12; WSL is a
   candidate; Claude Code on macOS is experimental with installer-recorded
   source and runtime paths; native Windows PowerShell/CMD is unsupported.

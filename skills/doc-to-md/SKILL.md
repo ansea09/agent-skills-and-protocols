@@ -20,7 +20,7 @@ compatibility:
     - "tesseract for OCR"
     - "Ghostscript or pypdfium2-backed OCRmyPDF rasterization path"
   runtime_requirement: "Run scripts/install.sh to build local runtimes; optional book/OCR runtimes are explicit."
-  python_profile_policy: "Hash-locked support is exact by OS, architecture, and Python minor version; unlisted Python minors are candidate until validated."
+  python_profile_policy: "Hash-locked support is exact by OS version, architecture, and Python minor version; macos-arm64-py313 requires macOS 14 or newer, and unlisted profiles are candidate until validated."
   hash_profiles:
     - "macos-arm64-py313: core, book, OCR"
     - "macos-intel-py312: core, book"
@@ -76,7 +76,7 @@ This skill is the portable public core. Keep only publishable commands, wrappers
 
 Personal local preferences belong outside this skill, for example in a private repository policy file. The public core must not depend on private-only files, paths, fixtures, or commands.
 
-Current support contract: Codex on macOS arm64 is supported for core workflows, including `mdown` and `mdown-epub`, plus book and OCR workflows with the `macos-arm64-py313` hash profile. Codex on Intel macOS is supported for core workflows, including `mdown` and `mdown-epub`, plus book workflows with Python 3.12 and the `macos-intel-py312` hash profile; OCR hash-locked support is not published for Intel macOS. Python minor versions are not interchangeable for `--hash-locked`: unlisted profiles such as `macos-arm64-py312`, `macos-arm64-py314`, or `macos-intel-py313` are candidate/unverified until validated and listed in `references/python-profiles.md`. WSL is a candidate; Claude Code on macOS is experimental unless the installed wrappers know the skill source path and runtime paths through `DOC_TO_MD_SKILL_DIR`, `DOC_TO_MD_BIN_DIR`, and `DOC_TO_MD_TOOLS_DIR`; native Windows PowerShell/CMD is unsupported. Read `references/support-matrix.md` before installing outside these maintained Codex/macOS paths.
+Current support contract: Codex on macOS 14 or newer on arm64 is supported for core workflows, including `mdown` and `mdown-epub`, plus book and OCR workflows with the `macos-arm64-py313` hash profile. Codex on Intel macOS is supported for core workflows, including `mdown` and `mdown-epub`, plus book workflows with Python 3.12 and the `macos-intel-py312` hash profile; OCR hash-locked support is not published for Intel macOS. Python minor versions are not interchangeable for `--hash-locked`: unlisted profiles such as `macos-arm64-py312`, `macos-arm64-py314`, or `macos-intel-py313` are candidate/unverified until validated and listed in `references/python-profiles.md`. WSL is a candidate; Claude Code on macOS is experimental unless the installed wrappers know the skill source path and runtime paths through `DOC_TO_MD_SKILL_DIR`, `DOC_TO_MD_BIN_DIR`, and `DOC_TO_MD_TOOLS_DIR`; native Windows PowerShell/CMD is unsupported. Read `references/support-matrix.md` before installing outside these maintained Codex/macOS paths.
 
 Use the local wrapper `markitdown-local`, which runs the pinned core MarkItDown venv at `${DOC_TO_MD_TOOLS_DIR:-${CODEX_HOME:-$HOME/.codex}/tools}/markitdown-core-venv`. The short command `mdown` is a symlink to the same wrapper. Prefer local-file conversion with `-o/--output` so the wrapper can protect the previous output from normal process failures, then perform focused verification.
 
@@ -291,7 +291,7 @@ bash "$DOC_TO_MD_SKILL_DIR/scripts/install.sh"
 ```
 
 For public release on maintained hash profiles, use hash-locked installs.
-macOS arm64 / Python 3.13 supports core workflows, including `mdown-epub`, plus book and OCR:
+macOS 14+ arm64 / Python 3.13 supports core workflows, including `mdown-epub`, plus book and OCR:
 
 ```bash
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --hash-locked
@@ -299,7 +299,7 @@ bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --book --
 bash "${CODEX_HOME:-$HOME/.codex}/skills/doc-to-md/scripts/install.sh" --ocr --hash-locked
 ```
 
-Supported macOS arm64 happy path with all maintained workflows and JSON
+Supported macOS 14+ arm64 happy path with all maintained workflows and JSON
 doctors:
 
 ```bash
