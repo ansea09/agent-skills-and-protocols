@@ -3,6 +3,16 @@
 This file is for users and maintainers. It is not part of the runtime protocol
 that an agent must read before every task.
 
+## Unreleased - Host-Authorized Suite Acquisition
+
+- Make the host permission request explicit before acquisition. Distinguish
+  external-download-required from a host denial and from an approved fetch
+  failure. Stop on denial; never bypass the sandbox or silently claim Suite use.
+- Document the exact Codex execution-tool route and child-only inherited-flag
+  handling, without changing the helper guard, runtime scripts or global policy.
+- Earlier 0.2.1 acquisition evidence remains historical; see the repository's
+  authorized-acquisition follow-up record for the new checks and their limits.
+
 ## 0.2.1 - DPF Discovery And Optional Engineering Suite
 
 - Added explicit DPF creation, update and review triggers to the description.

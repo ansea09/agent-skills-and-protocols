@@ -61,6 +61,12 @@ the missing input for Suite-dependent work. A sandbox download block is not a
 successful retrieval. A draft based on other sources must say so; neither
 installation nor skill selection guarantees a Suite download.
 
+When Suite is needed, the agent must request the host's authorized external
+execution route described in the source lifecycle contract. A helper result of
+`external-download-required` is a request for that transition, not a user denial.
+If the host denies execution or cannot provide it, the agent stops acquisition
+and explains the affected work and alternatives. No sandbox setting is disabled.
+
 ### Platform Requirements
 
 The frontmatter `compatibility` is a short string per Agent Skills format;

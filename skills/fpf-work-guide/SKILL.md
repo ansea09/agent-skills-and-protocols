@@ -240,6 +240,9 @@ only when needed; preserve authored DPFs outside the source directory, then
 release this task's inputs when no longer needed. Suite is reference material,
 not a replacement protocol or permission to rewrite personal DPFs. Never fetch
 it from the sandbox or run downloaded source scripts.
+Use the host approval-capable execution tool for acquisition as specified in
+that reference. `external-download-required` requests this transition; it is
+not itself a permission denial. Stop on a host denial or unavailable tool.
 
 Use `references/chunk-lookup.md` as the canonical chunk lookup procedure.
 
