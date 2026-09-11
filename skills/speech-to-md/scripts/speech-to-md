@@ -300,10 +300,8 @@ def coerce_segment(raw: dict[str, Any], index: int) -> dict[str, Any]:
         end = timestamps.get("to") or offsets.get("to")
     start_s = parse_timestamp(start)
     end_s = parse_timestamp(end)
-    if start_s is not None and isinstance(start, int) and start > 10000:
-        start_s = start / 1000
-    if end_s is not None and isinstance(end, int) and end > 10000:
-        end_s = end / 1000
+    # Keep values as float seconds when numeric; avoid mixed heuristic conversions
+    # that can misinterpret engine-provided units.
     return {
         "index": index,
         "start": start_s,
@@ -315,12 +313,19 @@ def coerce_segment(raw: dict[str, Any], index: int) -> dict[str, Any]:
     }
 
 
-def parse_transcript_payload(path: Path) -> tuple[str, list[dict[str, Any]], str]:
+def parse_transcript_payload(
+    path: Path,
+    *,
+    strict: bool = False,
+    context: str | None = None,
+) -> tuple[str, list[dict[str, Any]], str]:
     text = read_text(path)
     if path.suffix.lower() == ".json":
         try:
             payload = json.loads(text)
         except json.JSONDecodeError:
+            if strict:
+                raise RuntimeError(f"invalid json payload from {context or path}: malformed json")
             return normalize_text(text), segment_from_text(text), "text"
         candidate = None
         if isinstance(payload, dict):
@@ -339,6 +344,8 @@ def parse_transcript_payload(path: Path) -> tuple[str, list[dict[str, Any]], str
             segments = [item for item in segments if item["text"]]
             content = "\n\n".join(item["text"] for item in segments).strip()
             return normalize_text(content), segments, "json"
+        if strict:
+            raise RuntimeError(f"unrecognized json payload shape in {context or path}: expected a segments-like structure")
     return normalize_text(text), segment_from_text(text), "text"
 
 
@@ -368,6 +375,8 @@ def run_streaming_process(
     idle_timeout: int,
     on_line: Any | None = None,
 ) -> tuple[int, str]:
+    if not command:
+        raise RuntimeError("empty command")
     proc = subprocess.Popen(
         command,
         text=True,
@@ -392,33 +401,48 @@ def run_streaming_process(
     output_lines: list[str] = []
     last_activity = time.monotonic()
     reader_done = False
-    while True:
-        try:
-            item = line_queue.get(timeout=1)
-        except queue.Empty:
-            item = None
+    try:
+        while True:
+            try:
+                item = line_queue.get(timeout=1)
+            except queue.Empty:
+                item = None
 
-        if item is sentinel:
-            reader_done = True
-        elif isinstance(item, str):
-            output_lines.append(item)
-            last_activity = time.monotonic()
-            if on_line:
-                on_line(item, output_lines)
+            if item is sentinel:
+                reader_done = True
+            elif isinstance(item, str):
+                output_lines.append(item)
+                if on_line:
+                    on_line(item, output_lines)
+                last_activity = time.monotonic()
 
-        returncode = proc.poll()
-        if returncode is not None and reader_done and line_queue.empty():
-            reader.join(timeout=1)
-            return returncode, "".join(output_lines)
+            returncode = proc.poll()
+            if returncode is not None and reader_done and line_queue.empty():
+                reader.join(timeout=1)
+                return returncode, "".join(output_lines)
 
-        if idle_timeout > 0 and returncode is None and time.monotonic() - last_activity > idle_timeout:
+            if idle_timeout > 0 and returncode is None and time.monotonic() - last_activity > idle_timeout:
+                proc.terminate()
+                try:
+                    proc.wait(timeout=10)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                    proc.wait()
+                raise subprocess.TimeoutExpired(command, idle_timeout, output="".join(output_lines))
+    except Exception:
+        if proc.poll() is None:
             proc.terminate()
             try:
                 proc.wait(timeout=10)
             except subprocess.TimeoutExpired:
                 proc.kill()
                 proc.wait()
-            raise subprocess.TimeoutExpired(command, idle_timeout, output="".join(output_lines))
+        raise
+    finally:
+        if proc.stdout:
+            proc.stdout.close()
+        if reader.is_alive():
+            reader.join(timeout=1)
 
 
 def partial_bundle_dir_for(output_dir: Path) -> Path:
@@ -483,10 +507,11 @@ def write_partial_bundle(
             encoding="utf-8",
         )
         if output_exists(partial_dir):
-            if partial_dir.is_dir() and not partial_dir.is_symlink():
-                shutil.rmtree(partial_dir)
+            if is_speech_to_md_bundle_dir(partial_dir):
+                if partial_dir.is_dir():
+                    shutil.rmtree(partial_dir)
             else:
-                partial_dir.unlink()
+                return
         bundle_dir.replace(partial_dir)
     finally:
         if temp_dir.exists():
@@ -502,8 +527,25 @@ def doctor_payload(args: argparse.Namespace) -> dict[str, Any]:
     checks.append({"name": "python", "status": "ok", "detail": sys.version.split()[0]})
     checks.append({"name": "platform", "status": "ok", "detail": f"{platform.system()} {platform.machine()}"})
     checks.append({"name": "engine", "status": "ok", "detail": f"{adapter.key} ({adapter.kind})"})
+    whisper_probe = command_fingerprint(whisper_bin, ["--help"]) if whisper_bin else None
+    whisper_ready = bool(
+        whisper_bin
+        and whisper_probe
+        and whisper_probe.get("exists")
+        and whisper_probe.get("probe_error") is None
+        and whisper_probe.get("probe_returncode") == 0
+    )
     if whisper_bin:
-        checks.append({"name": "whisper-cli", "status": "ok", "detail": whisper_bin})
+        if whisper_ready:
+            checks.append({"name": "whisper-cli", "status": "ok", "detail": whisper_bin})
+        else:
+            checks.append(
+                {
+                    "name": "whisper-cli",
+                    "status": "fail",
+                    "detail": f"{whisper_bin}: command not executable or probe failed",
+                }
+            )
     else:
         checks.append({"name": "whisper-cli", "status": "warn", "detail": "not found on PATH; transcript import still works"})
     if model:
@@ -514,7 +556,20 @@ def doctor_payload(args: argparse.Namespace) -> dict[str, Any]:
     else:
         checks.append({"name": "whisper-model", "status": "warn", "detail": "set SPEECH_TO_MD_WHISPER_CPP_MODEL, set SPEECH_TO_MD_MODELS_DIR, or pass --model"})
     ffmpeg = configured_ffmpeg(args)
-    checks.append({"name": "ffmpeg", "status": "ok" if ffmpeg else "warn", "detail": ffmpeg or "not found; some audio normalization paths may be unavailable"})
+    if ffmpeg:
+        ffmpeg_probe = command_fingerprint(ffmpeg, ["-version"])
+        ffmpeg_ready = bool(
+            ffmpeg_probe
+            and ffmpeg_probe.get("exists")
+            and ffmpeg_probe.get("probe_error") is None
+            and ffmpeg_probe.get("probe_returncode") == 0
+        )
+        if ffmpeg_ready:
+            checks.append({"name": "ffmpeg", "status": "ok", "detail": ffmpeg})
+        else:
+            checks.append({"name": "ffmpeg", "status": "warn", "detail": f"{ffmpeg}: not executable or probe failed"})
+    else:
+        checks.append({"name": "ffmpeg", "status": "warn", "detail": "not found; some audio normalization paths may be unavailable"})
     if any(item["status"] == "fail" for item in checks):
         status = "fail"
     elif any(item["status"] == "warn" for item in checks):
@@ -683,7 +738,7 @@ def run_whisper_cpp(args: argparse.Namespace, work_dir: Path) -> EngineRun:
     partial_interval = max(0, args.partial_bundle_interval)
     partial_dir = partial_bundle_dir_for(args.output)
 
-    def capture_progress(line: str, output_lines: list[str]) -> None:
+    def capture_progress(line: str, output_lines: list[str]) -> bool:
         nonlocal last_partial_at
         segment = coerce_stdout_segment(line, len(partial_segments) + 1)
         if segment:
@@ -702,6 +757,8 @@ def run_whisper_cpp(args: argparse.Namespace, work_dir: Path) -> EngineRun:
                 warnings=[],
             )
             last_partial_at = now
+            return True
+        return False
 
     returncode, process_output = run_streaming_process(
         command,
@@ -731,9 +788,9 @@ def run_whisper_cpp(args: argparse.Namespace, work_dir: Path) -> EngineRun:
     vtt_path = prefix.with_suffix(".vtt")
     warnings: list[str] = []
     if json_path.is_file():
-        content, segments, _ = parse_transcript_payload(json_path)
+        content, segments, _ = parse_transcript_payload(json_path, strict=True, context=f"{source}")
     elif txt_path.is_file():
-        content, segments, _ = parse_transcript_payload(txt_path)
+        content, segments, _ = parse_transcript_payload(txt_path, strict=False, context=f"{source}")
         warnings.append("whisper.cpp did not emit JSON; segments are not timestamped.")
     else:
         raise RuntimeError("whisper.cpp completed but produced no JSON or TXT transcript.")
@@ -781,8 +838,10 @@ def write_bundle(
         "conversion-report.md",
     ]
     if vtt_path and vtt_path.is_file():
-        shutil.copy2(vtt_path, output_dir / "timestamps.vtt")
+        timestamps_output = output_dir / "timestamps.vtt"
+        shutil.copy2(vtt_path, timestamps_output)
         files.append("timestamps.vtt")
+        engine["vtt_path"] = str(timestamps_output)
 
     (output_dir / "content.md").write_text("# Transcript\n\n" + normalize_text(content), encoding="utf-8")
     segment_lines = ["# Timestamped Segments", ""]
@@ -857,10 +916,11 @@ def write_bundle(
     ]
     (output_dir / "LLM_README.md").write_text("\n".join(readme) + "\n", encoding="utf-8")
 
+    status = "ok" if not warnings else "warn"
     report = [
         "# Conversion Report",
         "",
-        f"- Status: `ok`",
+        f"- Status: `{status}`",
         f"- Engine: `{engine.get('name', 'unknown')}`",
         f"- Output bundle: `{output_dir}`",
         f"- Segment count: `{len(segments)}`",
@@ -871,7 +931,20 @@ def write_bundle(
 
 
 def output_exists(path: Path) -> bool:
-    return path.exists() or path.is_symlink()
+    return path.exists()
+
+
+def is_speech_to_md_bundle_dir(path: Path) -> bool:
+    if not path.is_dir():
+        return False
+    manifest_path = path / "manifest.json"
+    if not manifest_path.is_file():
+        return False
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except Exception:
+        return False
+    return manifest.get("schema") == SCHEMA and isinstance(manifest.get("files"), list)
 
 
 def publish_bundle(bundle_dir: Path, output_dir: Path, staging: Path, force: bool) -> None:
@@ -880,6 +953,8 @@ def publish_bundle(bundle_dir: Path, output_dir: Path, staging: Path, force: boo
     if output_exists(output_dir):
         if not force:
             raise SystemExit(f"ERROR: output exists; pass --force to replace it: {output_dir}")
+        if not is_speech_to_md_bundle_dir(output_dir):
+            raise SystemExit(f"ERROR: cannot replace existing output because it does not look like a speech-to-md bundle: {output_dir}")
         output_dir.replace(previous)
         moved_previous = True
     try:
@@ -889,12 +964,13 @@ def publish_bundle(bundle_dir: Path, output_dir: Path, staging: Path, force: boo
             previous.replace(output_dir)
         raise
 
-
 def build_bundle(args: argparse.Namespace) -> int:
     output_dir = args.output.expanduser().resolve()
     if output_exists(output_dir):
         if not args.force:
             raise SystemExit(f"ERROR: output exists; pass --force to replace it: {output_dir}")
+        if not is_speech_to_md_bundle_dir(output_dir):
+            raise SystemExit(f"ERROR: output exists but is not a speech-to-md bundle: {output_dir}")
     output_dir.parent.mkdir(parents=True, exist_ok=True)
     staging = Path(tempfile.mkdtemp(prefix=f".{output_dir.name}.", dir=str(output_dir.parent)))
     work_dir = staging / "work"
@@ -955,7 +1031,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--model", help="whisper.cpp model path; defaults to SPEECH_TO_MD_WHISPER_CPP_MODEL.")
     parser.add_argument("--whisper-bin", help="Path to whisper-cli; defaults to SPEECH_TO_MD_WHISPER_CPP_BIN or PATH.")
     parser.add_argument("--ffmpeg-bin", help="Path to ffmpeg; defaults to SPEECH_TO_MD_FFMPEG_BIN or PATH.")
-    parser.add_argument("--language", help="Optional language code passed to whisper.cpp.")
+    parser.add_argument(
+        "--language",
+        default=os.environ.get("SPEECH_TO_MD_LANGUAGE", "auto"),
+        help="Language code passed to whisper.cpp; set auto to detect language, or a BCP-47 shorthand such as en/ru.",
+    )
     parser.add_argument("--no-gpu", action="store_true", help="Pass -ng to whisper-cli; also available with SPEECH_TO_MD_WHISPER_CPP_NO_GPU=1.")
     parser.add_argument(
         "--audio-normalization",

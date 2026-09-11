@@ -61,6 +61,15 @@ Transcribe with local `whisper.cpp` after installing `whisper-cli` and a model:
 speech-to-md recording.mp3 -o recording-audio-bundle --model /path/to/ggml-model.bin
 ```
 
+Language detection is enabled by default:
+
+```bash
+speech-to-md recording.mp3 -o recording-audio-bundle --language auto
+```
+
+Override detection per run with `--language en`, `--language ru`, etc., or set
+`SPEECH_TO_MD_LANGUAGE` for your environment.
+
 `--audio-normalization auto` is the default. It passes WAV/MP3/FLAC directly to
 `whisper.cpp` and uses local `ffmpeg` to normalize other containers, such as
 M4A/AAC/MP4, to mono 16 kHz WAV before ASR. Use
