@@ -72,6 +72,10 @@ such as M4A/AAC/MP4, to mono 16 kHz WAV before ASR. Use
 `--audio-normalization always` for a consistent normalized path, or `never`
 only when you know the input is accepted by `whisper.cpp` directly.
 
+Language is `auto` by default (detect from audio where supported). Override it
+explicitly with `--language` (for example `--language en`, `--language ru`) or
+`SPEECH_TO_MD_LANGUAGE` in environment.
+
 If the local Metal/GPU path fails, retry the same trusted file with CPU
 fallback:
 
