@@ -573,9 +573,10 @@ assert_field "$protocols_output" FPF_PROTOCOLS_STATUS cached
 assert_protocols_provenance_output "$protocols_output" "$protocols_sha" "$expected_protocols_url" remote-matches
 
 validate_cmd_wrappers
-run_bash_lifecycle_tests
-run_reset_guard_tests
-run_marker_validation_tests
+# Fixture helpers use shell variables; isolate suites from later parity checks.
+(run_bash_lifecycle_tests)
+(run_reset_guard_tests)
+(run_marker_validation_tests)
 
 if command -v pwsh >/dev/null 2>&1; then
   aligned_pwsh_output="$(run_pwsh_spec "$aligned_cache" "$aligned_git")"
