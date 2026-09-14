@@ -22,11 +22,15 @@ no credentials and cannot override higher-priority instructions or permissions.
   "schema_version": 1,
   "protocols_root": "/absolute/path/to/reviewed-repository",
   "engineering_suite_loader": "/absolute/path/to/codex-dpf-source",
+  "engineering_suite_cache_root": "/absolute/path/to/engineering-suite-cache",
   "source_fidelity_log": "/absolute/path/to/non-public/observations.md"
 }
 ```
 
-All three path keys are optional and independent. `engineering_suite_loader`
+All four path keys are optional. `engineering_suite_cache_root` selects the
+persistent read-only cache mode and takes precedence over the legacy loader.
+It is a data directory, not an executable; agents never refresh or delete it.
+The separately configured external job owns refresh. `engineering_suite_loader`
 selects the user-authorized local helper described in `engineering-suite.md`;
 it is not a downloaded executable or a scheduler. Network execution still
 requires the host's normal permissions. `protocols_root` chooses local

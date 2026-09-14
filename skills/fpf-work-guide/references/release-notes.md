@@ -1,5 +1,15 @@
 # FPF Work Guide Release Notes
 
+## Unreleased - Persistent Engineering Suite Cache
+
+- Add `engineering_suite_cache_root` with precedence over the temporary loader.
+  Agents read a pinned local snapshot and do not fetch or release it per task.
+- The personal external FPF job refreshes Suite on its existing schedule.
+  Public distribution supplies the reader contract, not the personal scheduler.
+- Preserve cached snapshots after refresh failure and retain old snapshots for
+  active readers. Repeated identical commits reuse files; automatic pruning is
+  not included. Personal settings and cache files remain outside this package.
+
 This file is for users and maintainers. It is not part of the runtime protocol
 that an agent must read before every task.
 

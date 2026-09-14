@@ -2,6 +2,10 @@
 
 Status: accepted, 2026-09-11. Publication identity is recorded by the merging PR.
 
+Personal cache lifetime superseded on 2026-09-14 by
+[ADR 0006](0006-persistent-engineering-suite-cache.md). The temporary acquisition
+and permission route below remains historical/legacy, not the active personal mode.
+
 ## Context
 
 DPF authoring, updating and review should be discoverable without requiring
