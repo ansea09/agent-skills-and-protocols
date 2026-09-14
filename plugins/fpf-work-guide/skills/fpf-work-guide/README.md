@@ -43,6 +43,17 @@ the current cached copy and must disclose cached/fresh status.
 
 ### Optional Engineering DPF Suite
 
+For persistent-cache use, set `engineering_suite_cache_root` in local settings
+to the dedicated cache written by an external updater. The agent reads one
+validated commit snapshot, does not download on each task and never deletes
+the shared cache. The personal deployment reuses the FPF external job/session
+trigger and six-hour cadence; no public scheduler is bundled. Failed refresh
+can use a valid cached snapshot with an explicit freshness limitation.
+Snapshots are retained for active-reader safety, so disk use can grow.
+
+The following on-demand workflow is a legacy option only when no persistent
+root is configured:
+
 For domain DPF use and authoring, an explicitly authorized local helper can
 download a temporary Suite snapshot only when needed. Set
 `engineering_suite_loader` in optional local settings; see

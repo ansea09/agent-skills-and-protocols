@@ -1,4 +1,4 @@
-# On-Demand Engineering DPF Suite
+# Engineering DPF Suite Sources
 
 Use only when a task needs Suite to create, update, review or apply a DPF.
 Ordinary FPF answers do not download Suite. Apply local-settings.md first.
@@ -6,7 +6,46 @@ Ordinary FPF answers do not download Suite. Apply local-settings.md first.
 command discovered in downloaded source. The public package describes this
 contract but does not install the personal helper or a background job.
 
-## Acquire, Read, Release
+## Persistent Cache (Preferred When Configured)
+
+If `engineering_suite_cache_root` is set, use this mode and do not enter the
+temporary acquisition procedure below. Read local files only, including when
+the last external refresh failed or the cache is older than six hours.
+
+1. Resolve the configured absolute root; require its owner.env marker
+   `OWNER=codex-fpf-engineering-suite-v1`. Reject symlink roots, pointers or
+   entrypoints that escape the root. Parse env files as data, never source them.
+2. Read current.env once and require a 40-character lowercase hexadecimal
+   DPF_SUITE_COMMIT. Resolve snapshots/<commit> once for this task. Require
+   the Suite README, Suite Reference, Method Engineering, sibling FPF-Spec.md
+   and LICENSE as in the temporary mode's validation contract.
+3. Read the index, then relevant bodies from that snapshot. Record the commit
+   and DPF_SUITE_VERIFIED_AT. Read last-attempt.env separately: a newer attempt
+   or a successful process exit does not mean a newer source edition.
+4. Describe the result as the current cached copy. A failed refresh with a valid
+   snapshot allows continued use with a freshness limitation. Missing, unsafe
+   or invalid cache blocks Suite-dependent work; ask for external refresh or
+   supplied sources. Do not silently fall back to the temporary loader.
+5. Store authored DPFs outside the cache. Never release or delete persistent
+   snapshots at task completion. Concurrent external refresh can change
+   current.env, but must not modify the snapshot this task already selected.
+
+The personal external FPF job refreshes Core and Suite on the existing session
+trigger and six-hour schedule. This public package provides the reader contract,
+not an installed scheduler or cache writer. Configure the writer with the same
+absolute root as the reader; paths are installation data, not repository defaults.
+The personal session trigger observes session-index IDs, not exact application
+launch events. Sleep, a stopped scheduler or network failure can delay refresh.
+
+The writer retains immutable snapshots, reuses unchanged commits, and promotes
+the pointer only after validation. No automatic pruning is assumed: old readers
+must remain safe. Disk use grows with distinct upstream commits; remove obsolete
+snapshots only in a separate maintenance window with no active readers.
+
+## Legacy Temporary Mode: Acquire, Read, Release
+
+Use only when no persistent cache root is configured and an authorized loader
+is configured. These release rules never apply to the persistent cache.
 
 1. Use the host-authorized acquisition procedure below before Suite-dependent
    drafting. A helper result of `external-download-required` means that an
