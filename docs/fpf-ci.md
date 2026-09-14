@@ -5,6 +5,8 @@ codex branches, pull requests to main, and manual dispatch. It checks the
 public FPF skill, protocol artifacts, pinned format-validator regressions,
 Bash/PowerShell lifecycle fixtures and plugin/source parity on Ubuntu 24.04.
 PowerShell coverage is required rather than silently skipped.
+The Bash doctor fixture expects the explicit `linux-best-effort` degradation
+on native Linux; it must not mistake that support boundary for a runtime failure.
 
 Validation dependencies are pinned in scripts/requirements-skill-validation.txt.
 The checkout action is commit-pinned, credentials are not persisted, the token

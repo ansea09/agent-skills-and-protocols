@@ -341,8 +341,26 @@ assert_sandbox_network_disabled_output() {
 
 assert_doctor_output() {
   output="$1"
-  assert_field "$output" FPF_ENV_CHECK_STATUS ok
-  assert_field "$output" FPF_PORTABLE_CHECK_STATUS ok
+  runtime="$2"
+  expected_status=ok
+  expected_reason=portable-install-ready
+  if [ "$runtime" = bash ]; then
+    case "$(uname -s)" in
+      Linux)
+        if ! grep -qi 'microsoft\|wsl' /proc/version 2>/dev/null; then
+          expected_status=degraded
+          expected_reason=linux-best-effort
+        fi
+        ;;
+      MINGW*|MSYS*|CYGWIN*)
+        expected_status=degraded
+        expected_reason=windows-git-bash-best-effort
+        ;;
+    esac
+  fi
+  assert_field "$output" FPF_ENV_CHECK_STATUS "$expected_status"
+  assert_field "$output" FPF_PORTABLE_CHECK_STATUS "$expected_status"
+  assert_field "$output" FPF_PORTABLE_CHECK_REASON "$expected_reason"
   assert_field "$output" FPF_ENV_CHECK_PATH_POLICY_MODE portable-explicit
 }
 
@@ -420,7 +438,7 @@ EOF
   assert_context_attempted_output "$sandbox_retry_output"
 
   doctor_output="$(run_bash_doctor "$spec_cache" "$protocols_cache" "$tmp_root/bash-doctor/environment.env" "$fake_git")"
-  assert_doctor_output "$doctor_output"
+  assert_doctor_output "$doctor_output" bash
 }
 
 run_reset_guard_tests() {
@@ -530,7 +548,7 @@ EOF
   assert_context_attempted_output "$sandbox_retry_output"
 
   doctor_output="$(run_pwsh_doctor "$spec_cache" "$protocols_cache" "$tmp_root/pwsh-doctor/environment.env" "$fake_git")"
-  assert_doctor_output "$doctor_output"
+  assert_doctor_output "$doctor_output" pwsh
 }
 
 aligned_cache="$(make_spec_cache aligned "$aligned_sha")"
