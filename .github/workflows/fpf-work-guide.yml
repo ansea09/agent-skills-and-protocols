@@ -1,0 +1,39 @@
+name: FPF Work Guide
+
+on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      SKILLS_VALIDATE_ONLY: fpf-work-guide
+      PLUGINS_VALIDATE_ONLY: fpf-work-guide
+      FPF_VALIDATE_FORMAT: required
+      FPF_VALIDATE_POWERSHELL: required
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned validation tooling outside the checkout
+        run: |
+          python3 -m venv "$RUNNER_TEMP/fpf-validation"
+          "$RUNNER_TEMP/fpf-validation/bin/python" -m pip install -r scripts/requirements-skill-validation.txt
+          echo "FPF_VALIDATION_PYTHON=$RUNNER_TEMP/fpf-validation/bin/python" >> "$GITHUB_ENV"
+      - name: Validate protocols and validator regressions
+        run: |
+          python3 scripts/validate-protocols.py --self-test
+          "$FPF_VALIDATION_PYTHON" scripts/validate-fpf-skill-format.py --self-test
+      - name: Validate skill and Bash/PowerShell lifecycle fixtures
+        run: scripts/validate-skills.sh
+      - name: Validate plugin packaging and source parity
+        run: scripts/validate-plugins.sh

@@ -1,6 +1,6 @@
 # ADR 0006: Persistent Engineering Suite Cache
 
-Status: accepted, 2026-09-14; local candidate, not a publication record.
+Status: accepted, 2026-09-14. Publication identity is recorded by the merging PR.
 Supersedes the personal temporary-cache choice in ADR 0005. The legacy
 temporary helper remains supported for installations that explicitly select it.
 
@@ -53,6 +53,9 @@ Observed locally: 18 disposable-Git tests passed, including cached fallback,
 same-commit reuse, sandbox refusal, separate Core/Suite outcomes, lease safety
 and invalid layout rejection. Required format, protocol, Bash lifecycle and
 plugin structural checks passed; Windows execution is not verified.
+
+Public automated checks and their limits are documented in
+[FPF Work Guide CI](../fpf-ci.md). Private updater tests are not part of that CI.
 
 An initial attempt omitted the Suite root because inherited environment skipped
 env-file loading. Explicit LaunchAgent environment configuration corrected it.
