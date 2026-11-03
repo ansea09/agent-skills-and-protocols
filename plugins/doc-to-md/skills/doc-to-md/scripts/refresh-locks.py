@@ -49,12 +49,22 @@ CORE_ZONES = {
 CORE_SKIP_FREEZE = {"pip", "setuptools", "wheel"}
 
 CORE_CONSTRAINED_PACKAGES = {
-    "magika": "MarkItDown currently constrains magika to the 0.6 line; do not refresh magika to 1.x until MarkItDown changes its dependency constraint.",
+    "magika": "Refresh magika only through the explicit MarkItDown upgrade lane, using upstream dependency metadata.",
 }
 
 
 def normalize_name(name: str) -> str:
     return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def markitdown_with_docx(spec: str) -> str:
+    match = re.fullmatch(r"markitdown(?:\[([a-zA-Z0-9_,.-]+)\])?([<>=!~].+)?", spec.strip(), flags=re.IGNORECASE)
+    if not match:
+        raise SystemExit(f"refresh-locks: unsupported MarkItDown package spec: {spec}")
+    extras = [item.strip() for item in (match.group(1) or "").split(",") if item.strip()]
+    if "docx" not in {item.lower() for item in extras}:
+        extras.append("docx")
+    return f"markitdown[{','.join(extras)}]{match.group(2) or ''}"
 
 
 def run(command: list[str], *, cwd: Path | None = None, env: dict[str, str] | None = None) -> str:
@@ -312,7 +322,7 @@ def refresh_core(args: argparse.Namespace, tmp: Path) -> list[tuple[str, str]]:
             "--upgrade",
             "--upgrade-strategy",
             "eager",
-            args.markitdown_spec,
+            markitdown_with_docx(args.markitdown_spec),
         )
     if targets:
         pip(venv, "install", "--disable-pip-version-check", "--upgrade", *targets)

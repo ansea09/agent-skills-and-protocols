@@ -10,6 +10,11 @@ audit bundles are local operational artifacts and are not release payloads.
 
 ## Unreleased
 
+- Prepared the MarkItDown `0.1.9` core upgrade with Magika `1.0.3`,
+  refreshed arm64/Python 3.13 hashes, and DOCX-compatible Mammoth `1.13.0`.
+  The synthetic PPTX output no longer contains an empty heading before slide
+  text; the expected snapshot reflects that change. Source release checks pass;
+  installed promotion remains a separate decision.
 - Prepared the MarkItDown `0.1.7` core-runtime upgrade with regenerated exact
   pins and a refreshed `macos-arm64-py313` hash lock. MarkItDown still requires
   the Magika `0.6.x` line, so Magika `1.x` remains outside this upgrade.
