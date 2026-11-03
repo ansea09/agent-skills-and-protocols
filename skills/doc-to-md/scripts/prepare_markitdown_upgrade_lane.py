@@ -105,7 +105,11 @@ def automation_output(payload: dict[str, Any]) -> str:
     elif action_status == "blocked":
         lines.append("Next step: resolve the blocker before an upgrade branch can be prepared.")
     elif action_status == "not-prepared":
-        lines.append("Next step: wait for a ready-for-lane or magika-unblocked signal, or inspect the status file manually.")
+        if not monitor_payload["upstream"].get("pypi_version") and not monitor_payload["upstream"].get("github_version"):
+            lines.append("Next step: upstream metadata was unavailable; check network access and retry. Dependency compatibility remains unknown.")
+            lines.append("Evidence: " + " ".join(monitor_payload.get("errors") or monitor_payload.get("reasons") or []))
+        else:
+            lines.append("Next step: wait for a ready-for-lane or magika-unblocked signal, or inspect the status file manually.")
     elif action_status in {"prepare-failed", "gate-failed"}:
         lines.append("Next step: inspect the failed command output in the report; installed promotion is blocked.")
     summary = payload.get("summary")

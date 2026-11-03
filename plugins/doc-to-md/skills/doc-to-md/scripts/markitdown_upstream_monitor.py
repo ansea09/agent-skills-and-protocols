@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import re
 import sys
+import time
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -15,7 +16,7 @@ from urllib.request import Request, urlopen
 
 PYPI_URL = "https://pypi.org/pypi/markitdown/json"
 GITHUB_LATEST_URL = "https://api.github.com/repos/microsoft/markitdown/releases/latest"
-SIGNALS = {"no-action", "pending", "blocked", "ready-for-lane", "magika-unblocked"}
+SIGNALS = {"no-action", "pending", "blocked", "unavailable", "ready-for-lane", "magika-unblocked"}
 
 
 def utc_now() -> str:
@@ -60,9 +61,16 @@ def fetch_json(url: str, timeout: int) -> dict[str, Any]:
     try:
         import requests
 
-        response = requests.get(url, headers={"User-Agent": "doc-to-md-markitdown-monitor/1"}, timeout=timeout)
-        response.raise_for_status()
-        return response.json()
+        for attempt in range(3):
+            try:
+                response = requests.get(url, headers={"User-Agent": "doc-to-md-markitdown-monitor/1"}, timeout=timeout)
+                response.raise_for_status()
+                return response.json()
+            except requests.RequestException as exc:
+                status = exc.response.status_code if isinstance(exc, requests.HTTPError) and exc.response is not None else None
+                if attempt == 2 or (status is not None and status not in {429, 500, 502, 503, 504}):
+                    raise
+                time.sleep(attempt + 1)
     except ImportError:
         pass
 
@@ -227,7 +235,7 @@ def classify(
     if not local_version:
         return "blocked", ["requirements-core.txt does not pin markitdown."]
     if not latest_version:
-        return "blocked", ["No upstream MarkItDown version could be determined.", *upstream_errors]
+        return "unavailable", ["Upstream metadata is unavailable; upgrade compatibility could not be checked. Retry when PyPI or GitHub is reachable.", *upstream_errors]
 
     cmp = compare_versions(latest_version, local_version)
     if cmp < 0:
@@ -303,6 +311,7 @@ def human_signal(signal: str) -> str:
         "no-action": "No action",
         "pending": "Maintenance pending",
         "blocked": "Maintenance blocked",
+        "unavailable": "Upstream check unavailable",
         "ready-for-lane": "Ready for upgrade lane",
         "magika-unblocked": "Magika 1.x unblocked upstream",
     }[signal]
@@ -317,6 +326,7 @@ def build_thread_message(payload: dict[str, Any]) -> str:
     next_action = {
         "pending": "Review the status file and decide whether to approve a MarkItDown upgrade lane.",
         "blocked": "Do not upgrade yet. Review the blocker, then update policy or wait for upstream changes.",
+        "unavailable": "Check network access and retry the monitor. No dependency decision is available.",
         "ready-for-lane": "The automation can prepare an upgrade branch, run the source gate, and report the branch for review. Installed promotion still needs explicit approval.",
         "magika-unblocked": "The automation can prepare a dedicated MarkItDown upgrade branch. Review it before any installed promotion; do not upgrade magika alone.",
     }.get(signal, "No action is needed.")
